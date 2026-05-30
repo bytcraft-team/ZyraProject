@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
+<<<<<<< HEAD
         android:label="zyra_flow"
+=======
+        android:label="zyra"
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

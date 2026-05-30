@@ -8,12 +8,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+<<<<<<< HEAD
 import 'package:zyra_flow/main.dart';
+=======
+import 'package:zyra/main.dart';
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
+<<<<<<< HEAD
     // await tester.pumpWidget(const MyApp());
+=======
+    await tester.pumpWidget(const LunaApp());
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

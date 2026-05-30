@@ -90,12 +90,21 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
+<<<<<<< HEAD
             VALUE "FileDescription", "zyra_flow" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "zyra_flow" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "zyra_flow.exe" "\0"
             VALUE "ProductName", "zyra_flow" "\0"
+=======
+            VALUE "FileDescription", "zyra" "\0"
+            VALUE "FileVersion", VERSION_AS_STRING "\0"
+            VALUE "InternalName", "zyra" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "zyra.exe" "\0"
+            VALUE "ProductName", "zyra" "\0"
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

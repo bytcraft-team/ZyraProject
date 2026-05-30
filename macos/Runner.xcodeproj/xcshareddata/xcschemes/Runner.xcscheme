@@ -15,7 +15,11 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
                BuildableName = "zyra_flow.app"
+=======
+               BuildableName = "zyra.app"
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
                BlueprintName = "Runner"
                ReferencedContainer = "container:Runner.xcodeproj">
             </BuildableReference>
@@ -31,7 +35,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
             BuildableName = "zyra_flow.app"
+=======
+            BuildableName = "zyra.app"
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
             BlueprintName = "Runner"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
@@ -66,7 +74,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
             BuildableName = "zyra_flow.app"
+=======
+            BuildableName = "zyra.app"
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
             BlueprintName = "Runner"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
@@ -83,7 +95,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
             BuildableName = "zyra_flow.app"
+=======
+            BuildableName = "zyra.app"
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
             BlueprintName = "Runner"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>

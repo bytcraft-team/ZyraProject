@@ -1,12 +1,22 @@
 plugins {
     id("com.android.application")
+<<<<<<< HEAD
+=======
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    // END: FlutterFire Configuration
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
+<<<<<<< HEAD
     namespace = "com.example.zyra_flow"
+=======
+    namespace = "com.example.zyra"
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +31,11 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+<<<<<<< HEAD
         applicationId = "com.example.zyra_flow"
+=======
+        applicationId = "com.example.zyra"
+>>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
