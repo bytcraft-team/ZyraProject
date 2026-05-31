@@ -33,7 +33,7 @@ class HeaderWidget extends StatelessWidget {
             children: [
               Text(greeting, style: AppTextStyles.greeting),
               const SizedBox(height: 2),
-              Text(user.firstName, style: AppTextStyles.userName),
+              Text(user.fullName, style: AppTextStyles.userName),
             ],
           ),
           // Avatar avec badge

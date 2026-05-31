@@ -110,9 +110,7 @@ class _DurationStep extends StatelessWidget {
           title: title,
           subtitle: subtitle,
         ),
-
         const SizedBox(height: AppDimensions.xl),
-
         Center(
           child: Column(
             children: [
@@ -145,7 +143,8 @@ class _DurationStep extends StatelessWidget {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.pinkSoft,
                   borderRadius: BorderRadius.circular(100),
@@ -163,9 +162,7 @@ class _DurationStep extends StatelessWidget {
             ],
           ),
         ),
-
         const SizedBox(height: AppDimensions.xl),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppDimensions.md),
           child: Column(
@@ -184,12 +181,15 @@ class _DurationStep extends StatelessWidget {
                   ),
                   trackHeight: 6,
                 ),
-                child: Slider(
-                  value: value.toDouble(),
-                  min: min.toDouble(),
-                  max: max.toDouble(),
-                  divisions: max - min,
-                  onChanged: (v) => onChanged(v.round()),
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Slider(
+                    value: value.toDouble(),
+                    min: min.toDouble(),
+                    max: max.toDouble(),
+                    divisions: max - min,
+                    onChanged: (v) => onChanged(v.round()),
+                  ),
                 ),
               ),
               Row(

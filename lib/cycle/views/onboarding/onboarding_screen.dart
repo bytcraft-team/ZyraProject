@@ -1,84 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zyra/cycle/core/constants/app_colors.dart';
+import 'package:zyra/cycle/core/constants/app_dimensions.dart';
+import 'package:zyra/cycle/viewmodels/settings_viewmodel.dart';
+import 'package:zyra/main_shell.dart';
 
-import '../../viewmodels/settings_viewmodel.dart';
-import 'widgets/progress_bar_widget.dart';
-import 'widgets/step_last_period_widget.dart';
 import 'widgets/step_cycle_duration_widget.dart';
-import 'widgets/step_regularity_widget.dart';
 import 'widgets/step_goal_widget.dart';
+import 'widgets/step_last_period_widget.dart';
+//import 'widgets/step_period_duration_widget.dart';
+import 'widgets/step_regularity_widget.dart';
 import 'widgets/onboarding_nav_buttons.dart';
+import 'widgets/progress_bar_widget.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<SettingsViewModel>(
-      builder: (context, vm, _) {
-        return SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              OnboardingProgressBar(
-                currentStep: vm.currentStep,
-                totalSteps: SettingsViewModel.totalSteps,
-              ),
-
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  switchInCurve: Curves.easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, anim) => FadeTransition(
-                    opacity: anim,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0.05, 0),
-                        end: Offset.zero,
-                      ).animate(anim),
-                      child: child,
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    key: ValueKey(vm.currentStep),
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: 24),
-                    child: _buildStep(vm),
-                  ),
-                ),
-              ),
-
-              OnboardingNavButtons(
-                currentStep: vm.currentStep,
-                totalSteps: SettingsViewModel.totalSteps,
-                canProceed: vm.canProceed,
-                isLoading: vm.state == SettingsLoadState.loading,
-                isLastStep: vm.currentStep ==
-                    SettingsViewModel.totalSteps - 1,
-                onNext: vm.nextStep,
-                onPrevious: vm.previousStep,
-                onFinish: () async {
-                  final success = await vm.finishOnboarding();
-                  if (!success) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Erreur lors de la sauvegarde. Vérifie la connexion ou regarde la console.',
-                          ),
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   Widget _buildStep(SettingsViewModel vm) {
     switch (vm.currentStep) {
@@ -110,5 +46,83 @@ class OnboardingScreen extends StatelessWidget {
       default:
         return const SizedBox.shrink();
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7F3FF),
+      body: SafeArea(
+        child: Consumer<SettingsViewModel>(
+          builder: (context, vm, child) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.md,
+                    vertical: AppDimensions.lg,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Onboarding cycle',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                OnboardingProgressBar(
+                  currentStep: vm.currentStep,
+                  totalSteps: SettingsViewModel.totalSteps,
+                ),
+                const SizedBox(height: AppDimensions.md),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.md,
+                      vertical: AppDimensions.sm,
+                    ),
+                    child: _buildStep(vm),
+                  ),
+                ),
+                OnboardingNavButtons(
+                  currentStep: vm.currentStep,
+                  totalSteps: SettingsViewModel.totalSteps,
+                  canProceed: vm.canProceed,
+                  isLastStep: vm.currentStep == SettingsViewModel.totalSteps - 1,
+                  isLoading: vm.state == SettingsLoadState.loading,
+                  onPrevious: vm.previousStep,
+                  onNext: vm.nextStep,
+                  onFinish: () async {
+                    final success = await vm.finishOnboarding();
+                    if (success && context.mounted) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const MainShell()),
+                        (route) => false,
+                      );
+                      return;
+                    }
+
+                    if (!success && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Impossible de terminer l\'onboarding. Réessaie.'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 }

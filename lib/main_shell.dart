@@ -28,10 +28,9 @@ class _MainShellState extends State<MainShell> {
   int _selectedIndex = 0;
 
   late final List<Widget> _pages;
-  
+
   // Pour ne pas recharger inutilement les tabs déjà ouverts
   final Set<int> _initializedTabs = {};
-  
 
   @override
   void initState() {
@@ -46,6 +45,7 @@ class _MainShellState extends State<MainShell> {
     ];
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _initializeTabIfNeeded(0);
     });
   }
@@ -56,8 +56,7 @@ class _MainShellState extends State<MainShell> {
     switch (index) {
       case 0:
         final homeVm = context.read<HomeViewModel>();
-        if (homeVm.state == ViewState.idle ||
-            homeVm.state == ViewState.error) {
+        if (homeVm.state == ViewState.idle || homeVm.state == ViewState.error) {
           homeVm.loadData();
         }
         break;
@@ -70,13 +69,11 @@ class _MainShellState extends State<MainShell> {
         context.read<CalendarViewModel>().init();
         break;
 
-      
-
       case 3:
         // EducationViewModel n'a pas besoin d'init async
         break;
 
-        case 4:
+      case 4:
         final settingsVm = context.read<SettingsViewModel>();
         if (settingsVm.state == SettingsLoadState.idle) {
           settingsVm.init();

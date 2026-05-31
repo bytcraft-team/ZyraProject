@@ -43,8 +43,7 @@ class CycleRepositoryImpl implements CycleRepository {
       }
     }
     return const UserModel(
-      firstName: 'Hajar',
-      lastName: '',
+
       hasUnreadNotifications: false,
       unreadNotificationCount: 0,
     );

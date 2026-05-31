@@ -1,46 +1,145 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:zyra/firebase_options.dart';
-import 'package:zyra/onboarding/cycle_dashboard.dart';
-import 'package:zyra/onboarding/onboarding_model.dart';
-import 'package:zyra/onboarding/onboarding_screen.dart';
-import 'package:zyra/onboarding/onboarding_service.dart';
-import 'package:zyra/pregnancy/pregnancy_tracker_screen.dart';
+import 'package:zyra/core/global_keys.dart';
+import 'package:zyra/pregnancy/view/pregnancy_tracker_screen.dart';
+import 'package:zyra/pregnancy/onboarding/onboarding_screen.dart';
+import 'package:zyra/auth/login_screen.dart';
+import 'package:zyra/auth/signup_screen.dart';
+import 'package:zyra/auth/viewmodels/authentication_view_model.dart';
+import 'package:zyra/pregnancy/repositories/user_repository.dart';
+import 'package:zyra/splash/first_page.dart';
+import 'package:zyra/splash/splash_screen.dart' as splash;
+import 'package:zyra/app_entry.dart';
+import 'package:zyra/cycle/viewmodels/settings_viewmodel.dart';
+import 'package:zyra/cycle/data/repositories/settings_repository.dart';
+import 'package:zyra/cycle/viewmodels/home_viewmodel.dart';
+import 'package:zyra/cycle/data/repositories/cycle_repository.dart';
+import 'package:zyra/cycle/viewmodels/daily_log_viewmodel.dart';
+import 'package:zyra/cycle/data/repositories/daily_log_repository.dart';
+import 'package:zyra/cycle/viewmodels/calendar_viewmodel.dart';
+import 'package:zyra/cycle/data/repositories/calendar_repository.dart';
+import 'package:zyra/pregnancy/viewmodels/pregnancy_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ),
-  );
-  runApp(const ZyraApp());
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const LunaApp());
 }
 
-class ZyraApp extends StatelessWidget {
-  const ZyraApp({super.key});
+class LunaApp extends StatelessWidget {
+  const LunaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Zyra',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFE91E8C),
-          primary: const Color(0xFFE91E8C),
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: const Color(0xFF8EA88D),
+      primary: const Color(0xFF8EA88D),
+      onPrimary: Colors.white,
+      secondary: const Color(0xFF7FBFC0),
+      background: const Color(0xFFFFF8F1),
+      surface: const Color(0xFFFFFFFF),
+    );
+
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) =>
+              AuthenticationViewModel(userRepository: UserRepository()),
         ),
-        scaffoldBackgroundColor: const Color(0xFFFFF0F8),
-        textTheme: GoogleFonts.poppinsTextTheme(),
+        ChangeNotifierProvider(
+          create: (_) =>
+              SettingsViewModel(repository: SettingsRepositoryImpl()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => HomeViewModel(repository: CycleRepositoryImpl()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              DailyLogViewModel(repository: DailyLogRepositoryImpl()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              CalendarViewModel(repository: CalendarRepositoryImpl()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => PregnancyViewModel(),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Luna',
+        scaffoldMessengerKey: appScaffoldMessengerKey,
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: colorScheme,
+          scaffoldBackgroundColor: const Color(0xFFFFF8F1),
+          appBarTheme: const AppBarTheme(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            iconTheme: IconThemeData(color: Color(0xFF4B4B4B)),
+            foregroundColor: Color(0xFF4B4B4B),
+          ),
+        ),
+        initialRoute: '/splash',
+        routes: {
+          '/splash': (_) => const splash.SplashScreen(),
+          '/': (_) => const AuthGate(),
+          '/first': (_) => const SplashScreen(),
+          '/home': (_) => const AuthGate(),
+          '/login': (_) => const LoginScreen(),
+          '/signup': (_) => const SignupScreen(),
+        },
       ),
-      home: const OnboardingRouter(),
+    );
+  }
+}
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, authVm, child) {
+        if (authVm.status == AuthStatus.initializing || authVm.isLoading) {
+          return const Scaffold(
+            backgroundColor: Color(0xFFFFF8F1),
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (authVm.status == AuthStatus.error) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Erreur d\'authentification'),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () =>
+                        Navigator.pushReplacementNamed(context, '/login'),
+                    child: const Text('Se connecter'),
+                  ),
+                  if (authVm.errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Text(authVm.errorMessage!),
+                    ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        if (!authVm.isAuthenticated) {
+          return const LoginScreen();
+        }
+
+        return const OnboardingRouter();
+      },
     );
   }
 }
@@ -53,33 +152,35 @@ class OnboardingRouter extends StatefulWidget {
 }
 
 class _OnboardingRouterState extends State<OnboardingRouter> {
-  late final Future<UserProfileType?> _initialRoute;
+  late final Future<Map<String, dynamic>?> _initialUserProfile;
 
   @override
   void initState() {
     super.initState();
-    _initialRoute = OnboardingService.loadUserProfile();
+    _initialUserProfile = UserRepository().loadCurrentUserProfile();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserProfileType?>(
-      future: _initialRoute,
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _initialUserProfile,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
-            backgroundColor: Color(0xFFFFF0F8),
-            body: Center(
-              child: CircularProgressIndicator(color: Color(0xFFE91E8C)),
-            ),
+            backgroundColor: Color(0xFFFFF8F1),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
-        final profileType = snapshot.data;
-        if (profileType == UserProfileType.pregnancy) {
-          return const PregnancyHomePage();
-        } else if (profileType == UserProfileType.cycle) {
-          return const CycleDashboardPage();
+
+        final userProfile = snapshot.data;
+        if (userProfile != null && (userProfile['isOnboarded'] == true)) {
+          final mode = (userProfile['mode'] as String?) ?? 'cycle';
+          if (mode == 'pregnancy') {
+            return const PregnancyHomePage();
+          }
+          return const AppEntry();
         }
+
         return const OnboardingEntryPage();
       },
     );

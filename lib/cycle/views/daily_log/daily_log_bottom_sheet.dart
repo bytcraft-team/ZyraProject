@@ -33,10 +33,10 @@ class DailyLogBottomSheet extends StatelessWidget {
   }) {
     return showModalBottomSheet(
       context: context,
-      isScrollControlled: true,     // ✅ obligatoire pour clavier
+      isScrollControlled: true, // ✅ obligatoire pour clavier
       backgroundColor: Colors.transparent,
       enableDrag: true,
-      useSafeArea: false,           // on gère SafeArea manuellement
+      useSafeArea: false, // on gère SafeArea manuellement
       builder: (ctx) => ChangeNotifierProvider(
         create: (_) => DailyLogViewModel(
           repository: DailyLogRepositoryImpl(),
@@ -70,6 +70,7 @@ class _DailyLogSheetBodyState extends State<_DailyLogSheetBody> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       context.read<DailyLogViewModel>().initWithDate(widget.date);
     });
   }
@@ -82,7 +83,7 @@ class _DailyLogSheetBodyState extends State<_DailyLogSheetBody> {
       await Future.delayed(const Duration(milliseconds: 1500));
       if (mounted) {
         Navigator.of(context).pop(); // ferme DailyLogBottomSheet
-        widget.onSaved?.call();      // callback vers DayDetail
+        widget.onSaved?.call(); // callback vers DayDetail
       }
     }
   }
@@ -90,10 +91,10 @@ class _DailyLogSheetBodyState extends State<_DailyLogSheetBody> {
   @override
   Widget build(BuildContext context) {
     // ── Dimensions responsives ──────────────────────────────────
-    final screenH      = MediaQuery.of(context).size.height;
-    final keyboardH    = MediaQuery.of(context).viewInsets.bottom;
-    final bottomSafeH  = MediaQuery.of(context).padding.bottom;
-    final topSafeH     = MediaQuery.of(context).padding.top;
+    final screenH = MediaQuery.of(context).size.height;
+    final keyboardH = MediaQuery.of(context).viewInsets.bottom;
+    final bottomSafeH = MediaQuery.of(context).padding.bottom;
+    final topSafeH = MediaQuery.of(context).padding.top;
 
     // Hauteur du sheet : 90% de l'écran max, ajustée pour le clavier
     final sheetH = (screenH * 0.92).clamp(500.0, screenH - topSafeH);
@@ -123,8 +124,7 @@ class _DailyLogSheetBodyState extends State<_DailyLogSheetBody> {
                   if (vm.isLoading) {
                     return const Center(
                       child: CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation(AppColors.pink),
+                        valueColor: AlwaysStoppedAnimation(AppColors.pink),
                       ),
                     );
                   }
@@ -174,18 +174,34 @@ class _SheetHeader extends StatelessWidget {
 
   String _formatDate(DateTime d) {
     final now = DateTime.now();
-    final isToday = d.day == now.day &&
-        d.month == now.month &&
-        d.year == now.year;
+    final isToday =
+        d.day == now.day && d.month == now.month && d.year == now.year;
     if (isToday) return "Aujourd'hui";
 
     const days = [
-      '', 'Lundi', 'Mardi', 'Mercredi',
-      'Jeudi', 'Vendredi', 'Samedi', 'Dimanche',
+      '',
+      'Lundi',
+      'Mardi',
+      'Mercredi',
+      'Jeudi',
+      'Vendredi',
+      'Samedi',
+      'Dimanche',
     ];
     const months = [
-      '', 'jan', 'fév', 'mar', 'avr', 'mai', 'juin',
-      'juil', 'août', 'sep', 'oct', 'nov', 'déc',
+      '',
+      'jan',
+      'fév',
+      'mar',
+      'avr',
+      'mai',
+      'juin',
+      'juil',
+      'août',
+      'sep',
+      'oct',
+      'nov',
+      'déc',
     ];
     return '${days[d.weekday]} ${d.day} ${months[d.month]}';
   }

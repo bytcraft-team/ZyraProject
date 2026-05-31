@@ -1,26 +1,34 @@
 import 'dart:convert';
 
 class UserModel {
-  final String firstName;
+  final String? firstName;
   final String? lastName;
   final String? profileImageUrl;
   final bool hasUnreadNotifications;
   final int unreadNotificationCount;
 
   const UserModel({
-    required this.firstName,
+    this.firstName,
     this.lastName,
     this.profileImageUrl,
     this.hasUnreadNotifications = false,
     this.unreadNotificationCount = 0,
   });
 
-  /// Génère les initiales de l'utilisateur (ex: "Jane Doe" -> "JD")
+  String get fullName {
+    final first = firstName?.trim() ?? '';
+    final last = lastName?.trim() ?? '';
+    if (first.isEmpty && last.isEmpty) return 'Utilisateur';
+    return [first, last].where((part) => part.isNotEmpty).join(' ');
+  }
+
   String get initials {
-    final first = firstName.isNotEmpty ? firstName[0].toUpperCase() : '';
-    final last =
-        lastName != null && lastName!.isNotEmpty ? lastName![0].toUpperCase() : '';
-    return '$first$last'.isNotEmpty ? '$first$last' : 'U';
+    final parts = fullName.split(' ').where((part) => part.isNotEmpty).toList();
+    if (parts.isEmpty) return 'U';
+    if (parts.length == 1) {
+      return parts.first.substring(0, 1).toUpperCase();
+    }
+    return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}'.toUpperCase();
   }
 
   /// Crée une copie de UserModel en modifiant uniquement les champs spécifiés
@@ -54,7 +62,7 @@ class UserModel {
   /// Crée une instance de UserModel à partir d'une Map
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      firstName: map['firstName'] as String? ?? '',
+      firstName: map['firstName'] as String?,
       lastName: map['lastName'] as String?,
       profileImageUrl: map['profileImageUrl'] as String?,
       hasUnreadNotifications: map['hasUnreadNotifications'] as bool? ?? false,

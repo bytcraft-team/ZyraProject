@@ -25,14 +25,24 @@ class _DateStripWidgetState extends State<DateStripWidget> {
   late final ScrollController _scrollCtrl;
 
   static const List<String> _dayNames = [
-    '', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'
+    '',
+    'Lun',
+    'Mar',
+    'Mer',
+    'Jeu',
+    'Ven',
+    'Sam',
+    'Dim'
   ];
 
   @override
   void initState() {
     super.initState();
     _scrollCtrl = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToSelected());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _scrollToSelected();
+    });
   }
 
   void _scrollToSelected() {

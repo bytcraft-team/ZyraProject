@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'cycle/viewmodels/settings_viewmodel.dart';
 import 'cycle/views/onboarding/onboarding_screen.dart';
+import 'pregnancy/viewmodels/pregnancy_view_model.dart';
 import 'main_shell.dart';
 
 class AppEntry extends StatefulWidget {
@@ -17,9 +18,20 @@ class _AppEntryState extends State<AppEntry> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      // Initialise les paramètres globaux
       final settingsVm = context.read<SettingsViewModel>();
       if (settingsVm.state == SettingsLoadState.idle) {
         settingsVm.init();
+      }
+
+      // Recalcule les données de grossesse à l'ouverture de l'application
+      // pour s'assurer que les semaines et jours sont à jour
+      try {
+        context.read<PregnancyViewModel>().recalculateCurrentWeek();
+      } catch (e) {
+        debugPrint('Erreur lors du recalcul de la grossesse au démarrage: $e');
       }
     });
   }
