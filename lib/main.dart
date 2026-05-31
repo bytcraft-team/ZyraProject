@@ -1,18 +1,8 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'screens/settings/settings_screen.dart';
-
-void main() {
-  runApp(
-    const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SettingsScreen(),
-    ),
-  );
-}
-=======
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:zyra/firebase_options.dart';
 import 'package:zyra/onboarding/cycle_dashboard.dart';
 import 'package:zyra/onboarding/onboarding_model.dart';
 import 'package:zyra/onboarding/onboarding_screen.dart';
@@ -21,50 +11,34 @@ import 'package:zyra/pregnancy/pregnancy_tracker_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
     ),
   );
-  runApp(const LunaApp());
+  runApp(const ZyraApp());
 }
 
-class LunaApp extends StatelessWidget {
-  const LunaApp({super.key});
+class ZyraApp extends StatelessWidget {
+  const ZyraApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF8EA88D),
-      primary: const Color(0xFF8EA88D),
-      onPrimary: Colors.white,
-      secondary: const Color(0xFF7FBFC0),
-      background: const Color(0xFFFFF8F1),
-      surface: const Color(0xFFFFFFFF),
-    );
-
     return MaterialApp(
-      title: 'Luna',
+      title: 'Zyra',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: colorScheme,
-        scaffoldBackgroundColor: const Color(0xFFFFF8F1),
-        textTheme: GoogleFonts.plusJakartaSansTextTheme(),
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          iconTheme: IconThemeData(color: Color(0xFF4B4B4B)),
-          foregroundColor: Color(0xFF4B4B4B),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFE91E8C),
+          primary: const Color(0xFFE91E8C),
         ),
-        cardTheme: CardThemeData(
-          color: const Color(0xFFFFFFFF),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          elevation: 2,
-        ),
+        scaffoldBackgroundColor: const Color(0xFFFFF0F8),
+        textTheme: GoogleFonts.poppinsTextTheme(),
       ),
       home: const OnboardingRouter(),
     );
@@ -94,21 +68,20 @@ class _OnboardingRouterState extends State<OnboardingRouter> {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
-            backgroundColor: Color(0xFFFFF8F1),
-            body: Center(child: CircularProgressIndicator()),
+            backgroundColor: Color(0xFFFFF0F8),
+            body: Center(
+              child: CircularProgressIndicator(color: Color(0xFFE91E8C)),
+            ),
           );
         }
-
         final profileType = snapshot.data;
         if (profileType == UserProfileType.pregnancy) {
           return const PregnancyHomePage();
         } else if (profileType == UserProfileType.cycle) {
           return const CycleDashboardPage();
         }
-
         return const OnboardingEntryPage();
       },
     );
   }
 }
->>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
