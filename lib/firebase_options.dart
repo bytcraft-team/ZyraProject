@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -48,6 +39,16 @@ class DefaultFirebaseOptions {
         );
     }
   }
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyD8OTerB8v80xC5PAYI5aiALcL25PyOEg0',
+    appId: '1:13980846794:web:c59f7cb4d4cccc94408233',
+    messagingSenderId: '13980846794',
+    projectId: 'zyra-project-5ed13',
+    authDomain: 'zyra-project-5ed13.firebaseapp.com',
+    storageBucket: 'zyra-project-5ed13.firebasestorage.app',
+    measurementId: 'G-8X0P9WHGK1',
+  );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAXwlZW2A-Vt6TMGE9kW-JMHW6OC5pm6cY',
@@ -64,5 +65,24 @@ class DefaultFirebaseOptions {
     projectId: 'zyra-project-5ed13',
     storageBucket: 'zyra-project-5ed13.firebasestorage.app',
     iosBundleId: 'com.example.zyra',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyBrpjPcztc3xnMyUMviSBB-XzlXRWNgHYI',
+    appId: '1:13980846794:ios:7ee2b9a6ace26034408233',
+    messagingSenderId: '13980846794',
+    projectId: 'zyra-project-5ed13',
+    storageBucket: 'zyra-project-5ed13.firebasestorage.app',
+    iosBundleId: 'com.example.zyra',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyD8OTerB8v80xC5PAYI5aiALcL25PyOEg0',
+    appId: '1:13980846794:web:f7d282ac73d1a526408233',
+    messagingSenderId: '13980846794',
+    projectId: 'zyra-project-5ed13',
+    authDomain: 'zyra-project-5ed13.firebaseapp.com',
+    storageBucket: 'zyra-project-5ed13.firebasestorage.app',
+    measurementId: 'G-6X0LM8EXCZ',
   );
 }

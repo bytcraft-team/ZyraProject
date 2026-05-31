@@ -1,168 +1,107 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:zyra/onboarding/cycle_dashboard.dart';
-import 'package:zyra/onboarding/onboarding_model.dart';
-import 'package:zyra/onboarding/onboarding_screen.dart';
-import 'package:zyra/onboarding/onboarding_service.dart';
-import 'package:zyra/pregnancy/pregnancy_tracker_screen.dart';
-import 'package:zyra/screens/pages/login_screen.dart';
-import 'package:zyra/screens/pages/signup_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart'; // Import crucial ajouté
 
-void main() async {
+import 'cycle/core/constants/app_colors.dart';
+import 'cycle/data/repositories/cycle_repository.dart';
+import 'cycle/data/repositories/daily_log_repository.dart';
+import 'cycle/data/repositories/calendar_repository.dart';
+
+import 'cycle/viewmodels/home_viewmodel.dart';
+import 'cycle/viewmodels/daily_log_viewmodel.dart';
+import 'cycle/viewmodels/calendar_viewmodel.dart';
+import 'cycle/viewmodels/education_viewmodel.dart';
+
+import 'cycle/data/repositories/settings_repository.dart';
+import 'cycle/viewmodels/settings_viewmodel.dart';
+import 'app_entry.dart';
+import 'firebase_options.dart'; // Généré par FlutterFire CLI (indispensable)
+
+Future<void> main() async {
+  // 1. Liaison obligatoire avec le moteur Flutter pour les appels natifs/asynchrones
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  // 2. Initialisation asynchrone de Firebase avant le lancement de l'UI
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint("Erreur critique lors de l'initialisation de Firebase : $e");
+    // L'application continue, mais les dépôts distants s'appuieront sur leurs fallbacks locaux
+  }
+
+  // 3. Configuration de la barre d'état et du style système
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  runApp(const MyApp());
+
+  // 4. Lancement global de l'application
+  runApp(const CycleApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class CycleApp extends StatelessWidget {
+  const CycleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF8EA88D),
-      primary: const Color(0xFF8EA88D),
-      onPrimary: Colors.white,
-      secondary: const Color(0xFF7FBFC0),
-      background: const Color(0xFFFFF8F1),
-      surface: const Color(0xFFFFFFFF),
-    );
-
-    return MaterialApp(
-      title: 'Zyra',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: colorScheme,
-        scaffoldBackgroundColor: const Color(0xFFFFF8F1),
-        textTheme: GoogleFonts.plusJakartaSansTextTheme(),
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          iconTheme: IconThemeData(color: Color(0xFF4B4B4B)),
-          foregroundColor: Color(0xFF4B4B4B),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<HomeViewModel>(
+          create: (_) => HomeViewModel(
+            repository: CycleRepositoryImpl(),
+          ),
         ),
-        cardTheme: CardThemeData(
-          color: const Color(0xFFFFFFFF),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
+        ChangeNotifierProvider<DailyLogViewModel>(
+          create: (_) => DailyLogViewModel(
+            repository: DailyLogRepositoryImpl(),
           ),
-          elevation: 2,
         ),
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignupScreen(),
-      },
-    );
-  }
-}
-
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset('assets/images/imgz.jpeg', fit: BoxFit.cover),
+        ChangeNotifierProvider<CalendarViewModel>(
+          create: (_) => CalendarViewModel(
+            repository: CalendarRepositoryImpl(),
           ),
-          Positioned(
-            bottom: 40,
-            left: 30,
-            right: 30,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF7B5EA7), Color(0xFFD4799A)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/login');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Continuer',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward, color: Colors.white),
-                  ],
-                ),
-              ),
-            ),
+        ),
+        ChangeNotifierProvider<EducationViewModel>(
+          create: (_) => EducationViewModel(),
+        ),
+        ChangeNotifierProvider<SettingsViewModel>(
+          create: (_) => SettingsViewModel(
+            repository: SettingsRepositoryImpl(),
           ),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Cycle App',
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
         ],
+        supportedLocales: const [
+          Locale('fr', 'FR'),
+        ],
+        locale: const Locale('fr', 'FR'),
+        theme: ThemeData(
+          useMaterial3: true,
+          fontFamily: 'Poppins',
+          scaffoldBackgroundColor: AppColors.background,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.pink,
+            surface: AppColors.background,
+          ),
+        ),
+        home: const AppEntry(),
       ),
-    );
-  }
-}
-
-class OnboardingRouter extends StatefulWidget {
-  const OnboardingRouter({super.key});
-
-  @override
-  State<OnboardingRouter> createState() => _OnboardingRouterState();
-}
-
-class _OnboardingRouterState extends State<OnboardingRouter> {
-  late final Future<UserProfileType?> _initialRoute;
-
-  @override
-  void initState() {
-    super.initState();
-    _initialRoute = OnboardingService.loadUserProfile();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<UserProfileType?>(
-      future: _initialRoute,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(
-            backgroundColor: Color(0xFFFFF8F1),
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final profileType = snapshot.data;
-        if (profileType == UserProfileType.pregnancy) {
-          return const PregnancyHomePage();
-        } else if (profileType == UserProfileType.cycle) {
-          return const CycleDashboardPage();
-        }
-        return const OnboardingEntryPage();
-      },
     );
   }
 }
