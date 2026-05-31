@@ -17,37 +17,6 @@ import 'package:zyra/pregnancy/shared_navigation.dart';
 // All icons below use IconData with codepoints from Material Symbols Rounded.
 // ══════════════════════════════════════════════════════════════════════════════
 
-// ── Material Symbols Rounded codepoints ──────────────────────────────────────
-// These are rounded-weight Material Symbols (not the classic Icons set).
-// If you prefer classic Material Icons as fallback, swap to Icons.xxx equivalents.
-abstract class _Sym {
-  static const _fam = 'MaterialSymbols';
-
-  // Symptoms
-  static const sickLeaf          = IconData(0xef67, fontFamily: _fam); // sick / nausea
-  static const bolt               = IconData(0xe663, fontFamily: _fam); // fatigue / energy
-  static const headCircuit        = IconData(0xf55a, fontFamily: _fam); // headache
-  static const vertebra           = IconData(0xf87e, fontFamily: _fam); // back pain
-  static const flashOn            = IconData(0xe3e7, fontFamily: _fam); // cramps
-  static const mood               = IconData(0xe7f2, fontFamily: _fam); // mood
-  static const bedtime            = IconData(0xef44, fontFamily: _fam); // sleep
-  static const restaurant         = IconData(0xe56c, fontFamily: _fam); // appetite
-  static const childFriendly      = IconData(0xeb48, fontFamily: _fam); // baby movements
-
-  // UI
-  static const favorite           = IconData(0xe87d, fontFamily: _fam);
-  static const sparkle            = IconData(0xf21e, fontFamily: _fam);
-  static const addCircle          = IconData(0xe145, fontFamily: _fam);
-  static const checkCircle        = IconData(0xe86c, fontFamily: _fam);
-  static const editNote           = IconData(0xe745, fontFamily: _fam);
-  static const settings           = IconData(0xe8b8, fontFamily: _fam);
-  static const notifications      = IconData(0xe7f4, fontFamily: _fam);
-  static const pregnantWoman      = IconData(0xe91e, fontFamily: _fam);
-  static const calendar           = IconData(0xe935, fontFamily: _fam);
-  static const arrowRight         = IconData(0xe5c8, fontFamily: _fam);
-  static const info               = IconData(0xe88e, fontFamily: _fam);
-}
-
 // ── Fallback: use standard Material Icons if MaterialSymbols font is unavailable
 // Simply replace _Sym.xxx → Icons.xxx equivalents throughout.
 
@@ -108,8 +77,8 @@ class _SymptomData {
   final IconData icon;
   final Color accent;
   final Color bg;
-  double intensity;
-  bool selected;
+  double intensity = 0.4;
+  bool selected = false;
 
   _SymptomData({
     required this.id,
@@ -118,8 +87,6 @@ class _SymptomData {
     required this.icon,
     required this.accent,
     required this.bg,
-    this.intensity = 0.4,
-    this.selected = false,
   });
 }
 

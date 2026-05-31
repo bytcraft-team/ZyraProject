@@ -62,7 +62,7 @@ class _Colors {
   static const Color violet = Color(0xFF9B7AB8);
   static const Color violetLight = Color(0xFFB07FCC);
   static const Color violetSoft = Color(0xFFC07FCC);
-  static const Color pink = Color(0xFFE3437D);
+
   static const Color divider = Color(0x26B482D2);
   static const Color arcTrack = Color(0x26B482D2);
 }
@@ -384,12 +384,6 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
         ),
       ],
     ),
-  );
-  Widget _statDivider() => Container(
-    height: 32,
-    width: 1,
-    margin: const EdgeInsets.symmetric(horizontal: 28),
-    color: _Colors.divider,
   );
 
   // ─────────────────────────────────────────────
