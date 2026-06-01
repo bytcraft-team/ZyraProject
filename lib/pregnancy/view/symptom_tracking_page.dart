@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:zyra/pregnancy/viewmodels/pregnancy_view_model.dart';
 import 'package:zyra/pregnancy/view/shared_navigation.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -414,6 +416,8 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
 
   // ── Greeting ──────────────────────────────────────────────────────────────────
   Widget _buildGreetingCard() {
+    final tracking = Provider.of<PregnancyViewModel>(context, listen: false)
+        .pregnancyTracking;
     return _PremiumCard(
       child: Row(
         children: [
@@ -471,7 +475,7 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                   ),
                 ),
                 const SizedBox(height: 18),
-                // Progress
+                // Pregnant week and remaining days based on real tracking data
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -480,9 +484,9 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                         Icon(Icons.pregnant_woman_rounded,
                             size: 14, color: _C.secondary),
                         const SizedBox(width: 5),
-                        const Text(
-                          'Semaine 24',
-                          style: TextStyle(
+                        Text(
+                          tracking?.weekDisplay ?? 'Semaine non définie',
+                          style: const TextStyle(
                             color: _C.onSurfaceMid,
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
@@ -490,24 +494,29 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                         ),
                       ],
                     ),
-                    const Text(
-                      '55 %',
-                      style: TextStyle(
-                        color: _C.secondary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: LinearProgressIndicator(
-                    value: 0.55,
+                    value: tracking != null
+                        ? (tracking.currentWeek / 40).clamp(0.0, 1.0) as double
+                        : 0.55,
                     minHeight: 6,
                     backgroundColor: _C.surfaceVar,
                     valueColor: const AlwaysStoppedAnimation(_C.secondary),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  tracking != null
+                      ? 'Trimestre ${tracking.trimester} • DDP ${_formatDate(tracking.expectedDeliveryDate)}'
+                      : 'Données de grossesse indisponibles',
+                  style: const TextStyle(
+                    color: _C.onSurfaceLow,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -952,6 +961,24 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
       'déc',
     ];
     return '${n.day} ${m[n.month - 1]}. ${n.year}';
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'janv',
+      'fév',
+      'mars',
+      'avr',
+      'mai',
+      'juin',
+      'juil',
+      'août',
+      'sept',
+      'oct',
+      'nov',
+      'déc',
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }
 

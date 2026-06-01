@@ -1,10 +1,8 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:zyra/pregnancy/view/nutrition_page.dart';
 import 'package:zyra/pregnancy/view/shared_navigation.dart';
-import 'package:zyra/pregnancy/viewmodels/pregnancy_view_model.dart';
-import 'baby_growth_page.dart';
-import 'symptom_tracking_page.dart';
+import 'view/baby_growth_page.dart';
+import 'view/symptom_tracking_page.dart';
 
 // ============================================================
 // TRIMESTER THEME
@@ -119,15 +117,6 @@ class PregnancyHomePage extends StatefulWidget {
 class _PregnancyHomePageState extends State<PregnancyHomePage> {
   int _selectedIndex = 0; // Home page is index 0
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      context.read<PregnancyViewModel>().loadTrackingFromFirestore();
-    });
-  }
-
   void _onItemTapped(int index) {
     if (index != _selectedIndex) {
       navigateToPage(context, index);
@@ -154,78 +143,38 @@ class PregnancyHomePageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PregnancyViewModel>(
-      builder: (context, viewModel, child) {
-        if (viewModel.isLoading && viewModel.pregnancyTracking == null) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
+    return Scaffold(
+      body: Container(
+        child: Column(
+          children: [
+            // HEADER
+            _buildHeader(),
 
-        if (viewModel.pregnancyTracking == null) {
-          return Scaffold(
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+            // BODY
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Aucune donnée de grossesse disponible.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    _buildMainStats(),
+                    const SizedBox(height: 28),
+                    _buildWeekCalendar(),
+                    const SizedBox(height: 28),
+                    _buildTodayTip(),
+                    const SizedBox(height: 28),
+                    _buildQuickAccessGrid(context),
                     const SizedBox(height: 16),
-                    Text(
-                      viewModel.errorMessage ??
-                          'Veuillez compléter votre profil de grossesse pour afficher le suivi.',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 14),
-                    ),
                   ],
                 ),
               ),
             ),
-          );
-        }
-
-        return Scaffold(
-          body: Container(
-            child: Column(
-              children: [
-                // HEADER
-                _buildHeader(),
-
-                // BODY
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 20,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildMainStats(viewModel),
-                        const SizedBox(height: 28),
-                        _buildWeekCalendar(viewModel),
-                        const SizedBox(height: 28),
-                        _buildTodayTip(viewModel),
-                        const SizedBox(height: 28),
-                        _buildQuickAccessGrid(context),
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
@@ -309,11 +258,7 @@ class PregnancyHomePageContent extends StatelessWidget {
   // ----------------------------------------------------------
   // MAIN STATS — flat on background, no card
   // ----------------------------------------------------------
-  Widget _buildMainStats(PregnancyViewModel viewModel) {
-    final tracking = viewModel.pregnancyTracking!;
-    final weekInfo = viewModel.currentWeekInfo;
-    final babyLength = weekInfo?.babyLengthCm.toStringAsFixed(2) ?? '39';
-    final babyWeight = weekInfo?.babyWeightGrams.toStringAsFixed(2) ?? '460';
+  Widget _buildMainStats() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -322,7 +267,7 @@ class PregnancyHomePageContent extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                tracking.weekDisplay.toUpperCase(),
+                '19 SEMAINES DE',
                 style: TextStyle(
                   color: AppColors.violet.withValues(alpha: 0.7),
                   fontSize: 12,
@@ -376,7 +321,7 @@ class PregnancyHomePageContent extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildStatItem('Taille', babyLength, 'cm', Icons.straighten),
+            _buildStatItem('Taille', '39', 'cm', Icons.straighten),
             // Baby avatar — gradient ring, no card
             Container(
               width: 140,
@@ -392,14 +337,12 @@ class PregnancyHomePageContent extends StatelessWidget {
               padding: const EdgeInsets.all(3),
               child: ClipOval(
                 child: Image.asset(
-                  viewModel.getLocalImagePath() ??
-                      'assets/imagesBaby/baby19.jpg',
+                  'assets/imagesBaby/baby19.jpg',
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-            _buildStatItem(
-                'Poids', babyWeight, 'g', Icons.monitor_weight_outlined),
+            _buildStatItem('Poids', '460', 'g', Icons.monitor_weight_outlined),
           ],
         ),
         const SizedBox(height: 22),
@@ -419,10 +362,10 @@ class PregnancyHomePageContent extends StatelessWidget {
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.auto_awesome, color: Colors.white70, size: 13),
-                const SizedBox(width: 8),
-                const Text(
+              children: const [
+                Icon(Icons.auto_awesome, color: Colors.white70, size: 13),
+                SizedBox(width: 8),
+                Text(
                   'Plus que ',
                   style: TextStyle(
                     color: Colors.white70,
@@ -431,14 +374,14 @@ class PregnancyHomePageContent extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${tracking.daysRemaining}',
-                  style: const TextStyle(
+                  '140',
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const Text(
+                Text(
                   ' jours',
                   style: TextStyle(
                     color: Colors.white70,
@@ -509,10 +452,9 @@ class PregnancyHomePageContent extends StatelessWidget {
   // ----------------------------------------------------------
   // WEEK CALENDAR — flat on background, no card container
   // ----------------------------------------------------------
-  Widget _buildWeekCalendar(PregnancyViewModel viewModel) {
+  Widget _buildWeekCalendar() {
     final now = DateTime.now();
     final weekStart = now.subtract(Duration(days: now.weekday % 7));
-    final pregnancyWeek = viewModel.pregnancyTracking?.currentWeek;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -555,7 +497,7 @@ class PregnancyHomePageContent extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'Semaine ${pregnancyWeek ?? _getWeekNumber(now)}',
+                'Semaine ${_getWeekNumber(now)}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 12,
@@ -662,10 +604,7 @@ class PregnancyHomePageContent extends StatelessWidget {
   // ----------------------------------------------------------
   // TODAY TIP — flat on background, no card
   // ----------------------------------------------------------
-  Widget _buildTodayTip(PregnancyViewModel viewModel) {
-    final tip = viewModel.currentWeekInfo?.motherTips ??
-        'Restez hydratée tout au long de la journée et prenez des pauses courtes pour vous détendre. Votre corps a besoin de repos et de soins pendant la grossesse.';
-
+  Widget _buildTodayTip() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -715,8 +654,8 @@ class PregnancyHomePageContent extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  tip,
+                const Text(
+                  "Restez hydratée tout au long de la journée et prenez des pauses courtes pour vous détendre. Votre corps a besoin de repos et de soins pendant la grossesse.",
                   style: TextStyle(
                     color: AppColors.muted,
                     fontSize: 13,

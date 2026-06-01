@@ -351,12 +351,12 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
           children: [
             Flexible(
                 child: _inlineStat(
-                    '${weekInfo?.babyWeightGrams.toStringAsFixed(0) ?? '193'} g',
+                    '${weekInfo?.babyWeightGrams.toStringAsFixed(2) ?? '193'} g',
                     'Poids')),
             const SizedBox(width: 8),
             Flexible(
                 child: _inlineStat(
-                    '${weekInfo?.babyLengthCm.toStringAsFixed(1) ?? '15.3'} cm',
+                    '${weekInfo?.babyLengthCm.toStringAsFixed(2) ?? '15.3'} cm',
                     'Taille')),
             const SizedBox(width: 8),
             Flexible(child: _inlineStat('2ème', 'Trimestre')),

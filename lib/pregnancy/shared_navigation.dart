@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:zyra/screens/community/articles_list_screen.dart';
-import 'package:zyra/screens/community/posts_feed_screen.dart';
-import 'baby_growth_page.dart';
+import 'package:zyra/pregnancy/view/baby_growth_page.dart';
 import 'package:zyra/pregnancy/view/nutrition_page.dart';
-import 'package:zyra/pregnancy/view/pregnancy_tracker_screen.dart';
+import 'package:zyra/pregnancy/pregnancy_tracker_screen.dart';
 import 'package:zyra/pregnancy/view/symptom_tracking_page.dart';
 
 // ============================================================
@@ -33,7 +31,7 @@ final List<NavItem> navigationItems = [
   NavItem(
     icon: Icons.home_rounded,
     label: 'Home',
-    page: const PregnancyHomePage(),
+    page: const PregnancyTrackerApp(),
   ),
   NavItem(
     icon: Icons.child_care,
@@ -50,12 +48,7 @@ final List<NavItem> navigationItems = [
     label: 'Symptoms',
     page: const SymptomTrackingPage(),
   ),
-  NavItem(
-    icon: Icons.add_box, 
-    label: 'Poste',
-    page: const PostsFeedScreen()),
-
-
+  NavItem(icon: Icons.person_outline, label: 'Profile'),
 ];
 
 // ============================================================

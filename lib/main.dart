@@ -19,6 +19,7 @@ import 'package:zyra/cycle/data/repositories/cycle_repository.dart';
 import 'package:zyra/cycle/viewmodels/daily_log_viewmodel.dart';
 import 'package:zyra/cycle/data/repositories/daily_log_repository.dart';
 import 'package:zyra/cycle/viewmodels/calendar_viewmodel.dart';
+import 'package:zyra/cycle/viewmodels/education_viewmodel.dart';
 import 'package:zyra/cycle/data/repositories/calendar_repository.dart';
 import 'package:zyra/pregnancy/viewmodels/pregnancy_view_model.dart';
 
@@ -62,6 +63,9 @@ class LunaApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) =>
               CalendarViewModel(repository: CalendarRepositoryImpl()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => EducationViewModel(),
         ),
         ChangeNotifierProvider(
           create: (_) => PregnancyViewModel(),

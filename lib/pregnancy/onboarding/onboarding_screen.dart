@@ -93,7 +93,7 @@ class OnboardingEntryPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            'Êtes-vous enceinte ?',
+                            'Quel est votre but ?',
                             style: theme.textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.w800,
                               foreground: Paint()
@@ -117,7 +117,7 @@ class OnboardingEntryPage extends StatelessWidget {
                           // ✅ OUI → questions grossesse
                           _LargeChoiceButton(
                             icon: Icons.pregnant_woman,
-                            label: 'Oui, je suis enceinte',
+                            label: 'Suivi grossesse',
                             gradient: const LinearGradient(
                               colors: [Color(0xFFE91E8F), Color(0xFFC86CF3)],
                             ),
@@ -136,7 +136,7 @@ class OnboardingEntryPage extends StatelessWidget {
                           // ❌ NON → suivi de cycle
                           _LargeChoiceButton(
                             icon: Icons.calendar_month,
-                            label: 'Non, suivi de cycle',
+                            label: 'Suivi de cycle',
                             gradient: const LinearGradient(
                               colors: [Color(0xFFF06EC8), Color(0xFF9C27B0)],
                             ),

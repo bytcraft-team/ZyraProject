@@ -67,7 +67,10 @@ class OnboardingScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           'Onboarding cycle',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
                               ),
@@ -95,7 +98,8 @@ class OnboardingScreen extends StatelessWidget {
                   currentStep: vm.currentStep,
                   totalSteps: SettingsViewModel.totalSteps,
                   canProceed: vm.canProceed,
-                  isLastStep: vm.currentStep == SettingsViewModel.totalSteps - 1,
+                  isLastStep:
+                      vm.currentStep == SettingsViewModel.totalSteps - 1,
                   isLoading: vm.state == SettingsLoadState.loading,
                   onPrevious: vm.previousStep,
                   onNext: vm.nextStep,
@@ -112,7 +116,8 @@ class OnboardingScreen extends StatelessWidget {
                     if (!success && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Impossible de terminer l\'onboarding. Réessaie.'),
+                          content: Text(
+                              'Impossible de terminer l\'onboarding. Réessaie.'),
                         ),
                       );
                     }

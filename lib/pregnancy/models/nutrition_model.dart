@@ -68,13 +68,32 @@ class NutritionModel {
   String get categoryLabel {
     switch (category) {
       case 'protein':
-        return 'Protein';
+        return 'Protéines';
       case 'vegetable':
-        return 'Vegetable';
+        return 'Légumes';
       case 'fruit':
-        return 'Fruit';
+        return 'Fruits';
       default:
-        return category;
+        return category.isEmpty
+            ? 'Aliment'
+            : '${category[0].toUpperCase()}${category.substring(1)}';
+    }
+  }
+
+  String get mealTypeLabel {
+    switch (mealType.toLowerCase()) {
+      case 'breakfast':
+        return 'Petit-déjeuner';
+      case 'lunch':
+        return 'Déjeuner';
+      case 'dinner':
+        return 'Dîner';
+      case 'snack':
+        return 'En-cas';
+      default:
+        return mealType.isEmpty
+            ? 'Repas'
+            : '${mealType[0].toUpperCase()}${mealType.substring(1)}';
     }
   }
 }

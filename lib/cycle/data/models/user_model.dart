@@ -28,7 +28,8 @@ class UserModel {
     if (parts.length == 1) {
       return parts.first.substring(0, 1).toUpperCase();
     }
-    return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}'.toUpperCase();
+    return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}'
+        .toUpperCase();
   }
 
   /// Crée une copie de UserModel en modifiant uniquement les champs spécifiés
@@ -43,8 +44,10 @@ class UserModel {
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
-      hasUnreadNotifications: hasUnreadNotifications ?? this.hasUnreadNotifications,
-      unreadNotificationCount: unreadNotificationCount ?? this.unreadNotificationCount,
+      hasUnreadNotifications:
+          hasUnreadNotifications ?? this.hasUnreadNotifications,
+      unreadNotificationCount:
+          unreadNotificationCount ?? this.unreadNotificationCount,
     );
   }
 

@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../models/nutrition_model.dart';
 
+const _kDetailBackground = Color(0xFFFBFAFB);
+const _kDetailGradient = LinearGradient(
+  colors: [Color(0xFF7856DF), Color(0xFFCA86E0), Color(0xFFE34386)],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
+
 class NutritionDetailPage extends StatelessWidget {
   final NutritionModel item;
 
@@ -10,11 +17,18 @@ class NutritionDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FBF7),
+      backgroundColor: _kDetailBackground,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1F7A67),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Détails nutritionnels'),
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          'Détails nutritionnels',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+        flexibleSpace: Container(
+            decoration: const BoxDecoration(gradient: _kDetailGradient)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -22,6 +36,7 @@ class NutritionDetailPage extends StatelessWidget {
           children: [
             _buildImageHeader(),
             Container(
+              margin: const EdgeInsets.only(top: 20),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
               decoration: const BoxDecoration(
                 color: Colors.white,
@@ -61,9 +76,11 @@ class NutritionDetailPage extends StatelessWidget {
                         .toList(),
                   ),
                   const SizedBox(height: 18),
-                  _buildInfoRow('Quantité recommandée', item.recommendedQuantity),
+                  _buildInfoRow(
+                      'Quantité recommandée', item.recommendedQuantity),
                   const SizedBox(height: 18),
-                  _buildInfoRow('Conseil de consommation', item.consumptionAdvice),
+                  _buildInfoRow(
+                      'Conseil de consommation', item.consumptionAdvice),
                   const SizedBox(height: 18),
                   _buildPrecautionsBox(),
                 ],
@@ -83,19 +100,81 @@ class NutritionDetailPage extends StatelessWidget {
           bottomLeft: Radius.circular(28),
           bottomRight: Radius.circular(28),
         ),
-        child: Image.network(
-          item.imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => Container(
-            color: const Color(0xFFEAF7F1),
-            child: const Center(
-              child: Icon(
-                Icons.fastfood_outlined,
-                color: Color(0xFF1F7A67),
-                size: 42,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.network(
+              item.imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: const Color(0xFFEAF7F1),
+                child: const Center(
+                  child: Icon(
+                    Icons.fastfood_outlined,
+                    color: Color(0xFF1F7A67),
+                    size: 42,
+                  ),
+                ),
               ),
             ),
-          ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.black.withOpacity(0.45),
+                    Colors.black.withOpacity(0.12),
+                    Colors.transparent,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+            Positioned(
+              left: 20,
+              right: 20,
+              bottom: 20,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.92),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.name,
+                        style: const TextStyle(
+                          color: Color(0xFF102A16),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFECE6FF),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        'Semaine ${item.weekNumber}',
+                        style: const TextStyle(
+                          color: Color(0xFF4F2B8C),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -18,34 +18,9 @@ class SettingsRepositoryImpl implements SettingsRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  CycleSettings _settings = CycleSettings(
+  CycleSettings _settings = const CycleSettings(
     onboardingCompleted: false,
-    history: [
-      CycleHistoryEntry(
-        id: '1',
-        startDate: DateTime.now().subtract(const Duration(days: 56)),
-        endDate: DateTime.now().subtract(const Duration(days: 29)),
-        duration: 27,
-        periodDuration: 5,
-        regularity: 'Régulier',
-      ),
-      CycleHistoryEntry(
-        id: '2',
-        startDate: DateTime.now().subtract(const Duration(days: 28)),
-        endDate: DateTime.now().subtract(const Duration(days: 1)),
-        duration: 27,
-        periodDuration: 4,
-        regularity: 'Régulier',
-      ),
-      CycleHistoryEntry(
-        id: '3',
-        startDate: DateTime.now().subtract(const Duration(days: 84)),
-        endDate: DateTime.now().subtract(const Duration(days: 57)),
-        duration: 27,
-        periodDuration: 6,
-        regularity: 'Légèrement irrégulier',
-      ),
-    ],
+    history: [],
   );
 
   SettingsRepositoryImpl();
@@ -81,7 +56,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
     // Envoi asynchrone vers Firestore si l'utilisateur est connecté
     final user = _auth.currentUser;
     if (user == null) {
-      debugPrint('Onboarding local saved, mais aucun utilisateur Firebase connecté.');
+      debugPrint(
+          'Onboarding local saved, mais aucun utilisateur Firebase connecté.');
       return;
     }
 
@@ -107,7 +83,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
         },
         SetOptions(merge: true),
       );
-      debugPrint('Onboarding synchronisé vers Firestore pour user ${user.uid}.');
+      debugPrint(
+          'Onboarding synchronisé vers Firestore pour user ${user.uid}.');
     } catch (e) {
       debugPrint('Erreur Firestore onboarding sync: $e');
     }
@@ -116,11 +93,9 @@ class SettingsRepositoryImpl implements SettingsRepository {
   @override
   Future<void> deleteHistoryEntry(String id) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    final updated = _settings.history
-        .where((e) => e.id != id)
-        .toList();
+    final updated = _settings.history.where((e) => e.id != id).toList();
     _settings = _settings.copyWith(history: updated);
-    
+
     // Ajouté : Sauvegarde immédiate dans SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_prefsKey, jsonEncode(_settings.toMap()));
@@ -129,11 +104,10 @@ class SettingsRepositoryImpl implements SettingsRepository {
   @override
   Future<void> updateHistoryEntry(CycleHistoryEntry entry) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    final updated = _settings.history
-        .map((e) => e.id == entry.id ? entry : e)
-        .toList();
+    final updated =
+        _settings.history.map((e) => e.id == entry.id ? entry : e).toList();
     _settings = _settings.copyWith(history: updated);
-    
+
     // Ajouté : Sauvegarde immédiate dans SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_prefsKey, jsonEncode(_settings.toMap()));
