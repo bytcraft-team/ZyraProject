@@ -1,11 +1,10 @@
 name: zyra
-description: "A new Flutter project."
+description: "Zyra - Women Health App"
 publish_to: 'none'
-
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ^3.5.0
 
 dependencies:
   flutter:
@@ -59,3 +58,4 @@ flutter:
   assets:
     - assets/images/
     - assets/imagesBaby/
+    - assets/nutrition.json

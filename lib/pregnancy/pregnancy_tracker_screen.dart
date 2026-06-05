@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:zyra/pregnancy/nutrition_page.dart';
-import 'package:zyra/pregnancy/shared_navigation.dart';
-import 'baby_growth_page.dart';
-import 'symptom_tracking_page.dart';
+import 'package:zyra/pregnancy/view/nutrition_page.dart';
+import 'package:zyra/pregnancy/view/shared_navigation.dart';
+import 'view/baby_growth_page.dart';
+import 'view/symptom_tracking_page.dart';
 
 // ============================================================
 // TRIMESTER THEME
@@ -157,24 +157,16 @@ class PregnancyHomePageContent extends StatelessWidget {
                   horizontal: 20,
                   vertical: 20,
                 ),
-
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildMainStats(),
-
                     const SizedBox(height: 28),
-
                     _buildWeekCalendar(),
-
                     const SizedBox(height: 28),
-
                     _buildTodayTip(),
-
                     const SizedBox(height: 28),
-
                     _buildQuickAccessGrid(context),
-
                     const SizedBox(height: 16),
                   ],
                 ),
@@ -521,8 +513,7 @@ class PregnancyHomePageContent extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(7, (index) {
             final date = weekStart.add(Duration(days: index));
-            final isToday =
-                date.day == now.day &&
+            final isToday = date.day == now.day &&
                 date.month == now.month &&
                 date.year == now.year;
 
@@ -549,9 +540,8 @@ class PregnancyHomePageContent extends StatelessWidget {
                         '${date.day}',
                         style: TextStyle(
                           color: isToday ? Colors.white : AppColors.deepIndigo,
-                          fontWeight: isToday
-                              ? FontWeight.w800
-                              : FontWeight.w500,
+                          fontWeight:
+                              isToday ? FontWeight.w800 : FontWeight.w500,
                           fontSize: 13,
                         ),
                       ),
@@ -695,9 +685,7 @@ class PregnancyHomePageContent extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-
         const SizedBox(height: 16),
-
         Row(
           children: [
             Expanded(
@@ -714,9 +702,7 @@ class PregnancyHomePageContent extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(width: 10),
-
             Expanded(
               child: _buildModernCard(
                 context: context,
@@ -733,9 +719,7 @@ class PregnancyHomePageContent extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(width: 10),
-
             Expanded(
               child: _buildModernCard(
                 context: context,
@@ -767,34 +751,24 @@ class PregnancyHomePageContent extends StatelessWidget {
   }) {
     return TweenAnimationBuilder(
       duration: const Duration(milliseconds: 500),
-
       tween: Tween<double>(begin: 0.9, end: 1),
-
       curve: Curves.easeOutBack,
-
       builder: (context, double value, child) {
         return Transform.scale(scale: value, child: child);
       },
-
       child: GestureDetector(
         onTap: onTap,
-
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
-
           height: 110,
-
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: colors,
             ),
-
             borderRadius: BorderRadius.circular(24),
-
             boxShadow: [
               BoxShadow(
                 color: colors.last.withValues(alpha: 0.25),
@@ -803,29 +777,21 @@ class PregnancyHomePageContent extends StatelessWidget {
               ),
             ],
           ),
-
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
               Container(
                 width: 42,
                 height: 42,
-
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: iconColors),
-
                   borderRadius: BorderRadius.circular(14),
                 ),
-
                 child: Icon(icon, color: Colors.white, size: 20),
               ),
-
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-
                 children: [
                   Text(
                     title,
@@ -835,9 +801,7 @@ class PregnancyHomePageContent extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-
                   const SizedBox(height: 4),
-
                   Text(
                     subtitle,
                     style: TextStyle(
