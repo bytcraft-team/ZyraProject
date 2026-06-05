@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:zyra/pregnancy/baby_growth_page.dart';
-import 'package:zyra/pregnancy/nutrition_page.dart';
+import 'package:zyra/pregnancy/view/baby_growth_page.dart';
+import 'package:zyra/pregnancy/view/nutrition_page.dart';
 import 'package:zyra/pregnancy/pregnancy_tracker_screen.dart';
-import 'package:zyra/pregnancy/symptom_tracking_page.dart';
+import 'package:zyra/pregnancy/view/symptom_tracking_page.dart';
 
 // ============================================================
 // 🎨 APP COLORS — Blush Modern Theme
@@ -168,9 +168,8 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
                               ),
                               child: Icon(
                                 item.icon,
-                                color: isActive
-                                    ? Colors.white
-                                    : AppColors.muted,
+                                color:
+                                    isActive ? Colors.white : AppColors.muted,
                                 size: 22,
                               ),
                             ),
