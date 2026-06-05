@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'cycle/core/constants/app_colors.dart';
+import 'cycle1/core/constants/app_colors.dart';
 
-import 'cycle/viewmodels/home_viewmodel.dart';
-import 'cycle/viewmodels/daily_log_viewmodel.dart';
-import 'cycle/viewmodels/calendar_viewmodel.dart';
+import 'cycle1/viewmodels/home_viewmodel.dart';
+import 'cycle1/viewmodels/daily_log_viewmodel.dart';
+import 'cycle1/viewmodels/calendar_viewmodel.dart';
 
-import 'cycle/views/home/cycle_home_screen.dart';
-import 'cycle/views/daily_log/daily_log_screen.dart';
-import 'cycle/views/calendar/fertility_calendar_screen.dart';
-import 'cycle/views/education/phase_education_screen.dart';
+import 'cycle1/views/home/cycle_home_screen.dart';
+import 'cycle1/views/daily_log/daily_log_screen.dart';
+import 'cycle1/views/calendar/fertility_calendar_screen.dart';
+import 'cycle1/views/education/phase_education_screen.dart';
 
-import 'cycle/views/settings/cycle_settings_screen.dart';
-import 'cycle/viewmodels/settings_viewmodel.dart';
+import 'cycle1/views/settings/cycle_settings_screen.dart';
+import 'cycle1/viewmodels/settings_viewmodel.dart';
 
 import 'widgets/bottom_nav_bar.dart';
 

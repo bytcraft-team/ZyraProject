@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../pregnancy/repositories/signup_request.dart';
-import '../../pregnancy/repositories/user_repository.dart';
+import '../../pregnancy1/repositories/signup_request.dart';
+import '../../pregnancy1/repositories/user_repository.dart';
 
 enum AuthStatus { initializing, authenticated, unauthenticated, error }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zyra/auth/viewmodels/authentication_view_model.dart';
-import 'package:zyra/pregnancy/repositories/signup_request.dart';
+import 'package:zyra/pregnancy1/repositories/signup_request.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});

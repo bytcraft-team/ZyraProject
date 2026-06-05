@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -10,6 +12,8 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   double _progress = 0;
+  Timer? _loadingTimer;
+  int _progressStep = 0;
 
   @override
   void initState() {
@@ -17,23 +21,40 @@ class _SplashScreenState extends State<SplashScreen> {
     _startLoading();
   }
 
-  void _startLoading() async {
-    for (int i = 0; i <= 100; i++) {
-      await Future.delayed(const Duration(milliseconds: 40));
-      if (mounted) {
-        setState(() {
-          _progress = i / 100;
-        });
+  void _startLoading() {
+    _loadingTimer = Timer.periodic(const Duration(milliseconds: 40), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
       }
-    }
-    if (mounted) {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        Navigator.pushNamed(context, '/home');
-      } else {
-        Navigator.pushNamed(context, '/first');
+
+      setState(() {
+        _progressStep += 1;
+        _progress = (_progressStep / 100).clamp(0.0, 1.0);
+      });
+
+      if (_progressStep >= 100) {
+        timer.cancel();
+        _navigateToNextScreen();
       }
+    });
+  }
+
+  Future<void> _navigateToNextScreen() async {
+    if (!mounted) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await Navigator.pushNamed(context, '/home');
+    } else {
+      await Navigator.pushNamed(context, '/first');
     }
+  }
+
+  @override
+  void dispose() {
+    _loadingTimer?.cancel();
+    super.dispose();
   }
 
   @override

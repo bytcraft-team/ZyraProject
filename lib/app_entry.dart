@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'cycle/viewmodels/settings_viewmodel.dart';
-import 'cycle/views/onboarding/onboarding_screen.dart';
-import 'pregnancy/viewmodels/pregnancy_view_model.dart';
+import 'cycle1/viewmodels/settings_viewmodel.dart';
+import 'cycle1/views/onboarding/onboarding_screen.dart';
+import 'pregnancy1/viewmodels/pregnancy_view_model.dart';
 import 'main_shell.dart';
 
 class AppEntry extends StatefulWidget {
