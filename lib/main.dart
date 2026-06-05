@@ -1,24 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:zyra/onboarding/cycle_dashboard.dart';
-import 'package:zyra/onboarding/onboarding_model.dart';
-import 'package:zyra/onboarding/onboarding_screen.dart';
-import 'package:zyra/onboarding/onboarding_service.dart';
-import 'package:zyra/pregnancy/pregnancy_tracker_screen.dart';
-import 'package:zyra/screens/pages/login_screen.dart';
-import 'package:zyra/screens/pages/signup_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:zyra/l10n/app_localizations.dart';
+
+import 'providers/user_provider.dart';
+import 'providers/cycle_provider.dart';
+import 'providers/appearance_provider.dart';
+import 'viewmodel/notification_provider.dart';
+
+import 'services/local_notification_service.dart';
+
+import 'screens/pages/login_screen.dart';
+import 'screens/pages/signup_screen.dart';
+import 'screens/settings/settings_screen.dart';
+import 'screens/pages/appearance_settings_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 🔥 Firebase
   await Firebase.initializeApp();
+
+  // 🔔 Notifications
+  await LocalNotificationService.init();
+
+  // 📱 Status bar
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
     ),
   );
+
   runApp(const MyApp());
 }
 
@@ -27,141 +44,89 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF8EA88D),
-      primary: const Color(0xFF8EA88D),
-      onPrimary: Colors.white,
-      secondary: const Color(0xFF7FBFC0),
-      background: const Color(0xFFFFF8F1),
-      surface: const Color(0xFFFFFFFF),
-    );
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => CycleProvider(),
+        ),
 
-    return MaterialApp(
-      title: 'Zyra',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: colorScheme,
-        scaffoldBackgroundColor: const Color(0xFFFFF8F1),
-        textTheme: GoogleFonts.plusJakartaSansTextTheme(),
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          iconTheme: IconThemeData(color: Color(0xFF4B4B4B)),
-          foregroundColor: Color(0xFF4B4B4B),
+        ChangeNotifierProvider(
+          create: (_) => UserProvider(),
         ),
-        cardTheme: CardThemeData(
-          color: const Color(0xFFFFFFFF),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          elevation: 2,
+
+        ChangeNotifierProvider(
+          create: (_) => AppearanceProvider(),
         ),
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignupScreen(),
-      },
+
+        // 🔔 Notifications Provider
+        ChangeNotifierProvider(
+          create: (_) => NotificationProvider()..load(),
+        ),
+      ],
+
+      child: const AppRoot(),
     );
   }
 }
 
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
+class AppRoot extends StatelessWidget {
+  const AppRoot({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset('assets/images/imgz.jpeg', fit: BoxFit.cover),
-          ),
-          Positioned(
-            bottom: 40,
-            left: 30,
-            right: 30,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF7B5EA7), Color(0xFFD4799A)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
+    return Consumer<AppearanceProvider>(
+      builder: (context, appearance, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Zyra',
+
+          // ================= LANGUAGE =================
+
+          locale: appearance.locale,
+
+          supportedLocales: AppLocalizations.supportedLocales,
+
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+
+          // ================= THEME =================
+
+          theme: appearance.lightTheme,
+
+          darkTheme: appearance.darkTheme,
+
+          themeMode: appearance.themeMode,
+
+          // ================= START =================
+
+          home: const SettingsScreen(),
+
+          routes: {
+            '/login': (_) => const LoginScreen(),
+            '/signup': (_) => const SignupScreen(),
+            '/settings': (_) => const SettingsScreen(),
+            '/appearance': (_) => const AppearanceSettingsPage(),
+          },
+
+          // ================= GLOBAL FONT =================
+
+          builder: (context, child) {
+            final theme = Theme.of(context);
+
+            return Theme(
+              data: theme.copyWith(
+                textTheme: GoogleFonts.plusJakartaSansTextTheme(
+                  theme.textTheme,
                 ),
-                borderRadius: BorderRadius.circular(30),
               ),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/login');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Continuer',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward, color: Colors.white),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class OnboardingRouter extends StatefulWidget {
-  const OnboardingRouter({super.key});
-
-  @override
-  State<OnboardingRouter> createState() => _OnboardingRouterState();
-}
-
-class _OnboardingRouterState extends State<OnboardingRouter> {
-  late final Future<UserProfileType?> _initialRoute;
-
-  @override
-  void initState() {
-    super.initState();
-    _initialRoute = OnboardingService.loadUserProfile();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<UserProfileType?>(
-      future: _initialRoute,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(
-            backgroundColor: Color(0xFFFFF8F1),
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final profileType = snapshot.data;
-        if (profileType == UserProfileType.pregnancy) {
-          return const PregnancyHomePage();
-        } else if (profileType == UserProfileType.cycle) {
-          return const CycleDashboardPage();
-        }
-        return const OnboardingEntryPage();
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
+        );
       },
     );
   }

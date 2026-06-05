@@ -1,11 +1,11 @@
 {
-<<<<<<< HEAD
+
     "name": "zyra_flow",
     "short_name": "zyra_flow",
-=======
+
     "name": "zyra",
     "short_name": "zyra",
->>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
+
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
