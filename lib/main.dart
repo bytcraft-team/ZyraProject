@@ -1,32 +1,42 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:zyra/firebase_options.dart';
-import 'package:zyra/core/global_keys.dart';
-import 'package:zyra/pregnancy/view/pregnancy_tracker_screen.dart';
-import 'package:zyra/pregnancy/onboarding/onboarding_screen.dart';
-import 'package:zyra/auth/login_screen.dart';
-import 'package:zyra/auth/signup_screen.dart';
-import 'package:zyra/auth/viewmodels/authentication_view_model.dart';
-import 'package:zyra/pregnancy/repositories/user_repository.dart';
-import 'package:zyra/splash/first_page.dart';
-import 'package:zyra/splash/splash_screen.dart' as splash;
-import 'package:zyra/app_entry.dart';
-import 'package:zyra/cycle/viewmodels/settings_viewmodel.dart';
-import 'package:zyra/cycle/data/repositories/settings_repository.dart';
-import 'package:zyra/cycle/viewmodels/home_viewmodel.dart';
-import 'package:zyra/cycle/data/repositories/cycle_repository.dart';
-import 'package:zyra/cycle/viewmodels/daily_log_viewmodel.dart';
-import 'package:zyra/cycle/data/repositories/daily_log_repository.dart';
-import 'package:zyra/cycle/viewmodels/calendar_viewmodel.dart';
-import 'package:zyra/cycle/viewmodels/education_viewmodel.dart';
-import 'package:zyra/cycle/data/repositories/calendar_repository.dart';
-import 'package:zyra/pregnancy/viewmodels/pregnancy_view_model.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:zyra/l10n/app_localizations.dart';
+
+import 'providers/user_provider.dart';
+import 'providers/cycle_provider.dart';
+import 'providers/appearance_provider.dart';
+import 'viewmodel/notification_provider.dart';
+
+import 'services/local_notification_service.dart';
+
+import 'screens/pages/login_screen.dart';
+import 'screens/pages/signup_screen.dart';
+import 'screens/settings/settings_screen.dart';
+import 'screens/pages/appearance_settings_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const LunaApp());
+
+  // 🔥 Firebase
+  await Firebase.initializeApp();
+
+  // 🔔 Notifications
+  await LocalNotificationService.init();
+
+  // 📱 Status bar
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+
+  runApp(const MyApp());
 }
 
 class LunaApp extends StatelessWidget {
@@ -34,14 +44,11 @@ class LunaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF8EA88D),
-      primary: const Color(0xFF8EA88D),
-      onPrimary: Colors.white,
-      secondary: const Color(0xFF7FBFC0),
-      background: const Color(0xFFFFF8F1),
-      surface: const Color(0xFFFFFFFF),
-    );
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => CycleProvider(),
+        ),
 
     return MultiProvider(
       providers: [
@@ -148,12 +155,9 @@ class AuthGate extends StatelessWidget {
   }
 }
 
-class OnboardingRouter extends StatefulWidget {
-  const OnboardingRouter({super.key});
+          // ================= LANGUAGE =================
 
-  @override
-  State<OnboardingRouter> createState() => _OnboardingRouterState();
-}
+          locale: appearance.locale,
 
 class _OnboardingRouterState extends State<OnboardingRouter> {
   late final Future<Map<String, dynamic>?> _initialUserProfile;

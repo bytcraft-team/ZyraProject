@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/appearance_provider.dart';
+import '../../l10n/app_localizations.dart';
+
 import '../pages/cycle_settings_page.dart';
 import '../pages/notification_settings_page.dart';
 import '../pages/appearance_settings_page.dart';
@@ -6,96 +11,106 @@ import '../pages/security_settings_page.dart';
 import '../pages/about_settings_page.dart';
 import '../pages/ai_settings_page.dart';
 import '../pages/edit_profile_page.dart';
- 
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
- 
+
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<AppearanceProvider>();
+    final l10n = AppLocalizations.of(context)!;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF8FB),
+      // ❌ FIX IMPORTANT: ne pas bloquer le dark mode
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
       appBar: AppBar(
-        backgroundColor: const Color(0xFFC8698A),
+        backgroundColor: provider.currentPrimaryColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: Colors.white, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Paramètres',
-          style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
+        title: Text(
+          l10n.settings,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
+
       body: ListView(
         padding: const EdgeInsets.only(bottom: 40),
         children: [
-          _buildHero(context),
+          _hero(context, provider),
+
           const SizedBox(height: 8),
-          _buildSectionLabel('Cycle & Profil'),
-          _buildNavTile(
-            context,
-            emoji: '🩸',
-            bg: const Color(0xFFFDEEF4),
-            title: 'Cycle & Profil',
-            subtitle: 'Durée du cycle, des règles, mode grossesse',
-            page: const CycleSettingsPage(),
-          ),
-          _buildSectionLabel('Notifications'),
-          _buildNavTile(
-            context,
-            emoji: '🔔',
-            bg: const Color(0xFFEEEDFE),
-            title: 'Notifications',
-            subtitle: 'Alertes règles, fertilité, IA, messages',
-            page: const NotificationSettingsPage(),
-          ),
-          _buildSectionLabel('Apparence'),
-          _buildNavTile(
-            context,
-            emoji: '🎨',
-            bg: const Color(0xFFF5EEFE),
-            title: 'Apparence',
-            subtitle: 'Thème, couleurs, langue',
-            page: const AppearanceSettingsPage(),
-          ),
-          _buildSectionLabel('Assistant IA'),
-          _buildNavTile(
-            context,
-            emoji: '🤖',
-            bg: const Color(0xFFFEF7EE),
-            title: 'Assistant IA',
-            subtitle: 'Conseils personnalisés, suggestions intelligentes',
-            page: const AiSettingsPage(),
-          ),
-          _buildSectionLabel('Confidentialité & Sécurité'),
-          _buildNavTile(
-            context,
-            emoji: '🔒',
-            bg: const Color(0xFFEEF4FE),
-            title: 'Confidentialité & Sécurité',
-            subtitle: 'Verrouillage, export, suppression',
-            page: const SecuritySettingsPage(),
-          ),
-          _buildSectionLabel('À propos'),
-          _buildNavTile(
-            context,
-            emoji: 'ℹ️',
-            bg: const Color(0xFFE1F5EE),
-            title: 'À propos',
-            subtitle: 'Version, légal, équipe',
-            page: const AboutSettingsPage(),
-          ),
+
+          _section(l10n.cycleProfile),
+          _tile(context,
+              emoji: '🩸',
+              bg: const Color(0xFFFDEEF4),
+              title: l10n.cycleProfile,
+              subtitle: l10n.cycleDescription,
+              page: const CycleSettingsPage()),
+
+          _section(l10n.notifications),
+          _tile(context,
+              emoji: '🔔',
+              bg: const Color(0xFFEEEDFE),
+              title: l10n.notifications,
+              subtitle: l10n.notificationsDesc,
+              page: const NotificationSettingsPage()),
+
+          _section(l10n.appearance),
+          _tile(context,
+              emoji: '🎨',
+              bg: const Color(0xFFF5EEFE),
+              title: l10n.appearance,
+              subtitle: l10n.customizeAppearance,
+              page: const AppearanceSettingsPage()),
+
+          _section(l10n.security),
+          _tile(context,
+              emoji: '🔒',
+              bg: const Color(0xFFEEF4FE),
+              title: l10n.security,
+              subtitle: l10n.securityDesc,
+              page: const SecuritySettingsPage()),
+
+          _section(l10n.aiAssistant),
+          _tile(context,
+              emoji: '🤖',
+              bg: const Color(0xFFFEF7EE),
+              title: l10n.aiAssistant,
+              subtitle: l10n.aiDesc,
+              page: const AiSettingsPage()),
+
+          _section(l10n.about),
+          _tile(context,
+              emoji: 'ℹ️',
+              bg: const Color(0xFFE1F5EE),
+              title: l10n.about,
+              subtitle: l10n.aboutDesc,
+              page: const AboutSettingsPage()),
+
           const SizedBox(height: 16),
-          _buildDivider(),
-          _buildLogoutTile(context),
+          _divider(),
+          _logout(context, l10n),
         ],
       ),
     );
   }
- 
-  Widget _buildHero(BuildContext context) {
+
+  // ================= HERO =================
+  Widget _hero(BuildContext context, AppearanceProvider provider) {
     return Container(
-      color: const Color(0xFFC8698A),
+      color: provider.currentPrimaryColor,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       child: Row(
         children: [
@@ -111,55 +126,33 @@ class SettingsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+                border: Border.all(
+                    color: Colors.white.withOpacity(0.5), width: 2),
               ),
               alignment: Alignment.center,
-              child: const Text(
-                'SA',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
-              ),
+              child: const Text('SA',
+                  style: TextStyle(fontSize: 20, color: Colors.white)),
             ),
           ),
           const SizedBox(width: 14),
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Sara Saadi',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: Colors.white),
-                ),
+              children: [
+                Text('Sara Saadi',
+                    style: TextStyle(color: Colors.white, fontSize: 17)),
                 SizedBox(height: 2),
-                Text(
-                  'sara@example.com',
-                  style: TextStyle(fontSize: 12, color: Colors.white70),
-                ),
+                Text('sara@example.com',
+                    style: TextStyle(color: Colors.white70, fontSize: 12)),
               ],
             ),
-          ),
-          // ✅ Bouton Modifier avec navigation vers EditProfilePage
-          TextButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const EditProfilePage()),
-            ),
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.white.withOpacity(0.18),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: Colors.white.withOpacity(0.35)),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            ),
-            child: const Text('Modifier', style: TextStyle(fontSize: 12)),
           ),
         ],
       ),
     );
   }
- 
-  Widget _buildSectionLabel(String text) {
+
+  Widget _section(String text) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 6),
       child: Text(
@@ -173,25 +166,29 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
- 
-  Widget _buildNavTile(
-    BuildContext context, {
-    required String emoji,
-    required Color bg,
-    required String title,
-    required String subtitle,
-    required Widget page,
-  }) {
+
+  Widget _tile(BuildContext context,
+      {required String emoji,
+      required Color bg,
+      required String title,
+      required String subtitle,
+      required Widget page}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+
+      // ✅ FIX dark mode border/background
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF2D6E4), width: 1),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
+
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => page)),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => page),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
@@ -199,7 +196,8 @@ class SettingsScreen extends StatelessWidget {
               Container(
                 width: 36,
                 height: 36,
-                decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(
+                    color: bg, borderRadius: BorderRadius.circular(12)),
                 alignment: Alignment.center,
                 child: Text(emoji, style: const TextStyle(fontSize: 18)),
               ),
@@ -209,22 +207,31 @@ class SettingsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: const TextStyle(fontSize: 14, color: Color(0xFF3A1A28))),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        )),
                     const SizedBox(height: 2),
                     Text(subtitle,
-                        style: const TextStyle(fontSize: 11, color: Color(0xFFB06080))),
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color)),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Color(0xFFD4A0B8), size: 20),
+              Icon(Icons.chevron_right,
+                  color: Theme.of(context).iconTheme.color, size: 20),
             ],
           ),
         ),
       ),
     );
   }
- 
-  Widget _buildDivider() {
+
+  Widget _divider() {
     return Container(
       height: 3,
       margin: const EdgeInsets.symmetric(horizontal: 14),
@@ -234,62 +241,29 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
- 
-  Widget _buildLogoutTile(BuildContext context) {
+
+  Widget _logout(BuildContext context, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.fromLTRB(14, 8, 14, 0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF2D6E4)),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        onTap: () => _showLogoutDialog(context),
+        onTap: () {},
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                    color: const Color(0xFFFDEEF4),
-                    borderRadius: BorderRadius.circular(12)),
-                alignment: Alignment.center,
-                child: const Text('🚪', style: TextStyle(fontSize: 18)),
-              ),
+              const Text('🚪'),
               const SizedBox(width: 12),
-              const Text('Se déconnecter',
-                  style: TextStyle(fontSize: 14, color: Color(0xFFC0406A))),
+              Text(l10n.logout,
+                  style: const TextStyle(color: Color(0xFFC0406A))),
             ],
           ),
         ),
-      ),
-    );
-  }
- 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('Se déconnecter',
-            style: TextStyle(color: Color(0xFF3A1A28))),
-        content: const Text('Es-tu sûre de vouloir te déconnecter ?',
-            style: TextStyle(color: Color(0xFFB06080))),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Annuler',
-                  style: TextStyle(color: Color(0xFFB06080)))),
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Déconnecter',
-                  style: TextStyle(
-                      color: Color(0xFFC0406A),
-                      fontWeight: FontWeight.w500))),
-        ],
       ),
     );
   }
