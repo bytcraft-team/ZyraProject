@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-
+ 
 class AiSettingsPage extends StatefulWidget {
   const AiSettingsPage({super.key});
-
+ 
   @override
   State<AiSettingsPage> createState() => _AiSettingsPageState();
 }
-
+ 
 class _AiSettingsPageState extends State<AiSettingsPage> {
   bool _aiActif = true;
   bool _suggestionsPersonnalisees = true;
@@ -15,7 +15,7 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
   bool _conseilsSymptomes = true;
   bool _notifIA = true;
   int _selectedNiveau = 1; // 0=basique, 1=normal, 2=détaillé
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +102,7 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
       ),
     );
   }
-
+ 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: const Color(0xFFC8698A),
@@ -117,7 +117,7 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
       ),
     );
   }
-
+ 
   Widget _buildHero() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -159,7 +159,7 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
       ),
     );
   }
-
+ 
   Widget _buildSectionLabel(String text) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 16, 4, 6),
@@ -174,7 +174,7 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
       ),
     );
   }
-
+ 
   Widget _buildCard({required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
@@ -185,10 +185,10 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
       child: Column(children: children),
     );
   }
-
+ 
   Widget _divider() => const Divider(
       height: 0.5, thickness: 0.5, indent: 64, color: Color(0xFFF5E0EC));
-
+ 
   Widget _buildToggleTile({
     required String emoji,
     required Color bg,
@@ -235,14 +235,14 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
       ),
     );
   }
-
+ 
   Widget _buildNiveauSelector() {
     final niveaux = [
       {'label': 'Basique', 'sub': 'Réponses courtes', 'emoji': '💬'},
       {'label': 'Normal', 'sub': 'Équilibré', 'emoji': '📝'},
       {'label': 'Détaillé', 'sub': 'Explications complètes', 'emoji': '📚'},
     ];
-
+ 
     return Row(
       children: List.generate(niveaux.length, (i) {
         final selected = _selectedNiveau == i;
@@ -286,7 +286,7 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
       }),
     );
   }
-
+ 
   Widget _buildInfoCard() {
     final items = [
       {'icon': '🩸', 'text': 'Données du cycle menstruel'},
@@ -294,7 +294,7 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
       {'icon': '📋', 'text': 'Symptômes enregistrés'},
       {'icon': '📅', 'text': 'Historique des périodes'},
     ];
-
+ 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -327,7 +327,7 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
       ),
     );
   }
-
+ 
   Widget _buildSaveButton() {
     return ElevatedButton(
       onPressed: () {

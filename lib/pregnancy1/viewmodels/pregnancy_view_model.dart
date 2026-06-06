@@ -146,7 +146,6 @@ class PregnancyViewModel extends ChangeNotifier {
         lastCalculatedAt: DateTime.now(),
       );
 
-      // Recharge les données de la nouvelle semaine si changement
       if (adjustedWeek != _currentWeekInfo?.weekNumber) {
         await loadWeekInfo(adjustedWeek);
       }
@@ -161,13 +160,12 @@ class PregnancyViewModel extends ChangeNotifier {
     }
   }
 
-  /// Obtient le chemin local de l'image pour la semaine actuelle
   String? getLocalImagePath() {
     if (_currentWeekInfo?.imageUrl == null) return null;
+    
     return WeekDataService.buildLocalImagePath(_currentWeekInfo!.imageUrl);
   }
 
-  /// Obtient le label du trimestre courant
   String getCurrentTrimesterLabel() {
     if (_pregnancyTracking == null) return '';
     return PregnancyCalculator.getTrimesterLabel(
@@ -175,12 +173,10 @@ class PregnancyViewModel extends ChangeNotifier {
     );
   }
 
-  /// Exporte les données de suivi pour Firestore
   Map<String, dynamic> exportToFirestore() {
     return _pregnancyTracking?.toFirestore() ?? {};
   }
 
-  /// Restaure à partir des données Firestore
   void restoreFromFirestore(Map<String, dynamic> data) {
     try {
       _pregnancyTracking = PregnancyTracking.fromFirestore(data);

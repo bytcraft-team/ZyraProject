@@ -129,14 +129,23 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
 
   // ── Moods (icon-based, no emojis)
   static const _moods = [
-    _MoodData(Icons.sentiment_very_dissatisfied_rounded, 'Difficile',
-        Color(0xFFCF8080)),
     _MoodData(
-        Icons.sentiment_dissatisfied_rounded, 'Fatigué', Color(0xFFCFAF80)),
+      Icons.sentiment_very_dissatisfied_rounded,
+      'Difficile',
+      Color(0xFFCF8080),
+    ),
+    _MoodData(
+      Icons.sentiment_dissatisfied_rounded,
+      'Fatigué',
+      Color(0xFFCFAF80),
+    ),
     _MoodData(Icons.sentiment_neutral_rounded, 'Neutre', Color(0xFF9B80CF)),
     _MoodData(Icons.sentiment_satisfied_rounded, 'Bien', Color(0xFF80A8CF)),
     _MoodData(
-        Icons.sentiment_very_satisfied_rounded, 'Radieuse', Color(0xFF80CFAA)),
+      Icons.sentiment_very_satisfied_rounded,
+      'Radieuse',
+      Color(0xFF80CFAA),
+    ),
   ];
 
   // ── Symptoms
@@ -270,16 +279,22 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
     final tracking = context.read<PregnancyViewModel>().pregnancyTracking;
     final selectedSymptoms = _symptoms
         .where((symptom) => symptom.selected)
-        .map((symptom) => {
-              'id': symptom.id,
-              'label': symptom.label,
-              'intensity': (symptom.intensity * 5).round().clamp(1, 5),
-            })
+        .map(
+          (symptom) => {
+            'id': symptom.id,
+            'label': symptom.label,
+            'intensity': (symptom.intensity * 5).round().clamp(1, 5),
+          },
+        )
         .toList();
 
     if (selectedSymptoms.isEmpty && _notes.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ajoute au moins un symptôme ou une note avant d’enregistrer.')),
+        const SnackBar(
+          content: Text(
+            'Ajoute au moins un symptôme ou une note avant d’enregistrer.',
+          ),
+        ),
       );
       return;
     }
@@ -293,13 +308,15 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
         moodIndex: _selectedMood,
         notes: _notes.text,
         symptoms: selectedSymptoms,
-        expectedDeliveryDate: tracking?.expectedDeliveryDate ?? DateTime.now().add(const Duration(days: 280)),
+        expectedDeliveryDate:
+            tracking?.expectedDeliveryDate ??
+            DateTime.now().add(const Duration(days: 280)),
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Enregistrement impossible: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Enregistrement impossible: $e')));
       setState(() => _isSaving = false);
       return;
     }
@@ -322,8 +339,11 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                 color: _C.primary.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child:
-                  const Icon(Icons.check_rounded, color: _C.primary, size: 20),
+              child: const Icon(
+                Icons.check_rounded,
+                color: _C.primary,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 14),
             const Expanded(
@@ -483,8 +503,10 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
 
   // ── Greeting ──────────────────────────────────────────────────────────────────
   Widget _buildGreetingCard() {
-    final tracking = Provider.of<PregnancyViewModel>(context, listen: false)
-        .pregnancyTracking;
+    final tracking = Provider.of<PregnancyViewModel>(
+      context,
+      listen: false,
+    ).pregnancyTracking;
     return _PremiumCard(
       child: Row(
         children: [
@@ -496,7 +518,9 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: _C.primary.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(20),
@@ -504,8 +528,11 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.calendar_today_rounded,
-                              size: 12, color: _C.primary),
+                          Icon(
+                            Icons.calendar_today_rounded,
+                            size: 12,
+                            color: _C.primary,
+                          ),
                           const SizedBox(width: 5),
                           Text(
                             _todayStr(),
@@ -548,8 +575,11 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.pregnant_woman_rounded,
-                            size: 14, color: _C.secondary),
+                        Icon(
+                          Icons.pregnant_woman_rounded,
+                          size: 14,
+                          color: _C.secondary,
+                        ),
                         const SizedBox(width: 5),
                         Text(
                           tracking?.weekDisplay ?? 'Semaine non définie',
@@ -684,7 +714,7 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                               color: m.color.withOpacity(0.25),
                               blurRadius: 16,
                               spreadRadius: 2,
-                            )
+                            ),
                           ]
                         : null,
                   ),
@@ -713,8 +743,10 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
               ),
               child: Container(
                 key: ValueKey(_selectedMood),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: _moods[_selectedMood].color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -859,7 +891,9 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
         builder: (ctx, v, child) => Opacity(
           opacity: v.clamp(0, 1),
           child: Transform.translate(
-              offset: Offset(0, 18 * (1 - v)), child: child),
+            offset: Offset(0, 18 * (1 - v)),
+            child: child,
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.only(bottom: 10),
@@ -971,7 +1005,8 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation(
-                                _C.secondary.withOpacity(0.7)),
+                              _C.secondary.withOpacity(0.7),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -989,8 +1024,11 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                       key: const ValueKey('save'),
                       mainAxisSize: MainAxisSize.min,
                       children: const [
-                        Icon(Icons.favorite_rounded,
-                            color: Colors.white, size: 18),
+                        Icon(
+                          Icons.favorite_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                         SizedBox(width: 10),
                         Text(
                           'Enregistrer mon bilan',
@@ -1131,8 +1169,9 @@ class _SymptomCard extends StatelessWidget {
                       Text(
                         symptom.label,
                         style: TextStyle(
-                          color:
-                              symptom.selected ? _C.onSurface : _C.onSurfaceMid,
+                          color: symptom.selected
+                              ? _C.onSurface
+                              : _C.onSurfaceMid,
                           fontWeight: FontWeight.w800,
                           fontSize: 14.5,
                           letterSpacing: -0.2,
@@ -1144,7 +1183,9 @@ class _SymptomCard extends StatelessWidget {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 2),
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: _intensityColor.withOpacity(0.15),
                                     borderRadius: BorderRadius.circular(8),
@@ -1184,7 +1225,7 @@ class _SymptomCard extends StatelessWidget {
                               color: symptom.accent.withOpacity(0.3),
                               blurRadius: 10,
                               spreadRadius: 1,
-                            )
+                            ),
                           ]
                         : null,
                   ),
@@ -1222,8 +1263,11 @@ class _SymptomCard extends StatelessWidget {
                           const SizedBox(height: 14),
                           Row(
                             children: [
-                              Icon(Icons.tune_rounded,
-                                  size: 13, color: _C.onSurfaceLow),
+                              Icon(
+                                Icons.tune_rounded,
+                                size: 13,
+                                color: _C.onSurfaceLow,
+                              ),
                               const SizedBox(width: 6),
                               const Text(
                                 'Intensité',
@@ -1237,8 +1281,8 @@ class _SymptomCard extends StatelessWidget {
                               // Segment bar (5 dots)
                               Row(
                                 children: List.generate(5, (i) {
-                                  final filled =
-                                      (symptom.intensity * 5).round();
+                                  final filled = (symptom.intensity * 5)
+                                      .round();
                                   return AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
                                     width: i < filled ? 16 : 8,
@@ -1260,12 +1304,15 @@ class _SymptomCard extends StatelessWidget {
                             data: SliderThemeData(
                               trackHeight: 3,
                               thumbShape: const RoundSliderThumbShape(
-                                  enabledThumbRadius: 7),
+                                enabledThumbRadius: 7,
+                              ),
                               overlayShape: const RoundSliderOverlayShape(
-                                  overlayRadius: 14),
+                                overlayRadius: 14,
+                              ),
                               activeTrackColor: symptom.accent,
-                              inactiveTrackColor:
-                                  symptom.accent.withOpacity(0.12),
+                              inactiveTrackColor: symptom.accent.withOpacity(
+                                0.12,
+                              ),
                               thumbColor: symptom.accent,
                               overlayColor: symptom.accent.withOpacity(0.1),
                             ),
