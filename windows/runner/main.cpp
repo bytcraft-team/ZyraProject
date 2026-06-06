@@ -27,11 +27,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
-<<<<<<< HEAD
+
   if (!window.Create(L"zyra_flow", origin, size)) {
-=======
+
   if (!window.Create(L"zyra", origin, size)) {
->>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
+
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

@@ -1,8 +1,8 @@
-<<<<<<< HEAD
+
 # zyra_flow
-=======
+
 # zyra
->>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
+
 
 A new Flutter project.
 

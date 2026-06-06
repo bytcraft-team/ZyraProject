@@ -5,17 +5,17 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-<<<<<<< HEAD
+
 PRODUCT_NAME = zyra_flow
 
 // The application's bundle identifier
 PRODUCT_BUNDLE_IDENTIFIER = com.example.zyraFlow
-=======
+
 PRODUCT_NAME = zyra
 
 // The application's bundle identifier
 PRODUCT_BUNDLE_IDENTIFIER = com.example.zyra
->>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
+
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.

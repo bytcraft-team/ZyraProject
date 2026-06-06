@@ -4,10 +4,6 @@ import 'package:zyra/splash/splash_screen.dart';
 
 void main() {
   testWidgets('smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: SplashScreen(),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: SplashScreen()));
   });
 }

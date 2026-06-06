@@ -1,18 +1,18 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
-<<<<<<< HEAD
+
 project(zyra_flow LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "zyra_flow")
-=======
+
 project(zyra LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "zyra")
->>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
+
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

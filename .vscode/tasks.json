@@ -1,0 +1,77 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "flutter-pub-get",
+			"type": "shell",
+			"command": "C:\\flutter\\bin\\flutter.bat pub get",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "flutter-verify-gradle",
+			"type": "shell",
+			"command": "C:\\flutter\\bin\\flutter.bat analyze",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "flutter-build-debug",
+			"type": "shell",
+			"command": "C:\\flutter\\bin\\flutter.bat build apk --debug",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "flutter-pub-outdated",
+			"type": "shell",
+			"command": "C:\\flutter\\bin\\flutter.bat pub outdated",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "verify-gradle-wrapper",
+			"type": "shell",
+			"command": "cd C:\\Project\\FlutterProjects\\zyra\\android && .\\gradlew.bat -version",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "verify-gradle-wrapper2",
+			"type": "shell",
+			"command": "cd C:\\Project\\FlutterProjects\\zyra\\android ; .\\gradlew.bat -version",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "gradle-clean-refresh",
+			"type": "shell",
+			"command": "cd C:\\Project\\FlutterProjects\\zyra\\android ; .\\gradlew.bat --no-daemon --refresh-dependencies clean",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "gradle-assemble-debug",
+			"type": "shell",
+			"command": "cd C:\\Project\\FlutterProjects\\zyra\\android ; .\\gradlew.bat --no-daemon :app:assembleDebug",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
