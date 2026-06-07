@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zyra/theme/zyra_colors.dart';
 import 'package:zyra/screens/community/article_detail_screen.dart';
 import 'package:zyra/screens/community/create_article_screen.dart';
 import 'package:zyra/pregnancy1/view/shared_navigation.dart';
+import 'package:zyra/widgets/bottom_nav_bar.dart';
+import 'package:zyra/app_tab_notifier.dart';
 
 class ArticlesListScreen extends StatefulWidget {
-  const ArticlesListScreen({super.key});
+  final bool showCycleNav;
+  const ArticlesListScreen({super.key, this.showCycleNav = false});
   @override
   State<ArticlesListScreen> createState() => _ArticlesListScreenState();
 }
@@ -17,7 +19,14 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
   final _firestore = FirebaseFirestore.instance;
   String _selectedCat = 'Tout';
 
-  static const _cats = ['Tout', 'Cycle', 'Grossesse', 'Ramadan', 'Bien-être', 'Nutrition'];
+  static const _cats = [
+    'Tout',
+    'Cycle',
+    'Grossesse',
+    'Ramadan',
+    'Bien-être',
+    'Nutrition',
+  ];
 
   static const _catColors = {
     'Cycle': ZyraColors.primary,
@@ -42,7 +51,9 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
   };
 
   Query<Map<String, dynamic>> get _query {
-    final col = _firestore.collection('articles').orderBy('createdAt', descending: true);
+    final col = _firestore
+        .collection('articles')
+        .orderBy('createdAt', descending: true);
     if (_selectedCat == 'Tout') return col;
     return col.where('tag', isEqualTo: _selectedCat);
   }
@@ -61,12 +72,20 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
         ],
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 5,
-        onTap: (i) {
-          if (i != 5) navigateToPage(context, i);
-        },
-      ),
+      bottomNavigationBar: widget.showCycleNav
+          ? BottomNavBar(
+              selectedIndex: 6,
+              onTap: (i) {
+                appTabNotifier.value = i;
+                Navigator.popUntil(context, (r) => r.isFirst);
+              },
+            )
+          : CustomBottomNavBar(
+              currentIndex: 5,
+              onTap: (i) {
+                if (i != 5) navigateToPage(context, i);
+              },
+            ),
     );
   }
 
@@ -81,41 +100,55 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
             child: Row(
               children: [
                 Container(
-                  width: 42, height: 42,
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
                     color: ZyraColors.lightPink,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(Icons.article_outlined,
-                      color: ZyraColors.primary, size: 22),
+                  child: const Icon(
+                    Icons.article_outlined,
+                    color: ZyraColors.primary,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Santé & Bien-être',
-                        style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            color: ZyraColors.primary,
-                            fontWeight: FontWeight.w600)),
-                    Text('Articles',
-                        style: GoogleFonts.poppins(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            color: ZyraColors.darkText)),
+                    Text(
+                      'Santé & Bien-être',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        color: ZyraColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Articles',
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: ZyraColors.darkText,
+                      ),
+                    ),
                   ],
                 ),
                 const Spacer(),
                 GestureDetector(
                   onTap: () {},
                   child: Container(
-                    width: 42, height: 42,
+                    width: 42,
+                    height: 42,
                     decoration: BoxDecoration(
                       color: ZyraColors.lightPink,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(Icons.search_rounded,
-                        color: ZyraColors.primary, size: 22),
+                    child: const Icon(
+                      Icons.search_rounded,
+                      color: ZyraColors.primary,
+                      size: 22,
+                    ),
                   ),
                 ),
               ],
@@ -129,7 +162,8 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
   Widget _buildFeatured() {
     return SliverToBoxAdapter(
       child: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('articles')
+        stream: _firestore
+            .collection('articles')
             .orderBy('likes', descending: true)
             .limit(1)
             .snapshots(),
@@ -158,10 +192,15 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
         borderRadius: BorderRadius.circular(22),
       ),
       child: Center(
-        child: Text('Sois la première à écrire un article ! ✍️',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-                fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+        child: Text(
+          'Sois la première à écrire un article ! ✍️',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
@@ -173,8 +212,12 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
     final likes = d['likes'] as int? ?? 0;
     final tag = d['tag'] as String? ?? '';
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (_) => ArticleDetailScreen(articleId: id, data: d))),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ArticleDetailScreen(articleId: id, data: d),
+        ),
+      ),
       child: Container(
         margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
         padding: const EdgeInsets.all(20),
@@ -186,16 +229,22 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
           ),
           borderRadius: BorderRadius.circular(22),
           boxShadow: const [
-            BoxShadow(color: Color(0x44E91E8C), blurRadius: 16, offset: Offset(0, 6)),
+            BoxShadow(
+              color: Color(0x44E91E8C),
+              blurRadius: 16,
+              offset: Offset(0, 6),
+            ),
           ],
         ),
         child: Stack(
           children: [
             // decorative circles
             Positioned(
-              top: -10, right: -10,
+              top: -10,
+              right: -10,
               child: Container(
-                width: 80, height: 80,
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withOpacity(0.08),
@@ -203,9 +252,11 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
               ),
             ),
             Positioned(
-              bottom: -20, right: 30,
+              bottom: -20,
+              right: 30,
               child: Container(
-                width: 60, height: 60,
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withOpacity(0.06),
@@ -216,46 +267,73 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text('★  À la une',
-                      style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white)),
+                  child: Text(
+                    '★  À la une',
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 10),
-                Text(title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        height: 1.4)),
+                Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    height: 1.4,
+                  ),
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Text(author,
-                        style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            color: Colors.white70)),
-                    const Text('  •  ',
-                        style: TextStyle(color: Colors.white54)),
-                    Text('$readTime min',
-                        style: GoogleFonts.poppins(
-                            fontSize: 11, color: Colors.white70)),
-                    const Text('  •  ',
-                        style: TextStyle(color: Colors.white54)),
-                    const Icon(Icons.favorite_rounded,
-                        color: Colors.white70, size: 12),
+                    Text(
+                      author,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const Text(
+                      '  •  ',
+                      style: TextStyle(color: Colors.white54),
+                    ),
+                    Text(
+                      '$readTime min',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const Text(
+                      '  •  ',
+                      style: TextStyle(color: Colors.white54),
+                    ),
+                    const Icon(
+                      Icons.favorite_rounded,
+                      color: Colors.white70,
+                      size: 12,
+                    ),
                     const SizedBox(width: 3),
-                    Text('$likes',
-                        style: GoogleFonts.poppins(
-                            fontSize: 11, color: Colors.white70)),
+                    Text(
+                      '$likes',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: Colors.white70,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -282,25 +360,41 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   gradient: active
                       ? const LinearGradient(
-                          colors: [ZyraColors.purple, ZyraColors.primary])
+                          colors: [ZyraColors.purple, ZyraColors.primary],
+                        )
                       : null,
                   color: active ? null : Colors.white,
                   borderRadius: BorderRadius.circular(25),
                   boxShadow: active
-                      ? [const BoxShadow(
-                          color: Color(0x33E91E8C), blurRadius: 8, offset: Offset(0, 3))]
-                      : [const BoxShadow(
-                          color: Color(0x0F000000), blurRadius: 4)],
+                      ? [
+                          const BoxShadow(
+                            color: Color(0x33E91E8C),
+                            blurRadius: 8,
+                            offset: Offset(0, 3),
+                          ),
+                        ]
+                      : [
+                          const BoxShadow(
+                            color: Color(0x0F000000),
+                            blurRadius: 4,
+                          ),
+                        ],
                 ),
-                child: Text(cat,
-                    style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: active ? Colors.white : ZyraColors.greyText)),
+                child: Text(
+                  cat,
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: active ? Colors.white : ZyraColors.greyText,
+                  ),
+                ),
               ),
             );
           },
@@ -318,7 +412,8 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
             child: Padding(
               padding: EdgeInsets.all(40),
               child: Center(
-                  child: CircularProgressIndicator(color: ZyraColors.primary)),
+                child: CircularProgressIndicator(color: ZyraColors.primary),
+              ),
             ),
           );
         }
@@ -329,15 +424,20 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
               padding: const EdgeInsets.all(48),
               child: Column(
                 children: [
-                  Icon(Icons.article_outlined,
-                      size: 64,
-                      color: ZyraColors.primary.withOpacity(0.25)),
+                  Icon(
+                    Icons.article_outlined,
+                    size: 64,
+                    color: ZyraColors.primary.withOpacity(0.25),
+                  ),
                   const SizedBox(height: 14),
-                  Text('Aucun article dans cette catégorie',
-                      style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: ZyraColors.darkText)),
+                  Text(
+                    'Aucun article dans cette catégorie',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: ZyraColors.darkText,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -346,19 +446,16 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
         return SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
           sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (ctx, i) {
-                final d = docs[i].data() as Map<String, dynamic>;
-                return _ArticleCard(
-                  articleId: docs[i].id,
-                  data: d,
-                  catColors: _catColors,
-                  catBgs: _catBgs,
-                  catIcons: _catIcons,
-                );
-              },
-              childCount: docs.length,
-            ),
+            delegate: SliverChildBuilderDelegate((ctx, i) {
+              final d = docs[i].data() as Map<String, dynamic>;
+              return _ArticleCard(
+                articleId: docs[i].id,
+                data: d,
+                catColors: _catColors,
+                catBgs: _catBgs,
+                catIcons: _catIcons,
+              );
+            }, childCount: docs.length),
           ),
         );
       },
@@ -370,19 +467,23 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
         child: GestureDetector(
-          onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const CreateArticleScreen())),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CreateArticleScreen()),
+          ),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [ZyraColors.purple, ZyraColors.primary]),
+                colors: [ZyraColors.purple, ZyraColors.primary],
+              ),
               borderRadius: BorderRadius.circular(18),
               boxShadow: const [
                 BoxShadow(
-                    color: Color(0x44E91E8C),
-                    blurRadius: 14,
-                    offset: Offset(0, 5)),
+                  color: Color(0x44E91E8C),
+                  blurRadius: 14,
+                  offset: Offset(0, 5),
+                ),
               ],
             ),
             child: Row(
@@ -390,11 +491,14 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
               children: [
                 const Icon(Icons.edit_outlined, color: Colors.white, size: 20),
                 const SizedBox(width: 10),
-                Text('Écrire un article',
-                    style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white)),
+                Text(
+                  'Écrire un article',
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
               ],
             ),
           ),
@@ -431,9 +535,12 @@ class _ArticleCard extends StatelessWidget {
     final tagIcon = catIcons[tag] ?? Icons.article_outlined;
 
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(
-              builder: (_) => ArticleDetailScreen(articleId: articleId, data: data))),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ArticleDetailScreen(articleId: articleId, data: data),
+        ),
+      ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: ZyraColors.cardDecoration,
@@ -442,7 +549,8 @@ class _ArticleCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 54, height: 54,
+                width: 54,
+                height: 54,
                 decoration: BoxDecoration(
                   color: tagBg,
                   borderRadius: BorderRadius.circular(16),
@@ -454,49 +562,76 @@ class _ArticleCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(tag,
-                        style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: tagColor)),
+                    Text(
+                      tag,
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: tagColor,
+                      ),
+                    ),
                     const SizedBox(height: 3),
-                    Text(title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: ZyraColors.darkText,
-                            height: 1.4)),
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: ZyraColors.darkText,
+                        height: 1.4,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.access_time_rounded,
-                            size: 12, color: ZyraColors.greyText),
+                        const Icon(
+                          Icons.access_time_rounded,
+                          size: 12,
+                          color: ZyraColors.greyText,
+                        ),
                         const SizedBox(width: 3),
-                        Text('$readTime min',
-                            style: GoogleFonts.poppins(
-                                fontSize: 10, color: ZyraColors.greyText)),
+                        Text(
+                          '$readTime min',
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            color: ZyraColors.greyText,
+                          ),
+                        ),
                         const SizedBox(width: 10),
-                        const Icon(Icons.favorite_border_rounded,
-                            size: 12, color: ZyraColors.greyText),
+                        const Icon(
+                          Icons.favorite_border_rounded,
+                          size: 12,
+                          color: ZyraColors.greyText,
+                        ),
                         const SizedBox(width: 3),
-                        Text('$likes',
-                            style: GoogleFonts.poppins(
-                                fontSize: 10, color: ZyraColors.greyText)),
+                        Text(
+                          '$likes',
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            color: ZyraColors.greyText,
+                          ),
+                        ),
                         const SizedBox(width: 10),
-                        Text(author,
-                            style: GoogleFonts.poppins(
-                                fontSize: 10, color: ZyraColors.greyText),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis),
+                        Text(
+                          author,
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            color: ZyraColors.greyText,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_rounded,
-                  size: 14, color: ZyraColors.greyText),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: ZyraColors.greyText,
+              ),
             ],
           ),
         ),

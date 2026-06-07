@@ -16,6 +16,7 @@ import 'cycle1/views/settings/cycle_settings_screen.dart';
 import 'cycle1/viewmodels/settings_viewmodel.dart';
 
 import 'widgets/bottom_nav_bar.dart';
+import 'app_tab_notifier.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -48,6 +49,27 @@ class _MainShellState extends State<MainShell> {
       if (!mounted) return;
       _initializeTabIfNeeded(0);
     });
+
+    // Listen to external requests to change the active tab (from pushed screens)
+    appTabNotifier.addListener(_handleExternalTabChange);
+  }
+
+  void _handleExternalTabChange() {
+    final v = appTabNotifier.value;
+    if (v == null) return;
+    if (!mounted) return;
+    _initializeTabIfNeeded(v);
+    setState(() {
+      _selectedIndex = v;
+    });
+    // reset notifier
+    appTabNotifier.value = null;
+  }
+
+  @override
+  void dispose() {
+    appTabNotifier.removeListener(_handleExternalTabChange);
+    super.dispose();
   }
 
   void _initializeTabIfNeeded(int index) {
@@ -103,10 +125,7 @@ class _MainShellState extends State<MainShell> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: BottomNavBar(
         selectedIndex: _selectedIndex,
         onTap: _onTap,
