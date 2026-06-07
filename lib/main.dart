@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zyra/firebase_options.dart';
 import 'package:zyra/core/global_keys.dart';
 import 'package:zyra/pregnancy1/view/pregnancy_tracker_screen.dart';
+//import 'package:zyra/pregnancy1/view/postpartum_page.dart';
 import 'package:zyra/pregnancy1/onboarding/onboarding_screen.dart';
 import 'package:zyra/auth/login_screen.dart';
 import 'package:zyra/auth/signup_screen.dart';
@@ -22,6 +23,8 @@ import 'package:zyra/cycle1/viewmodels/calendar_viewmodel.dart';
 import 'package:zyra/cycle1/viewmodels/education_viewmodel.dart';
 import 'package:zyra/cycle1/data/repositories/calendar_repository.dart';
 import 'package:zyra/pregnancy1/viewmodels/pregnancy_view_model.dart';
+import 'package:zyra/pregnancy1/viewmodels/user_phase_view_model.dart';
+//import 'package:zyra/models/user_phase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,12 +67,9 @@ class LunaApp extends StatelessWidget {
           create: (_) =>
               CalendarViewModel(repository: CalendarRepositoryImpl()),
         ),
-        ChangeNotifierProvider(
-          create: (_) => EducationViewModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => PregnancyViewModel(),
-        ),
+        ChangeNotifierProvider(create: (_) => EducationViewModel()),
+
+        ChangeNotifierProvider(create: (_) => PregnancyViewModel()),
       ],
       child: MaterialApp(
         title: 'Luna',

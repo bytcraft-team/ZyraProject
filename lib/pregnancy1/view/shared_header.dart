@@ -13,11 +13,7 @@ class PregnancyModuleHeader extends StatelessWidget {
       child: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 120, 113, 220),
-              Color.fromARGB(255, 202, 134, 224),
-              Color.fromARGB(255, 227, 67, 134),
-            ],
+            colors: [Color(0xFF7B70D8), Color(0xFFC57AD8), Color(0xFFE3437D)],
             stops: [0.0, 0.5, 1.0],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -35,14 +31,14 @@ class PregnancyModuleHeader extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       color: AppColors.offWhite,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.3,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
                     ),
                   ),
                 ),
                 Positioned(
-                  left: 8,
+                  left: 16,
                   child: Container(
                     width: 36,
                     height: 36,
