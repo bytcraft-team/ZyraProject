@@ -18,7 +18,6 @@ abstract class CycleRepository {
   Future<UserModel> getUser();
   Future<CycleModel?> getCurrentCycle();
   Future<List<DayInfoModel>> getMonthDays(DateTime month);
-  Future<double?> getTodayBasalTemperature();
   Future<void> saveCycle(CycleModel cycle);
   Future<void> syncLocalToFirebase();
 }
@@ -112,23 +111,12 @@ class CycleRepositoryImpl implements CycleRepository {
           day: safeDayInCycle,
           cycleDuration: cycle.cycleDuration,
         ),
-        basalTemperature: null,
-        temperatureDelta: null,
         isPredicted: date.isAfter(today),
       );
     });
   }
 
-  @override
-  Future<double?> getTodayBasalTemperature() async {
-    try {
-      final todayLog = await _dailyLogRepository.getLogForDate(DateTime.now());
-      return todayLog?.basalTemperature;
-    } catch (e) {
-      debugPrint('Erreur lors de la lecture de la température du jour : $e');
-      return null;
-    }
-  }
+  // getTodayBasalTemperature removed (temperature tracking disabled)
 
   @override
   Future<void> saveCycle(CycleModel cycle) async {

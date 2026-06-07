@@ -45,6 +45,16 @@ class _DateStripWidgetState extends State<DateStripWidget> {
     });
   }
 
+  @override
+  void didUpdateWidget(covariant DateStripWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // When the days list or the selected date changes, scroll to selection.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _scrollToSelected();
+    });
+  }
+
   void _scrollToSelected() {
     final idx = widget.days.indexWhere((d) => _isSame(d, widget.selectedDate));
     if (idx < 0) return;

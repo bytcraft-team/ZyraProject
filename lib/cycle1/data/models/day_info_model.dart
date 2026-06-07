@@ -22,8 +22,7 @@ class DayInfoModel {
   final int dayInCycle;
   final CyclePhase phase;
   final FertilityLevel fertilityLevel;
-  final double? basalTemperature;
-  final double? temperatureDelta;
+  
   final bool isPredicted;
 
   const DayInfoModel({
@@ -31,8 +30,7 @@ class DayInfoModel {
     required this.dayInCycle,
     required this.phase,
     required this.fertilityLevel,
-    this.basalTemperature,
-    this.temperatureDelta,
+    
     this.isPredicted = false,
   });
 }

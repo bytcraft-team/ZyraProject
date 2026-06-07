@@ -157,8 +157,6 @@ class OnboardingViewModel extends ChangeNotifier {
               'daily_logs',
               {
                 'date': CycleDateUtils.storageKey(targetDate),
-                'basal_temperature':
-                    isPredicted ? null : 36.5 + (dayInCycle * 0.01),
                 'flow_intensity':
                     dayInCycle <= _periodDuration ? 'medium' : null,
                 'has_data': isPredicted ? 0 : 1,

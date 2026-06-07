@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import '../data/models/daily_log_model.dart';
 // Pour l'accès aux énumérations partagées
@@ -33,6 +35,35 @@ class DailyLogViewModel extends ChangeNotifier {
     return _weekHasData[CycleDateUtils.storageKey(date)] ?? false;
   }
 
+  DailyLogModel? _currentLog;
+  DailyLogModel? get currentLog => _currentLog;
+
+  DailyLogModel? getJournalByDate(DateTime date) {
+    if (CycleDateUtils.dateOnly(date) != CycleDateUtils.dateOnly(_selectedDate)) {
+      return null;
+    }
+    return _currentLog;
+  }
+
+  Timer? _saveStateResetTimer;
+
+  void _setSaveState(SaveState state, {Duration? resetAfter}) {
+    _saveStateResetTimer?.cancel();
+    _saveState = state;
+    notifyListeners();
+    if (resetAfter != null) {
+      _saveStateResetTimer = Timer(resetAfter, () {
+        if (_saveState == state) {
+          _saveState = SaveState.idle;
+          notifyListeners();
+        }
+      });
+    }
+  }
+
+  List<DailyLogModel> _historyLogs = [];
+  List<DailyLogModel> get historyLogs => List.unmodifiable(_historyLogs);
+
   // ── Champs du formulaire ─────────────────────────────────────
   FlowIntensity? _flowIntensity;
   FlowIntensity? get flowIntensity => _flowIntensity;
@@ -43,26 +74,18 @@ class DailyLogViewModel extends ChangeNotifier {
   List<MoodType> _moods = [];
   List<MoodType> get moods => List.unmodifiable(_moods);
 
-  double _basalTemperature = 36.5;
-  double get basalTemperature => _basalTemperature;
 
   CervicalMucusType? _cervicalMucus;
   CervicalMucusType? get cervicalMucus => _cervicalMucus;
 
-  String _notes = '';
-  String get notes => _notes;
-
-  List<NoteMedia> _medias = [];
-  List<NoteMedia> get medias => List.unmodifiable(_medias);
+  String? _note;
+  String? get note => _note;
 
   bool _showAllSymptoms = false;
   bool get showAllSymptoms => _showAllSymptoms;
 
   // ── Computed ─────────────────────────────────────────────────
-  bool get hasTemperatureWarning => _basalTemperature >= 37.0;
-
-  String get temperatureWarningMessage =>
-      '🌡️ Température élevée — possible ovulation détectée';
+  
 
   bool isSymptomSelected(SymptomType type) =>
       _symptoms.any((s) => s.type == type);
@@ -86,7 +109,7 @@ class DailyLogViewModel extends ChangeNotifier {
 
   // ── Init global (onglet Journal) ─────────────────────────────
   Future<void> init() async {
-    _buildWeekDays(DateTime.now());
+    generateDaysFromToday();
     await _loadWeekData();
     await _loadForDate(_selectedDate);
   }
@@ -94,17 +117,41 @@ class DailyLogViewModel extends ChangeNotifier {
   // ── Init depuis un jour spécifique (DayDetail → DailyLog) ────
   Future<void> initWithDate(DateTime date) async {
     _selectedDate = CycleDateUtils.dateOnly(date);
-    _buildWeekDays(date);
+    // Keep a dynamic window ending on the selected date if needed
+    generateDaysFromToday();
     await _loadWeekData();
     await _loadForDate(_selectedDate);
   }
 
-  void _buildWeekDays(DateTime center) {
+  /// Generate a list of days ending today (oldest -> newest).
+  ///
+  /// `limit` controls how many days to keep (default 30). The list is ordered
+  /// from oldest (index 0) to newest (last index = today).
+  void generateDaysFromToday({int limit = 30}) {
+    final today = CycleDateUtils.dateOnly(DateTime.now());
     _weekDays = List.generate(
-      14,
-      (i) => CycleDateUtils.dateOnly(center).subtract(Duration(days: 7 - i)),
+      limit,
+      (i) => CycleDateUtils.dateOnly(today.subtract(Duration(days: limit - 1 - i))),
     );
     notifyListeners();
+  }
+
+  /// Generate days ending on [end] (oldest -> newest). Useful to ensure a
+  /// selected date is within the visible window.
+  void generateDaysEndingOn(DateTime end, {int limit = 30}) {
+    final last = CycleDateUtils.dateOnly(end);
+    _weekDays = List.generate(
+      limit,
+      (i) => CycleDateUtils.dateOnly(last.subtract(Duration(days: limit - 1 - i))),
+    );
+    notifyListeners();
+  }
+
+  void _refreshDaysIfNeeded({int limit = 30}) {
+    final today = CycleDateUtils.dateOnly(DateTime.now());
+    if (_weekDays.isEmpty || CycleDateUtils.dateOnly(_weekDays.last) != today) {
+      generateDaysFromToday(limit: limit);
+    }
   }
 
   Future<void> _loadWeekData() async {
@@ -113,11 +160,29 @@ class DailyLogViewModel extends ChangeNotifier {
     _weekHasData = result.map(
       (k, v) => MapEntry(CycleDateUtils.storageKey(k), v),
     );
+    await _refreshHistory();
+    notifyListeners();
+  }
+
+  Future<void> _refreshHistory() async {
+    if (_weekDays.isEmpty) return;
+    final start = _weekDays.first;
+    final end = _weekDays.last;
+    final logs = await _repository.getLogsForRange(start, end);
+    _historyLogs = List<DailyLogModel>.from(logs);
+    _historyLogs.sort((a, b) => b.date.compareTo(a.date));
     notifyListeners();
   }
 
   Future<void> selectDate(DateTime date) async {
     _selectedDate = CycleDateUtils.dateOnly(date);
+    // Ensure the selected date is within the current window; if not, rebuild
+    // the days window to end on the selected date so it becomes visible.
+    if (_weekDays.isEmpty || _selectedDate.isBefore(_weekDays.first) || _selectedDate.isAfter(_weekDays.last)) {
+      generateDaysEndingOn(_selectedDate);
+    } else {
+      _refreshDaysIfNeeded();
+    }
     _resetForm();
     notifyListeners();
     await _loadForDate(_selectedDate);
@@ -129,7 +194,9 @@ class DailyLogViewModel extends ChangeNotifier {
     final log = await _repository.getLogForDate(date);
     if (log != null) {
       _applyLog(log);
+      _currentLog = log;
     } else {
+      _currentLog = null;
       _resetForm();
     }
     _isLoading = false;
@@ -140,20 +207,42 @@ class DailyLogViewModel extends ChangeNotifier {
     _flowIntensity = log.flowIntensity;
     _symptoms = List<SymptomEntry>.from(log.symptoms);
     _moods = List<MoodType>.from(log.moods);
-    _basalTemperature = log.basalTemperature ?? 36.5;
     _cervicalMucus = log.cervicalMucus;
-    _notes = log.notes ?? '';
-    _medias = List<NoteMedia>.from(log.medias);
+    _note = log.notes.isNotEmpty ? log.notes.first : null;
   }
 
   void _resetForm() {
     _flowIntensity = null;
     _symptoms = <SymptomEntry>[];
     _moods = <MoodType>[];
-    _basalTemperature = 36.5;
     _cervicalMucus = null;
-    _notes = '';
-    _medias = <NoteMedia>[];
+    _note = null;
+  }
+
+  Future<bool> deleteCurrentLog() async {
+    if (_currentLog == null) return false;
+    return deleteLogByDate(_selectedDate);
+  }
+
+  Future<bool> deleteLogByDate(DateTime date) async {
+    _setSaveState(SaveState.saving);
+
+    try {
+      await _repository.deleteLogForDate(date);
+      _weekHasData.remove(CycleDateUtils.storageKey(date));
+      await _refreshHistory();
+
+      if (CycleDateUtils.dateOnly(_selectedDate) == CycleDateUtils.dateOnly(date)) {
+        _currentLog = null;
+        _resetForm();
+      }
+
+      _setSaveState(SaveState.success, resetAfter: const Duration(milliseconds: 700));
+      return true;
+    } catch (_) {
+      _setSaveState(SaveState.error, resetAfter: const Duration(seconds: 1));
+      return false;
+    }
   }
 
   // ── Actions formulaire ───────────────────────────────────────
@@ -210,17 +299,11 @@ class DailyLogViewModel extends ChangeNotifier {
   }
 
   void increaseTemperature() {
-    _basalTemperature = double.parse(
-        (_basalTemperature + 0.1).toStringAsFixed(1));
-    if (_basalTemperature > 42.0) _basalTemperature = 42.0;
-    notifyListeners();
+    // temperature tracking removed
   }
 
   void decreaseTemperature() {
-    _basalTemperature = double.parse(
-        (_basalTemperature - 0.1).toStringAsFixed(1));
-    if (_basalTemperature < 35.0) _basalTemperature = 35.0;
-    notifyListeners();
+    // temperature tracking removed
   }
 
   void selectCervicalMucus(CervicalMucusType type) {
@@ -228,31 +311,15 @@ class DailyLogViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateNotes(String value) {
-    _notes = value;
+  void saveNote(String note) {
+    final trimmed = note.trim();
+    _note = trimmed.isEmpty ? null : trimmed;
     notifyListeners();
-  }
-
-  void addMedia(NoteMedia media) {
-    final currentMedias = List<NoteMedia>.from(_medias);
-    currentMedias.add(media);
-    _medias = currentMedias;
-    notifyListeners();
-  }
-
-  void removeMedia(int index) {
-    final currentMedias = List<NoteMedia>.from(_medias);
-    if (index >= 0 && index < currentMedias.length) {
-      currentMedias.removeAt(index);
-      _medias = currentMedias;
-      notifyListeners();
-    }
   }
 
   // ── Save ─────────────────────────────────────────────────────
   Future<bool> saveLog() async {
-    _saveState = SaveState.saving;
-    notifyListeners();
+    _setSaveState(SaveState.saving);
 
     try {
       final log = DailyLogModel(
@@ -260,31 +327,34 @@ class DailyLogViewModel extends ChangeNotifier {
         flowIntensity: _flowIntensity,
         symptoms: List.from(_symptoms),
         moods: List.from(_moods),
-        basalTemperature: _basalTemperature,
         cervicalMucus: _cervicalMucus,
-        notes: _notes.isEmpty ? null : _notes,
-        medias: List.from(_medias),
+        notes: _note != null ? <String>[_note!] : const [],
         hasData: true,
       );
 
       await _repository.saveLog(log);
-
-      // Mettre à jour la carte d'activité de la semaine
+      _currentLog = log;
       _weekHasData[CycleDateUtils.storageKey(_selectedDate)] = true;
+      // Refresh days/historical list and data after upsert
+      _refreshDaysIfNeeded();
+      await _refreshHistory();
 
-      _saveState = SaveState.success;
-      notifyListeners();
+      _setSaveState(SaveState.success, resetAfter: const Duration(milliseconds: 700));
       return true;
     } catch (_) {
-      _saveState = SaveState.error;
-      notifyListeners();
+      _setSaveState(SaveState.error, resetAfter: const Duration(seconds: 1));
       return false;
     }
   }
 
   // Remettre à zéro le saveState
   void resetSaveState() {
-    _saveState = SaveState.idle;
-    notifyListeners();
+    _setSaveState(SaveState.idle);
+  }
+
+  @override
+  void dispose() {
+    _saveStateResetTimer?.cancel();
+    super.dispose();
   }
 }

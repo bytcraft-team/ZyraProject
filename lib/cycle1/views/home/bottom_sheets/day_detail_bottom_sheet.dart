@@ -85,16 +85,6 @@ class DayDetailBottomSheet extends StatelessWidget {
             title: 'Fertilité',
             value: dayInfo.fertilityLevel.label,
           ),
-          if (dayInfo.basalTemperature != null) ...[
-            const SizedBox(height: AppDimensions.sm),
-            _InfoRow(
-              icon: Icons.thermostat_rounded,
-              iconColor: AppColors.warning,
-              iconBg: const Color(0xFFFFF8E1),
-              title: 'Température',
-              value: '${dayInfo.basalTemperature!.toStringAsFixed(1)}°C',
-            ),
-          ],
           const SizedBox(height: AppDimensions.lg),
           // Jour du cycle
           Container(

@@ -3,14 +3,13 @@ import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
-import '../../data/models/daily_log_model.dart';
 import '../../viewmodels/daily_log_viewmodel.dart';
 import 'widgets/date_strip_widget.dart';
 import 'widgets/flow_intensity_widget.dart';
 import 'widgets/symptoms_grid_widget.dart';
 import 'widgets/mood_selector_widget.dart';
-import 'widgets/temperature_input_widget.dart';
 import 'widgets/cervical_mucus_widget.dart';
+import 'widgets/journal_history_section.dart';
 import 'widgets/notes_section_widget.dart';
 import 'widgets/save_button_widget.dart';
 
@@ -154,43 +153,22 @@ class _LogBody extends StatelessWidget {
             onToggle: vm.toggleMood,
           ),
           const SizedBox(height: 8),
-          TemperatureInputWidget(
-            temperature: vm.basalTemperature,
-            showWarning: vm.hasTemperatureWarning,
-            warningMessage: vm.temperatureWarningMessage,
-            onIncrease: vm.increaseTemperature,
-            onDecrease: vm.decreaseTemperature,
-          ),
-          const SizedBox(height: 8),
           CervicalMucusWidget(
             selected: vm.cervicalMucus,
             onSelect: vm.selectCervicalMucus,
           ),
           const SizedBox(height: 8),
           NotesSectionWidget(
-            initialNotes: vm.notes,
-            medias: vm.medias,
-            onNotesChanged: vm.updateNotes,
-            onAddImage: () => vm.addMedia(
-              const NoteMedia(
-                type: NoteMediaType.image,
-                path: '/mock/image.jpg',
-              ),
-            ),
-            onAddAudio: () => vm.addMedia(
-              const NoteMedia(
-                type: NoteMediaType.audio,
-                path: '/mock/audio.mp3',
-                audioDuration: Duration(seconds: 12),
-              ),
-            ),
-            onRemoveMedia: vm.removeMedia,
+            note: vm.note,
+            onNoteChanged: vm.saveNote,
           ),
           const SizedBox(height: 8),
           SaveButtonWidget(
             saveState: vm.saveState,
-            onSave: vm.saveLog, // ✅ pas de Navigator.pop()
+            onSave: vm.saveLog,
           ),
+          const SizedBox(height: 16),
+          JournalHistorySection(viewModel: vm),
         ],
       ),
     );

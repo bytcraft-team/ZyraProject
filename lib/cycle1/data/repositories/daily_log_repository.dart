@@ -7,7 +7,9 @@ import '../models/daily_log_model.dart';
 abstract class DailyLogRepository {
   Future<DailyLogModel?> getLogForDate(DateTime date);
   Future<void> saveLog(DailyLogModel log);
+  Future<void> deleteLogForDate(DateTime date);
   Future<Map<DateTime, bool>> getWeekHasData(DateTime weekStart);
+  Future<List<DailyLogModel>> getLogsForRange(DateTime start, DateTime end);
 }
 
 class DailyLogRepositoryImpl implements DailyLogRepository {
@@ -72,11 +74,31 @@ class DailyLogRepositoryImpl implements DailyLogRepository {
   }
 
   @override
+  Future<void> deleteLogForDate(DateTime date) async {
+    final key = _dayKey(date);
+    _cache.remove(key);
+
+    final user = _auth.currentUser;
+    if (user == null) {
+      debugPrint('🔒 DailyLogRepository: aucun utilisateur Firebase connecté, suppression locale seulement.');
+      return;
+    }
+
+    try {
+      await _dailyLogCollection(user.uid).doc(key).delete();
+      debugPrint('✅ DailyLog supprimé sur Firestore pour $key');
+    } catch (e, stack) {
+      debugPrint('Erreur DailyLogRepository deleteLogForDate: $e');
+      debugPrint('$stack');
+    }
+  }
+
+  @override
   Future<Map<DateTime, bool>> getWeekHasData(DateTime weekStart) async {
     final cleanStart = CycleDateUtils.dateOnly(weekStart);
     final result = <DateTime, bool>{};
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 14; i++) {
       final currentDay = cleanStart.add(Duration(days: i));
       result[currentDay] = false;
     }
@@ -84,7 +106,7 @@ class DailyLogRepositoryImpl implements DailyLogRepository {
     final user = _auth.currentUser;
     if (user == null) {
       debugPrint('🔒 DailyLogRepository: aucun utilisateur Firebase connecté, lecture locale seulement.');
-      for (int i = 0; i < 7; i++) {
+      for (int i = 0; i < 14; i++) {
         final currentDay = cleanStart.add(Duration(days: i));
         final key = _dayKey(currentDay);
         result[currentDay] = _cache.containsKey(key);
@@ -94,7 +116,7 @@ class DailyLogRepositoryImpl implements DailyLogRepository {
 
     try {
       final start = cleanStart.toIso8601String();
-      final end = cleanStart.add(const Duration(days: 6)).toIso8601String();
+      final end = cleanStart.add(const Duration(days: 13)).toIso8601String();
       final snapshot = await _dailyLogCollection(user.uid)
           .where('date', isGreaterThanOrEqualTo: start)
           .where('date', isLessThanOrEqualTo: end)
@@ -112,7 +134,7 @@ class DailyLogRepositoryImpl implements DailyLogRepository {
     } catch (e, stack) {
       debugPrint('Erreur DailyLogRepository getWeekHasData: $e');
       debugPrint('$stack');
-      for (int i = 0; i < 7; i++) {
+      for (int i = 0; i < 14; i++) {
         final currentDay = cleanStart.add(Duration(days: i));
         final key = _dayKey(currentDay);
         result[currentDay] = _cache.containsKey(key);
@@ -120,5 +142,45 @@ class DailyLogRepositoryImpl implements DailyLogRepository {
     }
 
     return result;
+  }
+
+  @override
+  Future<List<DailyLogModel>> getLogsForRange(DateTime start, DateTime end) async {
+    final cleanStart = CycleDateUtils.dateOnly(start);
+    final cleanEnd = CycleDateUtils.dateOnly(end);
+    final logs = <DailyLogModel>[];
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      debugPrint('🔒 DailyLogRepository: aucun utilisateur Firebase connecté, lecture locale seulement.');
+      logs.addAll(_cache.values.where((log) {
+        return !log.date.isBefore(cleanStart) && !log.date.isAfter(cleanEnd);
+      }));
+      return logs;
+    }
+
+    try {
+      final startKey = cleanStart.toIso8601String();
+      final endKey = cleanEnd.toIso8601String();
+      final snapshot = await _dailyLogCollection(user.uid)
+          .where('date', isGreaterThanOrEqualTo: startKey)
+          .where('date', isLessThanOrEqualTo: endKey)
+          .get();
+
+      for (final doc in snapshot.docs) {
+        final data = Map<String, dynamic>.from(doc.data());
+        final model = DailyLogModel.fromMap(data);
+        logs.add(model);
+        _cache[_dayKey(model.date)] = model;
+      }
+    } catch (e, stack) {
+      debugPrint('Erreur DailyLogRepository getLogsForRange: $e');
+      debugPrint('$stack');
+      logs.addAll(_cache.values.where((log) {
+        return !log.date.isBefore(cleanStart) && !log.date.isAfter(cleanEnd);
+      }));
+    }
+
+    return logs;
   }
 }
