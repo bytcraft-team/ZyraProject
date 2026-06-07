@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import '../../data/models/calendar_model.dart';
 import '../../data/models/cycle_model.dart';
-import '../../data/models/daily_log_model.dart';
 import '../../data/models/settings_model.dart';
 import '../utils/cycle_utils.dart';
 import '../utils/date_utils.dart';

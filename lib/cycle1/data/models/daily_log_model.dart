@@ -197,6 +197,7 @@ extension CervicalMucusTypeExt on CervicalMucusType {
 // ─── Daily Log (modèle principal sérialisé) ───────────────────
 class DailyLogModel {
   final DateTime date;
+  final String? status; // ex: 'menstruation','fertile','ovulation','luteal'
   final FlowIntensity? flowIntensity;
   final List<SymptomEntry> symptoms;
   final List<MoodType> moods;
@@ -206,6 +207,7 @@ class DailyLogModel {
 
   const DailyLogModel({
     required this.date,
+    this.status,
     this.flowIntensity,
     this.symptoms = const [],
     this.moods = const [],
@@ -216,6 +218,7 @@ class DailyLogModel {
 
   DailyLogModel copyWith({
     DateTime? date,
+    String? status,
     FlowIntensity? flowIntensity,
     List<SymptomEntry>? symptoms,
     List<MoodType>? moods,
@@ -225,6 +228,7 @@ class DailyLogModel {
   }) {
     return DailyLogModel(
       date: date ?? this.date,
+      status: status ?? this.status,
       flowIntensity: flowIntensity ?? this.flowIntensity,
       symptoms: symptoms ?? this.symptoms,
       moods: moods ?? this.moods,
@@ -238,6 +242,7 @@ class DailyLogModel {
   Map<String, dynamic> toMap() {
     return {
       'date': date.toIso8601String(),
+      'status': status,
       'flowIntensity': flowIntensity?.name,
       'symptoms': symptoms.map((x) => x.toMap()).toList(),
       'moods': moods.map((x) => x.name).toList(),
@@ -251,6 +256,7 @@ class DailyLogModel {
   factory DailyLogModel.fromMap(Map<String, dynamic> map) {
     return DailyLogModel(
       date: DateTime.parse(map['date'] as String),
+      status: map['status'] as String?,
       flowIntensity: map['flowIntensity'] != null
           ? FlowIntensity.values.byName(map['flowIntensity'] as String)
           : null,

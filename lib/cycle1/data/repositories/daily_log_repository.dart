@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -10,12 +11,17 @@ abstract class DailyLogRepository {
   Future<void> deleteLogForDate(DateTime date);
   Future<Map<DateTime, bool>> getWeekHasData(DateTime weekStart);
   Future<List<DailyLogModel>> getLogsForRange(DateTime start, DateTime end);
+  Stream<DateTime> get onLogChanged;
 }
 
 class DailyLogRepositoryImpl implements DailyLogRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Map<String, DailyLogModel> _cache = {};
+  final _changes = StreamController<DateTime>.broadcast();
+
+  @override
+  Stream<DateTime> get onLogChanged => _changes.stream;
 
   CollectionReference<Map<String, dynamic>> _dailyLogCollection(String uid) {
     return _firestore
@@ -67,6 +73,8 @@ class DailyLogRepositoryImpl implements DailyLogRepository {
     try {
       await _dailyLogCollection(user.uid).doc(key).set(savedLog.toMap());
       debugPrint('✅ DailyLog sauvegardé sur Firestore pour $key');
+      // notifier les auditeurs
+      _changes.add(log.date);
     } catch (e, stack) {
       debugPrint('Erreur DailyLogRepository saveLog: $e');
       debugPrint('$stack');
@@ -87,6 +95,7 @@ class DailyLogRepositoryImpl implements DailyLogRepository {
     try {
       await _dailyLogCollection(user.uid).doc(key).delete();
       debugPrint('✅ DailyLog supprimé sur Firestore pour $key');
+      _changes.add(date);
     } catch (e, stack) {
       debugPrint('Erreur DailyLogRepository deleteLogForDate: $e');
       debugPrint('$stack');

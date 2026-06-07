@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../models/calendar_model.dart';
 import '../models/cycle_model.dart';
 import '../models/day_info_model.dart';
+import '../models/daily_log_model.dart';
 import '../../core/services/cycle_service.dart';
 import '../../core/utils/date_utils.dart';
 import 'daily_log_repository.dart';
@@ -32,11 +33,68 @@ class CalendarRepositoryImpl implements CalendarRepository {
     }
 
     final loggedKeys = await _loadLoggedKeysForMonth(month);
-    return CycleService.buildCalendarMonth(
+    // Construire le mois via le service puis surcharger les phases à partir
+    // des daily logs si un champ `status` est présent.
+    final built = CycleService.buildCalendarMonth(
       month: month,
       cycle: cycle,
       loggedDayKeys: loggedKeys,
     );
+
+    try {
+      final start = DateTime(month.year, month.month, 1);
+      final end = DateTime(month.year, month.month, CycleDateUtils.daysInMonth(month.year, month.month));
+      final logs = await _dailyLogRepository.getLogsForRange(start, end);
+
+      final mapByDate = <String, DailyLogModel>{};
+      for (final l in logs) {
+        final key = l.date.toIso8601String().split('T')[0];
+        mapByDate[key] = l;
+      }
+
+      final overriddenDays = built.days.map((d) {
+        final key = d.date.toIso8601String().split('T')[0];
+        final log = mapByDate[key];
+        if (log != null && log.status != null && log.status!.isNotEmpty) {
+          CyclePhase? mapped;
+          switch (log.status!.toLowerCase()) {
+            case 'menstruation':
+            case 'rules':
+              mapped = CyclePhase.rules;
+              break;
+            case 'fertile':
+              mapped = CyclePhase.fertile;
+              break;
+            case 'ovulation':
+              mapped = CyclePhase.ovulation;
+              break;
+            case 'luteal':
+              mapped = CyclePhase.luteal;
+              break;
+            default:
+              mapped = null;
+          }
+
+          if (mapped != null) {
+            return CalendarDay(
+              date: d.date,
+              dayInCycle: d.dayInCycle,
+              phase: mapped,
+              fertilityLevel: d.fertilityLevel,
+              isPredicted: false,
+              hasLoggedData: true,
+              isToday: d.isToday,
+            );
+          }
+        }
+        return d;
+      }).toList();
+
+      return CalendarMonth(month: built.month, days: overriddenDays, firstWeekdayOffset: built.firstWeekdayOffset);
+    } catch (e) {
+      debugPrint('Erreur surchargement daily logs pour calendar month: $e');
+      return built;
+    }
   }
 
   @override
@@ -87,14 +145,71 @@ class CalendarRepositoryImpl implements CalendarRepository {
       );
     }
 
-    final loggedKeys =
-        await _loadLoggedKeysForMonth(DateTime(date.year, date.month));
-    final hasLoggedData = loggedKeys.contains(CycleDateUtils.storageKey(date));
-    return CycleService.buildDayDetail(
-      date,
-      cycle,
-      hasLoggedData: hasLoggedData,
-    );
+    try {
+      final log = await _dailyLogRepository.getLogForDate(date);
+      final base = CycleService.buildDayDetail(
+        date,
+        cycle,
+        hasLoggedData: log != null,
+      );
+
+      if (log != null && log.status != null && log.status!.isNotEmpty) {
+        switch (log.status!.toLowerCase()) {
+          case 'menstruation':
+          case 'rules':
+            return CalendarDay(
+              date: base.date,
+              dayInCycle: base.dayInCycle,
+              phase: CyclePhase.rules,
+              fertilityLevel: base.fertilityLevel,
+              isPredicted: false,
+              hasLoggedData: true,
+              isToday: base.isToday,
+            );
+          case 'fertile':
+            return CalendarDay(
+              date: base.date,
+              dayInCycle: base.dayInCycle,
+              phase: CyclePhase.fertile,
+              fertilityLevel: base.fertilityLevel,
+              isPredicted: false,
+              hasLoggedData: true,
+              isToday: base.isToday,
+            );
+          case 'ovulation':
+            return CalendarDay(
+              date: base.date,
+              dayInCycle: base.dayInCycle,
+              phase: CyclePhase.ovulation,
+              fertilityLevel: base.fertilityLevel,
+              isPredicted: false,
+              hasLoggedData: true,
+              isToday: base.isToday,
+            );
+          case 'luteal':
+            return CalendarDay(
+              date: base.date,
+              dayInCycle: base.dayInCycle,
+              phase: CyclePhase.luteal,
+              fertilityLevel: base.fertilityLevel,
+              isPredicted: false,
+              hasLoggedData: true,
+              isToday: base.isToday,
+            );
+          default:
+            return base;
+        }
+      }
+
+      return base;
+    } catch (e) {
+      debugPrint('Erreur getDayDetail override from daily logs: $e');
+      return CycleService.buildDayDetail(
+        date,
+        cycle,
+        hasLoggedData: false,
+      );
+    }
   }
 
   Future<CycleModel?> _getCurrentCycle() async {
