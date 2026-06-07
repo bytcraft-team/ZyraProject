@@ -51,11 +51,15 @@ final List<NavItem> navigationItems = [
     page: const SymptomTrackingPage(),
   ),
   NavItem(
-    icon: Icons.add_box, 
-    label: 'Poste',
-    page: const PostsFeedScreen()),
-
-
+    icon: Icons.people_alt_outlined,
+    label: 'Posts',
+    page: const PostsFeedScreen(),
+  ),
+  NavItem(
+    icon: Icons.article_outlined,
+    label: 'Articles',
+    page: const ArticlesListScreen(),
+  ),
 ];
 
 // ============================================================
@@ -120,84 +124,88 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(navigationItems.length, (index) {
               final item = navigationItems[index];
               final isActive = index == widget.currentIndex;
 
-              return GestureDetector(
-                onTap: () {
-                  _animationController.forward().then((_) {
-                    _animationController.reverse();
-                  });
-                  widget.onTap(index);
-                },
-                child: AnimatedBuilder(
-                  animation: _scaleAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: isActive ? _scaleAnimation.value : 1.0,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: isActive
-                              ? LinearGradient(
-                                  colors: [
-                                    AppColors.violet.withOpacity(0.1),
-                                    AppColors.pink.withOpacity(0.1),
-                                  ],
-                                )
-                              : null,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: isActive
-                                    ? LinearGradient(
-                                        colors: [
-                                          AppColors.violet,
-                                          AppColors.pink,
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      )
-                                    : null,
-                                color: isActive ? null : Colors.transparent,
-                              ),
-                              child: Icon(
-                                item.icon,
-                                color:
-                                    isActive ? Colors.white : AppColors.muted,
-                                size: 22,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              item.label,
-                              style: TextStyle(
-                                color: isActive
-                                    ? AppColors.deepIndigo
-                                    : AppColors.muted,
-                                fontSize: 10,
-                                fontWeight: isActive
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _animationController.forward().then((_) {
+                      _animationController.reverse();
+                    });
+                    widget.onTap(index);
                   },
+                  child: AnimatedBuilder(
+                    animation: _scaleAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: isActive ? _scaleAnimation.value : 1.0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: isActive
+                                ? LinearGradient(
+                                    colors: [
+                                      AppColors.violet.withOpacity(0.1),
+                                      AppColors.pink.withOpacity(0.1),
+                                    ],
+                                  )
+                                : null,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: isActive
+                                      ? const LinearGradient(
+                                          colors: [
+                                            AppColors.violet,
+                                            AppColors.pink,
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        )
+                                      : null,
+                                  color: isActive ? null : Colors.transparent,
+                                ),
+                                child: Icon(
+                                  item.icon,
+                                  color: isActive
+                                      ? Colors.white
+                                      : AppColors.muted,
+                                  size: 22,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                item.label,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: isActive
+                                      ? AppColors.deepIndigo
+                                      : AppColors.muted,
+                                  fontSize: 10,
+                                  fontWeight: isActive
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               );
             }),
@@ -214,10 +222,14 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
 void navigateToPage(BuildContext context, int index) {
   final item = navigationItems[index];
   if (item.page != null) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => item.page!),
-    );
+    if (item.page is PostsFeedScreen || item.page is ArticlesListScreen) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => item.page!));
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => item.page!),
+      );
+    }
   } else {
     // Handle pages that don't exist yet
     ScaffoldMessenger.of(context).showSnackBar(

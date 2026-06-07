@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zyra/theme/zyra_colors.dart';
 import 'package:zyra/screens/community/create_post_screen.dart';
 import 'package:zyra/screens/community/articles_list_screen.dart';
+import 'package:zyra/pregnancy1/view/shared_navigation.dart';
 
 class PostsFeedScreen extends StatefulWidget {
   const PostsFeedScreen({super.key});
@@ -51,27 +52,38 @@ class _PostsFeedScreenState extends State<PostsFeedScreen> {
             bottom: 90,
             right: 20,
             child: GestureDetector(
-              onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const CreatePostScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CreatePostScreen()),
+              ),
               child: Container(
-                width: 56, height: 56,
+                width: 56,
+                height: 56,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: ZyraColors.mainGradient,
-                  boxShadow: [BoxShadow(
-                    color: Color(0x55E91E8C), blurRadius: 16, offset: Offset(0, 6))],
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x55E91E8C),
+                      blurRadius: 16,
+                      offset: Offset(0, 6),
+                    ),
+                  ],
                 ),
-                child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+                child: const Icon(
+                  Icons.add_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: _BottomNav(
-        currentIndex: 2,
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 4,
         onTap: (i) {
-          if (i == 3) Navigator.push(context,
-            MaterialPageRoute(builder: (_) => const ArticlesListScreen()));
+          if (i != 4) navigateToPage(context, i);
         },
       ),
     );
@@ -100,41 +112,55 @@ class _SliverHeader extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 42, height: 42,
+                      width: 42,
+                      height: 42,
                       decoration: BoxDecoration(
                         color: ZyraColors.lightPink,
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: const Icon(Icons.people_alt_outlined,
-                          color: ZyraColors.primary, size: 22),
+                      child: const Icon(
+                        Icons.people_alt_outlined,
+                        color: ZyraColors.primary,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Communauté',
-                            style: GoogleFonts.poppins(
-                                fontSize: 10,
-                                color: ZyraColors.primary,
-                                fontWeight: FontWeight.w600)),
-                        Text('Fil d\'actualité',
-                            style: GoogleFonts.poppins(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                                color: ZyraColors.darkText)),
+                        Text(
+                          'Communauté',
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            color: ZyraColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          'Fil d\'actualité',
+                          style: GoogleFonts.poppins(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: ZyraColors.darkText,
+                          ),
+                        ),
                       ],
                     ),
                     const Spacer(),
                     GestureDetector(
                       onTap: () {},
                       child: Container(
-                        width: 42, height: 42,
+                        width: 42,
+                        height: 42,
                         decoration: BoxDecoration(
                           color: ZyraColors.lightPink,
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Icon(Icons.notifications_outlined,
-                            color: ZyraColors.primary, size: 22),
+                        child: const Icon(
+                          Icons.notifications_outlined,
+                          color: ZyraColors.primary,
+                          size: 22,
+                        ),
                       ),
                     ),
                   ],
@@ -161,8 +187,12 @@ class _SliverHeader extends StatelessWidget {
                               color: active ? Colors.white : Colors.transparent,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: active
-                                  ? [const BoxShadow(
-                                      color: Color(0x18000000), blurRadius: 6)]
+                                  ? [
+                                      const BoxShadow(
+                                        color: Color(0x18000000),
+                                        blurRadius: 6,
+                                      ),
+                                    ]
                                   : [],
                             ),
                             child: Center(
@@ -170,8 +200,12 @@ class _SliverHeader extends StatelessWidget {
                                 ['Tendances', 'Récents', 'Abonnements'][i],
                                 style: GoogleFonts.poppins(
                                   fontSize: 11,
-                                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                                  color: active ? ZyraColors.primary : ZyraColors.greyText,
+                                  fontWeight: active
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: active
+                                      ? ZyraColors.primary
+                                      : ZyraColors.greyText,
                                 ),
                               ),
                             ),
@@ -234,19 +268,25 @@ class _SliverStories extends StatelessWidget {
           Stack(
             children: [
               Container(
-                width: 58, height: 58,
+                width: 58,
+                height: 58,
                 decoration: BoxDecoration(
                   color: ZyraColors.lightPink,
                   shape: BoxShape.circle,
                   border: Border.all(color: ZyraColors.divider, width: 2),
                 ),
-                child: const Icon(Icons.person_outline,
-                    color: ZyraColors.primary, size: 28),
+                child: const Icon(
+                  Icons.person_outline,
+                  color: ZyraColors.primary,
+                  size: 28,
+                ),
               ),
               Positioned(
-                bottom: 0, right: 0,
+                bottom: 0,
+                right: 0,
                 child: Container(
-                  width: 20, height: 20,
+                  width: 20,
+                  height: 20,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: ZyraColors.mainGradient,
@@ -257,11 +297,14 @@ class _SliverStories extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          Text('Ma story',
-              style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  color: ZyraColors.greyText,
-                  fontWeight: FontWeight.w500)),
+          Text(
+            'Ma story',
+            style: GoogleFonts.poppins(
+              fontSize: 10,
+              color: ZyraColors.greyText,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -273,7 +316,8 @@ class _SliverStories extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 58, height: 58,
+            width: 58,
+            height: 58,
             padding: const EdgeInsets.all(2.5),
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
@@ -285,20 +329,26 @@ class _SliverStories extends StatelessWidget {
                 color: ZyraColors.background,
               ),
               child: Center(
-                child: Text(initial,
-                    style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: ZyraColors.primary)),
+                child: Text(
+                  initial,
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: ZyraColors.primary,
+                  ),
+                ),
               ),
             ),
           ),
           const SizedBox(height: 6),
-          Text(name,
-              style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  color: ZyraColors.greyText,
-                  fontWeight: FontWeight.w500)),
+          Text(
+            name,
+            style: GoogleFonts.poppins(
+              fontSize: 10,
+              color: ZyraColors.greyText,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -310,10 +360,11 @@ class _SliverPosts extends StatelessWidget {
   final Query<Map<String, dynamic>> query;
   final String currentUserId;
   final FirebaseFirestore firestore;
-  const _SliverPosts(
-      {required this.query,
-      required this.currentUserId,
-      required this.firestore});
+  const _SliverPosts({
+    required this.query,
+    required this.currentUserId,
+    required this.firestore,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -325,7 +376,8 @@ class _SliverPosts extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(48),
               child: Center(
-                  child: CircularProgressIndicator(color: ZyraColors.primary)),
+                child: CircularProgressIndicator(color: ZyraColors.primary),
+              ),
             ),
           );
         }
@@ -352,24 +404,31 @@ class _SliverPosts extends StatelessWidget {
   }
 
   Widget _empty() => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 60),
-        child: Column(
-          children: [
-            Icon(Icons.people_outline,
-                size: 64, color: ZyraColors.primary.withOpacity(0.25)),
-            const SizedBox(height: 14),
-            Text('Aucun post pour l\'instant',
-                style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: ZyraColors.darkText)),
-            const SizedBox(height: 6),
-            Text('Sois la première à partager !',
-                style: GoogleFonts.poppins(
-                    fontSize: 13, color: ZyraColors.greyText)),
-          ],
+    padding: const EdgeInsets.symmetric(vertical: 60),
+    child: Column(
+      children: [
+        Icon(
+          Icons.people_outline,
+          size: 64,
+          color: ZyraColors.primary.withOpacity(0.25),
         ),
-      );
+        const SizedBox(height: 14),
+        Text(
+          'Aucun post pour l\'instant',
+          style: GoogleFonts.poppins(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: ZyraColors.darkText,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Sois la première à partager !',
+          style: GoogleFonts.poppins(fontSize: 13, color: ZyraColors.greyText),
+        ),
+      ],
+    ),
+  );
 }
 
 // ─── Post Card ────────────────────────────────────────────────
@@ -378,11 +437,12 @@ class _PostCard extends StatefulWidget {
   final Map<String, dynamic> data;
   final String currentUserId;
   final FirebaseFirestore firestore;
-  const _PostCard(
-      {required this.postId,
-      required this.data,
-      required this.currentUserId,
-      required this.firestore});
+  const _PostCard({
+    required this.postId,
+    required this.data,
+    required this.currentUserId,
+    required this.firestore,
+  });
   @override
   State<_PostCard> createState() => _PostCardState();
 }
@@ -397,7 +457,9 @@ class _PostCardState extends State<_PostCard>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 280));
+      vsync: this,
+      duration: const Duration(milliseconds: 280),
+    );
     _scale = TweenSequence([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.35), weight: 50),
       TweenSequenceItem(tween: Tween(begin: 1.35, end: 1.0), weight: 50),
@@ -427,21 +489,31 @@ class _PostCardState extends State<_PostCard>
 
   static Color _tagColor(String? t) {
     switch (t) {
-      case 'Ramadan': return const Color(0xFF27AE60);
-      case 'Grossesse': return const Color(0xFF2980B9);
-      case 'Bien-être': return ZyraColors.purple;
-      case 'Nutrition': return const Color(0xFFE67E22);
-      default: return ZyraColors.primary;
+      case 'Ramadan':
+        return const Color(0xFF27AE60);
+      case 'Grossesse':
+        return const Color(0xFF2980B9);
+      case 'Bien-être':
+        return ZyraColors.purple;
+      case 'Nutrition':
+        return const Color(0xFFE67E22);
+      default:
+        return ZyraColors.primary;
     }
   }
 
   static Color _tagBg(String? t) {
     switch (t) {
-      case 'Ramadan': return const Color(0xFFE8F8F5);
-      case 'Grossesse': return const Color(0xFFEBF5FB);
-      case 'Bien-être': return const Color(0xFFF5EEF8);
-      case 'Nutrition': return const Color(0xFFFEF9E7);
-      default: return ZyraColors.lightPink;
+      case 'Ramadan':
+        return const Color(0xFFE8F8F5);
+      case 'Grossesse':
+        return const Color(0xFFEBF5FB);
+      case 'Bien-être':
+        return const Color(0xFFF5EEF8);
+      case 'Nutrition':
+        return const Color(0xFFFEF9E7);
+      default:
+        return ZyraColors.lightPink;
     }
   }
 
@@ -474,16 +546,21 @@ class _PostCardState extends State<_PostCard>
             Row(
               children: [
                 Container(
-                  width: 44, height: 44,
+                  width: 44,
+                  height: 44,
                   decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: ZyraColors.mainGradient),
+                    shape: BoxShape.circle,
+                    gradient: ZyraColors.mainGradient,
+                  ),
                   child: Center(
-                    child: Text(initial,
-                        style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white)),
+                    child: Text(
+                      initial,
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -491,38 +568,54 @@ class _PostCardState extends State<_PostCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(name,
-                          style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: ZyraColors.darkText)),
-                      Text(_timeAgo(ts?.toDate()),
-                          style: GoogleFonts.poppins(
-                              fontSize: 11, color: ZyraColors.greyText)),
+                      Text(
+                        name,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: ZyraColors.darkText,
+                        ),
+                      ),
+                      Text(
+                        _timeAgo(ts?.toDate()),
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: ZyraColors.greyText,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 if (tag != null)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 5),
+                      horizontal: 12,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
-                        color: _tagBg(tag),
-                        borderRadius: BorderRadius.circular(25)),
-                    child: Text(tag,
-                        style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: _tagColor(tag))),
+                      color: _tagBg(tag),
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Text(
+                      tag,
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: _tagColor(tag),
+                      ),
+                    ),
                   ),
               ],
             ),
             const SizedBox(height: 12),
-            Text(content,
-                style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: const Color(0xFF555555),
-                    height: 1.6)),
+            Text(
+              content,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: const Color(0xFF555555),
+                height: 1.6,
+              ),
+            ),
             const SizedBox(height: 12),
             const Divider(color: ZyraColors.divider, height: 1),
             const SizedBox(height: 10),
@@ -548,13 +641,16 @@ class _PostCardState extends State<_PostCard>
                         ),
                       ),
                       const SizedBox(width: 5),
-                      Text('$likes',
-                          style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: _liked
-                                  ? ZyraColors.primary
-                                  : ZyraColors.greyText)),
+                      Text(
+                        '$likes',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: _liked
+                              ? ZyraColors.primary
+                              : ZyraColors.greyText,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -566,20 +662,29 @@ class _PostCardState extends State<_PostCard>
                       .snapshots(),
                   builder: (_, s) => Row(
                     children: [
-                      const Icon(Icons.chat_bubble_outline_rounded,
-                          color: ZyraColors.greyText, size: 18),
+                      const Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        color: ZyraColors.greyText,
+                        size: 18,
+                      ),
                       const SizedBox(width: 5),
-                      Text('${s.data?.docs.length ?? 0}',
-                          style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: ZyraColors.greyText)),
+                      Text(
+                        '${s.data?.docs.length ?? 0}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: ZyraColors.greyText,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 const Spacer(),
-                const Icon(Icons.share_outlined,
-                    color: ZyraColors.greyText, size: 18),
+                const Icon(
+                  Icons.share_outlined,
+                  color: ZyraColors.greyText,
+                  size: 18,
+                ),
               ],
             ),
           ],
@@ -590,75 +695,3 @@ class _PostCardState extends State<_PostCard>
 }
 
 // ─── Bottom Nav ───────────────────────────────────────────────
-class _BottomNav extends StatelessWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
-  const _BottomNav({required this.currentIndex, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final items = [
-      (Icons.home_outlined, Icons.home_rounded, 'Accueil'),
-      (Icons.edit_note_outlined, Icons.edit_note_rounded, 'Journal'),
-      (Icons.people_outline, Icons.people_rounded, 'Communauté'),
-      (Icons.article_outlined, Icons.article_rounded, 'Articles'),
-      (Icons.person_outline, Icons.person_rounded, 'Profil'),
-    ];
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Color(0x0F000000), blurRadius: 12)],
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(items.length, (i) {
-              final active = currentIndex == i;
-              final item = items[i];
-              return GestureDetector(
-                onTap: () => onTap(i),
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      active
-                          ? Container(
-                              width: 44, height: 32,
-                              decoration: BoxDecoration(
-                                color: ZyraColors.lightPink,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Icon(item.$2,
-                                  color: ZyraColors.primary, size: 22),
-                            )
-                          : Icon(item.$1,
-                              color: ZyraColors.greyText, size: 22),
-                      const SizedBox(height: 3),
-                      Text(
-                        item.$3,
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          fontWeight: active
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                          color: active
-                              ? ZyraColors.primary
-                              : ZyraColors.greyText,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
-}

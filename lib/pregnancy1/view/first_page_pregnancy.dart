@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zyra/pregnancy1/view/pregnancy_tracker_screen.dart';
+import 'package:zyra/widgets/zyra_buttons.dart';
 
 class ZyraLandingPage extends StatelessWidget {
   const ZyraLandingPage({super.key});
@@ -11,17 +12,12 @@ class ZyraLandingPage extends StatelessWidget {
         children: [
           // 🌸 Background Image
           Positioned.fill(
-            child: Image.asset(
-              'assets/images/baby_mom.png',
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset('assets/images/baby_mom.png', fit: BoxFit.cover),
           ),
 
           // 🌫️ Soft overlay
           Positioned.fill(
-            child: Container(
-              color: Colors.white.withOpacity(0.15),
-            ),
+            child: Container(color: Colors.white.withOpacity(0.15)),
           ),
 
           // 🌸 Decorations
@@ -43,11 +39,7 @@ class ZyraLandingPage extends StatelessWidget {
             right: 30,
             child: Opacity(
               opacity: 0.12,
-              child: Icon(
-                Icons.favorite,
-                size: 40,
-                color: Color(0xFFB405B1),
-              ),
+              child: Icon(Icons.favorite, size: 40, color: Color(0xFFB405B1)),
             ),
           ),
 
@@ -98,7 +90,7 @@ class ZyraLandingPage extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Georgia',
                       fontSize: 38,
-                      
+
                       letterSpacing: 4,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -126,64 +118,21 @@ class ZyraLandingPage extends StatelessWidget {
 
                 // 💖 BUTTON
                 Center(
-                  child: Container(
+                  child: ZyraPrimaryButton(
+                    label: 'Get Started',
                     width: 260,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(35),
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color.fromARGB(255, 219, 112, 187),
-                          Color.fromARGB(255, 195, 54, 192),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF9D69B4).withOpacity(0.25),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PregnancyTrackerApp(),
                         ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const PregnancyTrackerApp(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(35),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Get Started',
-                            style: TextStyle(
-                              fontSize: 17,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            size: 15,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 15,
+                      color: Colors.white,
                     ),
                   ),
                 ),
