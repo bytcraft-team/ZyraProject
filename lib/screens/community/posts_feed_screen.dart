@@ -4,11 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zyra/theme/zyra_colors.dart';
 import 'package:zyra/screens/community/create_post_screen.dart';
-import 'package:zyra/screens/community/articles_list_screen.dart';
 import 'package:zyra/pregnancy1/view/shared_navigation.dart';
+import 'package:zyra/widgets/bottom_nav_bar.dart';
+import 'package:zyra/app_tab_notifier.dart';
 
 class PostsFeedScreen extends StatefulWidget {
-  const PostsFeedScreen({super.key});
+  final bool showCycleNav;
+  const PostsFeedScreen({super.key, this.showCycleNav = false});
   @override
   State<PostsFeedScreen> createState() => _PostsFeedScreenState();
 }
@@ -80,12 +82,21 @@ class _PostsFeedScreenState extends State<PostsFeedScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 4,
-        onTap: (i) {
-          if (i != 4) navigateToPage(context, i);
-        },
-      ),
+      bottomNavigationBar: widget.showCycleNav
+          ? BottomNavBar(
+              selectedIndex: 5,
+              onTap: (i) {
+                // request MainShell to switch tab and return to it
+                appTabNotifier.value = i;
+                Navigator.popUntil(context, (r) => r.isFirst);
+              },
+            )
+          : CustomBottomNavBar(
+              currentIndex: 4,
+              onTap: (i) {
+                if (i != 4) navigateToPage(context, i);
+              },
+            ),
     );
   }
 }

@@ -1,7 +1,30 @@
 import 'package:flutter/material.dart';
 import '../cycle1/core/constants/app_colors.dart';
+import 'package:zyra/screens/community/posts_feed_screen.dart';
+import 'package:zyra/screens/community/articles_list_screen.dart';
 
-class BottomNavBar extends StatelessWidget {
+// Labels and icons for the bottom nav (file-scope so state can access them)
+const List<String> _labels = [
+  'Accueil',
+  'Journal',
+  'Calendrier',
+  'Éducation',
+  'Paramaitre',
+  'Posts',
+  'Articles',
+];
+
+const List<IconData> _icons = [
+  Icons.home_rounded,
+  Icons.edit_note_rounded,
+  Icons.calendar_month_rounded,
+  Icons.today_rounded,
+  Icons.menu_book_rounded,
+  Icons.people_alt_outlined,
+  Icons.article_outlined,
+];
+
+class BottomNavBar extends StatefulWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
 
@@ -11,95 +34,8 @@ class BottomNavBar extends StatelessWidget {
     required this.onTap,
   });
 
-  static const List<String> _labels = [
-    'Accueil',
-    'Journal',
-    'Calendrier',
-    'Éducation',
-    'Paramaitre'
-  ];
-
-  static const List<IconData> _icons = [
-    Icons.home_rounded,
-    Icons.edit_note_rounded,
-    Icons.calendar_month_rounded,
-    Icons.today_rounded,
-    Icons.menu_book_rounded,
-  ];
-
   @override
-  Widget build(BuildContext context) {
-    // ── Responsive : adapter selon la hauteur disponible ────────
-    final screenH        = MediaQuery.of(context).size.height;
-    final screenW        = MediaQuery.of(context).size.width;
-    final bottomPadding  = MediaQuery.of(context).padding.bottom;
-
-    // Hauteur de la barre (sans le SafeArea bottom)
-    final barHeight = screenH < 700 ? 56.0 : 62.0;
-
-    // Taille icône et texte selon la largeur écran
-    final iconSize  = screenW < 360 ? 20.0 : 22.0;
-    final fontSize  = screenW < 360 ? 9.0  : 10.0;
-    final iconPad   = screenH < 700 ? 6.0  : 8.0;
-
-    return Container(
-      // Hauteur totale = barre + padding système (boutons Android)
-      height: barHeight + bottomPadding,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((0.08 * 255).round()),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // ── Contenu de la barre ──────────────────────────────
-          SizedBox(
-            height: barHeight,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: List.generate(_labels.length, (i) {
-                final isActive = i == selectedIndex;
-                final color    = isActive
-                    ? AppColors.pink
-                    : AppColors.textSecondary;
-
-                return Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      debugPrint('BottomNav tap -> $i');
-                      onTap(i);
-                    },
-                    child: _NavItem(
-                      icon: _icons[i],
-                      label: _labels[i],
-                      isActive: isActive,
-                      color: color,
-                      iconSize: iconSize,
-                      fontSize: fontSize,
-                      iconPad: iconPad,
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ),
-
-          // ── Espace pour les boutons système Android ──────────
-          SizedBox(height: bottomPadding),
-        ],
-      ),
-    );
-  }
+  State<BottomNavBar> createState() => _BottomNavBarState();
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -107,12 +43,12 @@ class BottomNavBar extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────
 class _NavItem extends StatelessWidget {
   final IconData icon;
-  final String   label;
-  final bool     isActive;
-  final Color    color;
-  final double   iconSize;
-  final double   fontSize;
-  final double   iconPad;
+  final String label;
+  final bool isActive;
+  final Color color;
+  final double iconSize;
+  final double fontSize;
+  final double iconPad;
 
   const _NavItem({
     required this.icon,
@@ -156,10 +92,105 @@ class _NavItem extends StatelessWidget {
             fontSize: fontSize,
             fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
             color: color,
-            height: 1.0,       // évite le line-height qui cause overflow
+            height: 1.0, // évite le line-height qui cause overflow
           ),
         ),
       ],
+    );
+  }
+}
+
+class _BottomNavBarState extends State<BottomNavBar> {
+  @override
+  Widget build(BuildContext context) {
+    // Reuse original build logic but use widget.selectedIndex and _communityActiveIdx
+    final screenH = MediaQuery.of(context).size.height;
+    final screenW = MediaQuery.of(context).size.width;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    final barHeight = screenH < 700 ? 56.0 : 62.0;
+    final iconSize = screenW < 360 ? 20.0 : 22.0;
+    final fontSize = screenW < 360 ? 9.0 : 10.0;
+    final iconPad = screenH < 700 ? 6.0 : 8.0;
+
+    return Container(
+      height: barHeight + bottomPadding,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha((0.08 * 255).round()),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: barHeight,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: List.generate(_labels.length, (i) {
+                final isActive = i == widget.selectedIndex;
+                final color = isActive
+                    ? AppColors.pink
+                    : AppColors.textSecondary;
+
+                return Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      debugPrint('BottomNav tap -> $i');
+                      if (i < 5) {
+                        widget.onTap(i);
+                        return;
+                      }
+
+                      if (i == widget.selectedIndex) {
+                        return;
+                      }
+
+                      if (i == 5) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PostsFeedScreen(showCycleNav: true),
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (i == 6) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                ArticlesListScreen(showCycleNav: true),
+                          ),
+                        );
+                        return;
+                      }
+                    },
+                    child: _NavItem(
+                      icon: _icons[i],
+                      label: _labels[i],
+                      isActive: isActive,
+                      color: color,
+                      iconSize: iconSize,
+                      fontSize: fontSize,
+                      iconPad: iconPad,
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          SizedBox(height: bottomPadding),
+        ],
+      ),
     );
   }
 }
