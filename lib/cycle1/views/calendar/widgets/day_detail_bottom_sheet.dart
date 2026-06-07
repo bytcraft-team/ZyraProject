@@ -158,16 +158,6 @@ class CalendarDayDetailSheet extends StatelessWidget {
                   color: AppColors.pink,
                 ),
                 const Divider(height: AppDimensions.lg),
-                if (day.basalTemperature != null) ...[
-                  _InfoRow(
-                    label: 'Température basale',
-                    value:
-                        '${day.basalTemperature!.toStringAsFixed(1)}°C',
-                    icon: Icons.thermostat_rounded,
-                    color: AppColors.warning,
-                  ),
-                  const Divider(height: AppDimensions.lg),
-                ],
                 _InfoRow(
                   label: 'Données enregistrées',
                   value: day.hasLoggedData ? 'Oui ✅' : 'Non',

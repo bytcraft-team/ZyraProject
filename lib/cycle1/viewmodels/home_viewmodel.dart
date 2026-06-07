@@ -31,11 +31,6 @@ class HomeViewModel extends ChangeNotifier {
   List<DayInfoModel> _monthDays = [];
   List<DayInfoModel> get monthDays => _monthDays;
 
-  double? _todayTemperature;
-  double? get todayTemperature => _todayTemperature;
-
-  double? _temperatureDelta;
-  double? get temperatureDelta => _temperatureDelta;
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
@@ -100,11 +95,7 @@ class HomeViewModel extends ChangeNotifier {
     return _cycle!.regularity;
   }
 
-  String get temperatureDeltaFormatted {
-    if (_temperatureDelta == null) return '';
-    final sign = _temperatureDelta! >= 0 ? '+' : '';
-    return '$sign${_temperatureDelta!.toStringAsFixed(1)}° ce mois';
-  }
+  
 
   String get selectedMonthLabel {
     const months = [
@@ -175,13 +166,10 @@ class HomeViewModel extends ChangeNotifier {
 
       final finalCycle = effectiveCycle ?? _buildFallbackCycle();
       final monthDays = await _repository.getMonthDays(_selectedMonth);
-      final todayTemperature = await _repository.getTodayBasalTemperature();
-
       _user = user;
       _cycle = finalCycle;
       _monthDays = monthDays;
-      _todayTemperature = todayTemperature;
-      _temperatureDelta = 0.3;
+      
       _errorMessage = null;
       _setState(ViewState.success);
 
@@ -194,8 +182,7 @@ class HomeViewModel extends ChangeNotifier {
       _user = _defaultUser();
       _cycle = _buildFallbackCycle();
       _monthDays = _buildFallbackMonthDays(_selectedMonth, _cycle!);
-      _todayTemperature = 36.8;
-      _temperatureDelta = 0.0;
+      
       _errorMessage = 'Affichage de secours activé';
       _setState(ViewState.success);
     }
@@ -295,8 +282,6 @@ class HomeViewModel extends ChangeNotifier {
         dayInCycle: dayInCycle,
         phase: phase,
         fertilityLevel: fertility,
-        basalTemperature: isPredicted ? null : 36.5 + (dayInCycle * 0.01),
-        temperatureDelta: null,
         isPredicted: isPredicted,
       );
     });

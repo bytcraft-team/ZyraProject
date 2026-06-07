@@ -111,7 +111,7 @@ class CycleService {
         isPredicted: date.isAfter(today),
         hasLoggedData: loggedDayKeys.contains(CycleDateUtils.storageKey(date)),
         isToday: CycleDateUtils.isSameDay(date, today),
-        basalTemperature: null,
+        // basalTemperature removed
       );
     });
 
@@ -170,7 +170,6 @@ class CycleService {
     DateTime date,
     CycleModel cycle, {
     bool hasLoggedData = false,
-    double? basalTemperature,
   }) {
     final today = CycleDateUtils.dateOnly(DateTime.now());
     final rawDayInCycle = CycleUtils.cycleDay(
@@ -197,7 +196,7 @@ class CycleService {
       isPredicted: date.isAfter(today),
       hasLoggedData: hasLoggedData,
       isToday: CycleDateUtils.isSameDay(date, today),
-      basalTemperature: basalTemperature,
+      // basalTemperature removed
     );
   }
 }

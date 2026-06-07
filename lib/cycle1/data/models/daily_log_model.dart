@@ -192,42 +192,7 @@ extension CervicalMucusTypeExt on CervicalMucusType {
   }
 }
 
-// ─── Note Media ───────────────────────────────────────────────
-enum NoteMediaType { text, image, audio }
 
-class NoteMedia {
-  final NoteMediaType type;
-  final String path;
-  final String? thumbnail;
-  final Duration? audioDuration;
-
-  const NoteMedia({
-    required this.type,
-    required this.path,
-    this.thumbnail,
-    this.audioDuration,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'type': type.name,
-      'path': path,
-      'thumbnail': thumbnail,
-      'audioDurationMs': audioDuration?.inMilliseconds,
-    };
-  }
-
-  factory NoteMedia.fromMap(Map<String, dynamic> map) {
-    return NoteMedia(
-      type: NoteMediaType.values.byName(map['type'] as String),
-      path: map['path'] as String,
-      thumbnail: map['thumbnail'] as String?,
-      audioDuration: map['audioDurationMs'] != null 
-          ? Duration(milliseconds: map['audioDurationMs'] as int) 
-          : null,
-    );
-  }
-}
 
 // ─── Daily Log (modèle principal sérialisé) ───────────────────
 class DailyLogModel {
@@ -235,10 +200,8 @@ class DailyLogModel {
   final FlowIntensity? flowIntensity;
   final List<SymptomEntry> symptoms;
   final List<MoodType> moods;
-  final double? basalTemperature;
   final CervicalMucusType? cervicalMucus;
-  final String? notes;
-  final List<NoteMedia> medias;
+  final List<String> notes;
   final bool hasData;
 
   const DailyLogModel({
@@ -246,10 +209,8 @@ class DailyLogModel {
     this.flowIntensity,
     this.symptoms = const [],
     this.moods = const [],
-    this.basalTemperature,
     this.cervicalMucus,
-    this.notes,
-    this.medias = const [],
+    this.notes = const [],
     this.hasData = false,
   });
 
@@ -258,10 +219,8 @@ class DailyLogModel {
     FlowIntensity? flowIntensity,
     List<SymptomEntry>? symptoms,
     List<MoodType>? moods,
-    double? basalTemperature,
     CervicalMucusType? cervicalMucus,
-    String? notes,
-    List<NoteMedia>? medias,
+    List<String>? notes,
     bool? hasData,
   }) {
     return DailyLogModel(
@@ -269,10 +228,8 @@ class DailyLogModel {
       flowIntensity: flowIntensity ?? this.flowIntensity,
       symptoms: symptoms ?? this.symptoms,
       moods: moods ?? this.moods,
-      basalTemperature: basalTemperature ?? this.basalTemperature,
       cervicalMucus: cervicalMucus ?? this.cervicalMucus,
       notes: notes ?? this.notes,
-      medias: medias ?? this.medias,
       hasData: hasData ?? this.hasData,
     );
   }
@@ -284,10 +241,8 @@ class DailyLogModel {
       'flowIntensity': flowIntensity?.name,
       'symptoms': symptoms.map((x) => x.toMap()).toList(),
       'moods': moods.map((x) => x.name).toList(),
-      'basalTemperature': basalTemperature,
       'cervicalMucus': cervicalMucus?.name,
       'notes': notes,
-      'medias': medias.map((x) => x.toMap()).toList(),
       'hasData': hasData,
     };
   }
@@ -313,17 +268,11 @@ class DailyLogModel {
               ),
             )
           : const [],
-      basalTemperature: (map['basalTemperature'] as num?)?.toDouble(),
       cervicalMucus: map['cervicalMucus'] != null
           ? CervicalMucusType.values.byName(map['cervicalMucus'] as String)
           : null,
-      notes: map['notes'] as String?,
-      medias: map['medias'] != null
-          ? List<NoteMedia>.from(
-              (map['medias'] as List).map(
-                (x) => NoteMedia.fromMap(x as Map<String, dynamic>),
-              ),
-            )
+      notes: map['notes'] != null
+          ? List<String>.from(map['notes'] as List)
           : const [],
       hasData: map['hasData'] as bool? ?? false,
     );

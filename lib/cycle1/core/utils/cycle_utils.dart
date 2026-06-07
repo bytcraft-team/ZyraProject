@@ -15,7 +15,6 @@ class CycleUtils {
   static const int defaultCycleDuration = 28;
   static const int defaultPeriodDuration = 5;
   static const double defaultCycleTemperature = 36.5;
-  static const double ovulationTemperatureThreshold = 37.0;
 
   // Durées standard des phases (en jours)
   static const int phasePeriodDays    = 5;  // Règles
@@ -282,42 +281,7 @@ class CycleUtils {
     return cycleLengths.reduce((a, b) => a > b ? a : b);
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // Température basale
-  // ─────────────────────────────────────────────────────────────
-
-  /// Vrai si la température indique une possible ovulation
-  static bool isOvulationTemperature(double temperature) {
-    return temperature >= ovulationTemperatureThreshold;
-  }
-
-  /// Delta de température par rapport à une valeur de référence
-  static double temperatureDelta({
-    required double current,
-    required double reference,
-  }) {
-    return double.parse((current - reference).toStringAsFixed(1));
-  }
-
-  /// Formate le delta avec signe : "+0.3°" / "-0.1°"
-  static String formatTemperatureDelta(double delta) {
-    final sign = delta >= 0 ? '+' : '';
-    return '$sign${delta.toStringAsFixed(1)}°';
-  }
-
-  /// Message contextuel selon la température
-  static String temperatureMessage(double temperature) {
-    if (temperature >= 37.2) {
-      return '🌡️ Température élevée — ovulation probable confirmée';
-    }
-    if (temperature >= ovulationTemperatureThreshold) {
-      return '🌡️ Légère hausse — possible ovulation détectée';
-    }
-    if (temperature < 36.0) {
-      return '❄️ Température basse — phase pré-ovulatoire';
-    }
-    return '✅ Température dans la plage normale';
-  }
+  // Temperature tracking removed from utils
 
   // ─────────────────────────────────────────────────────────────
   // Génération des DailyLogModel pour le calendrier
@@ -334,17 +298,14 @@ class CycleUtils {
     final days = CycleDateUtils.allDaysInMonth(month);
 
     return days.map((date) {
-      // day and isPredicted intentionally omitted — not used in the model generation
       final key = CycleDateUtils.storageKey(date);
       final temp = recordedTemperatures?[key];
 
       return DailyLogModel(
         date: date,
-        basalTemperature: temp,
         hasData: temp != null,
-        symptoms: const [], // Sécurité : évite les erreurs sur paramètres requis
+        symptoms: const [],
         moods: const [],
-        medias: const [],
       );
     }).toList();
   }
@@ -394,7 +355,7 @@ class CycleUtils {
 
   static bool isValidCycleDuration(int days) => days >= 21 && days <= 45;
   static bool isValidPeriodDuration(int days) => days >= 1 && days <= 10;
-  static bool isValidBasalTemperature(double temp) => temp >= 35.0 && temp <= 42.0;
+  // Basal temperature validation removed
 
   // ─────────────────────────────────────────────────────────────
   // Prédictions futures

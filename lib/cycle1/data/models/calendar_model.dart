@@ -130,7 +130,6 @@ class CalendarDay {
   final bool isPredicted;
   final bool hasLoggedData;
   final bool isToday;
-  final double? basalTemperature;
 
   const CalendarDay({
     required this.date,
@@ -140,7 +139,6 @@ class CalendarDay {
     required this.isPredicted,
     required this.hasLoggedData,
     required this.isToday,
-    this.basalTemperature,
   });
 
   // Utilise l'extension sur CyclePhase si disponible, sinon fallback sur AppColors

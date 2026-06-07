@@ -4,13 +4,11 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_text_styles.dart';
-import '../../data/models/daily_log_model.dart';
 import '../../data/repositories/daily_log_repository.dart';
 import '../../viewmodels/daily_log_viewmodel.dart';
 import 'widgets/flow_intensity_widget.dart';
 import 'widgets/symptoms_grid_widget.dart';
 import 'widgets/mood_selector_widget.dart';
-import 'widgets/temperature_input_widget.dart';
 import 'widgets/cervical_mucus_widget.dart';
 import 'widgets/notes_section_widget.dart';
 import 'widgets/save_button_widget.dart';
@@ -120,7 +118,7 @@ class _DailyLogSheetBodyState extends State<_DailyLogSheetBody> {
             // ── Contenu scrollable ───────────────────────────
             Expanded(
               child: Consumer<DailyLogViewModel>(
-                builder: (_, vm, __) {
+                builder: (_, vm, child) {
                   if (vm.isLoading) {
                     return const Center(
                       child: CircularProgressIndicator(
@@ -213,10 +211,10 @@ class _SheetHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+          const BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.04),
             blurRadius: 6,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -340,16 +338,6 @@ class _LogForm extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          // 4. Température
-          TemperatureInputWidget(
-            temperature: vm.basalTemperature,
-            showWarning: vm.hasTemperatureWarning,
-            warningMessage: vm.temperatureWarningMessage,
-            onIncrease: vm.increaseTemperature,
-            onDecrease: vm.decreaseTemperature,
-          ),
-          const SizedBox(height: 8),
-
           // 5. Mucus
           CervicalMucusWidget(
             selected: vm.cervicalMucus,
@@ -359,23 +347,8 @@ class _LogForm extends StatelessWidget {
 
           // 6. Notes
           NotesSectionWidget(
-            initialNotes: vm.notes,
-            medias: vm.medias,
-            onNotesChanged: vm.updateNotes,
-            onAddImage: () => vm.addMedia(
-              const NoteMedia(
-                type: NoteMediaType.image,
-                path: '/mock/image.jpg',
-              ),
-            ),
-            onAddAudio: () => vm.addMedia(
-              const NoteMedia(
-                type: NoteMediaType.audio,
-                path: '/mock/audio.mp3',
-                audioDuration: Duration(seconds: 12),
-              ),
-            ),
-            onRemoveMedia: vm.removeMedia,
+            note: vm.note,
+            onNoteChanged: vm.saveNote,
           ),
           const SizedBox(height: 8),
 

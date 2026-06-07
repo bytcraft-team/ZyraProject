@@ -10,8 +10,7 @@ class InfoCardsGridWidget extends StatelessWidget {
   final FertilityLevel fertilityLevel;
   final int cycleDuration;
   final bool isRegular;
-  final double? basalTemperature;
-  final String? temperatureDelta;
+  final int periodDuration;
 
   const InfoCardsGridWidget({
     super.key,
@@ -20,8 +19,7 @@ class InfoCardsGridWidget extends StatelessWidget {
     required this.fertilityLevel,
     required this.cycleDuration,
     required this.isRegular,
-    this.basalTemperature,
-    this.temperatureDelta,
+    required this.periodDuration,
   });
 
   @override
@@ -37,9 +35,9 @@ class InfoCardsGridWidget extends StatelessWidget {
         childAspectRatio: _aspectRatio(context),
         children: [
           _InfoCard(
-            icon: Icons.water_drop_rounded,
-            iconBgColor: AppColors.phaseRulesSoft,
-            iconColor: AppColors.phaseRules,
+            icon: Icons.loop_rounded,
+            iconBgColor: const Color.fromARGB(51, 216, 150, 64),
+            iconColor: const Color.fromARGB(255, 228, 143, 63),
             label: 'PROCHAINES RÈGLES',
             value: '${daysUntilPeriod}j',
             subValue: '~$nextPeriodDate',
@@ -61,14 +59,12 @@ class InfoCardsGridWidget extends StatelessWidget {
             subValue: isRegular ? 'Régulier' : 'Irrégulier',
           ),
           _InfoCard(
-            icon: Icons.thermostat_rounded,
-            iconBgColor: const Color(0xFFFFF8E1),
-            iconColor: AppColors.warning,
-            label: 'TEMPÉRATURE',
-            value: basalTemperature != null
-                ? '${basalTemperature!.toStringAsFixed(1)}°'
-                : '—',
-            subValue: temperatureDelta ?? 'Non saisie',
+            icon: Icons.water_drop_rounded,
+            iconBgColor: AppColors.phaseRulesSoft,
+            iconColor: AppColors.phaseRules,
+            label: 'DURÉE RÉGLES',
+            value: '${periodDuration}j',
+            subValue: _periodDurationDescriptor(periodDuration),
           ),
         ],
       ),
@@ -79,6 +75,13 @@ class InfoCardsGridWidget extends StatelessWidget {
     final w = MediaQuery.of(context).size.width;
     if (w >= 600) return 1.4;
     return 1.1;
+  }
+
+  String _periodDurationDescriptor(int days) {
+    if (days <= 3) return 'Court';
+    if (days <= 6) return 'Moyenne';
+    if (days <= 9) return 'Long';
+    return 'Variable';
   }
 }
 
