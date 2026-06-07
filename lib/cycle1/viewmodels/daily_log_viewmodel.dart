@@ -322,8 +322,31 @@ class DailyLogViewModel extends ChangeNotifier {
     _setSaveState(SaveState.saving);
 
     try {
+      // Déterminer un status explicite à partir des réponses si possible.
+      String? status;
+      if (_flowIntensity != null && _flowIntensity != FlowIntensity.none) {
+        status = 'menstruation';
+      } else if (_cervicalMucus != null) {
+        switch (_cervicalMucus!) {
+          case CervicalMucusType.eggWhite:
+            status = 'ovulation';
+            break;
+          case CervicalMucusType.watery:
+            status = 'fertile';
+            break;
+          case CervicalMucusType.creamy:
+            status = 'fertile';
+            break;
+          case CervicalMucusType.dry:
+          case CervicalMucusType.none:
+            status = null;
+            break;
+        }
+      }
+
       final log = DailyLogModel(
         date: _selectedDate,
+        status: status,
         flowIntensity: _flowIntensity,
         symptoms: List.from(_symptoms),
         moods: List.from(_moods),

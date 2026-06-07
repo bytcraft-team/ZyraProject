@@ -91,7 +91,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
       // 2. INSTANCIATION DES MODÈLES AVEC LES VRAIES DONNÉES
       final userModel = UserModel(
-        firstName: user?.displayName ?? 'Hajar',
+        firstName: user?.displayName ?? '',
         lastName: '',
         hasUnreadNotifications: false,
         unreadNotificationCount: 0,

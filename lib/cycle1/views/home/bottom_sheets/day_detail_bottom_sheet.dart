@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../data/models/cycle_model.dart';
 import '../../../data/models/day_info_model.dart';
+import '../../../data/repositories/daily_log_repository.dart';
+import '../../../data/models/daily_log_model.dart';
+import '../../daily_log/daily_log_bottom_sheet.dart';
+import '../../../viewmodels/home_viewmodel.dart';
 
-class DayDetailBottomSheet extends StatelessWidget {
+class DayDetailBottomSheet extends StatefulWidget {
   final DayInfoModel dayInfo;
 
   const DayDetailBottomSheet({super.key, required this.dayInfo});
@@ -19,6 +24,42 @@ class DayDetailBottomSheet extends StatelessWidget {
     );
   }
 
+  @override
+  State<DayDetailBottomSheet> createState() => _DayDetailBottomSheetState();
+}
+
+class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
+  DailyLogModel? _log;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLog();
+  }
+
+  Future<void> _loadLog() async {
+    setState(() { _loading = true; });
+    try {
+      final repo = DailyLogRepositoryImpl();
+      final l = await repo.getLogForDate(widget.dayInfo.date);
+      setState(() { _log = l; _loading = false; });
+    } catch (e) {
+      setState(() { _log = null; _loading = false; });
+    }
+  }
+
+  Future<void> _onEdit() async {
+    await DailyLogBottomSheet.show(context: context, date: widget.dayInfo.date, onSaved: () async {
+      // After saving, try to refresh HomeViewModel and local log
+      try {
+        final homeVm = context.read<HomeViewModel>();
+        await homeVm.loadData();
+      } catch (_) {}
+      await _loadLog();
+    });
+  }
+
   String _formatDate(DateTime date) {
     const days = ['', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
     const months = [
@@ -30,7 +71,7 @@ class DayDetailBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final phase = dayInfo.phase;
+    final phase = widget.dayInfo.phase;
 
     return Container(
       decoration: const BoxDecoration(
@@ -49,23 +90,32 @@ class DayDetailBottomSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Handle
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+          // Handle + Edit
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
               ),
-            ),
+              TextButton(
+                onPressed: _onEdit,
+                child: const Text('Modifier'),
+              ),
+            ],
           ),
           const SizedBox(height: AppDimensions.lg),
           // Date
-          Text(_formatDate(dayInfo.date), style: AppTextStyles.calendarTitle),
+          Text(_formatDate(widget.dayInfo.date), style: AppTextStyles.calendarTitle),
           const SizedBox(height: 4),
           Text(
-            dayInfo.isPredicted ? ' Données prédites' : ' Données confirmées',
+            widget.dayInfo.isPredicted ? ' Données prédites' : ' Données confirmées',
             style: AppTextStyles.cardSubValue,
           ),
           const SizedBox(height: AppDimensions.lg),
@@ -83,7 +133,7 @@ class DayDetailBottomSheet extends StatelessWidget {
             iconColor: AppColors.purple,
             iconBg: AppColors.purpleSoft,
             title: 'Fertilité',
-            value: dayInfo.fertilityLevel.label,
+            value: widget.dayInfo.fertilityLevel.label,
           ),
           const SizedBox(height: AppDimensions.lg),
           // Jour du cycle
@@ -96,7 +146,7 @@ class DayDetailBottomSheet extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'Jour ${dayInfo.dayInCycle} du cycle',
+                  'Jour ${widget.dayInfo.dayInCycle} du cycle',
                   style: TextStyle(
                     fontFamily: AppTextStyles.fontFamily,
                     fontWeight: FontWeight.w600,
@@ -106,6 +156,18 @@ class DayDetailBottomSheet extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: AppDimensions.lg),
+          // Daily log details
+          if (_loading) const Center(child: CircularProgressIndicator()),
+          if (!_loading && _log == null)
+            Center(child: Text('Non renseigné', style: AppTextStyles.cardSubValue)),
+          if (!_loading && _log != null) ...[
+            if (_log!.flowIntensity != null) _DetailRow(label: 'Flux', value: _log!.flowIntensity!.label),
+            if (_log!.moods.isNotEmpty) _DetailRow(label: 'Humeur', value: _log!.moods.map((m) => m.emoji).join(' ')),
+            if (_log!.symptoms.isNotEmpty) _DetailRow(label: 'Symptômes', value: _log!.symptoms.map((s) => s.type.label).join(', ')),
+            if (_log!.cervicalMucus != null) _DetailRow(label: 'Glaire', value: _log!.cervicalMucus!.label),
+            if (_log!.notes.isNotEmpty) _DetailRow(label: 'Notes', value: _log!.notes.join('\n')),
+          ],
           const SizedBox(height: AppDimensions.lg),
         ],
       ),
@@ -150,6 +212,28 @@ class _InfoRow extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _DetailRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimensions.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: AppTextStyles.cardLabel),
+          const SizedBox(height: 4),
+          Text(value, style: AppTextStyles.cardValue),
+        ],
+      ),
     );
   }
 }

@@ -8,8 +8,9 @@ import '../../core/utils/cycle_utils.dart';
 import '../../core/utils/db_helper.dart';
 import '../../core/utils/date_utils.dart';
 import '../models/cycle_model.dart';
+import '../models/daily_log_model.dart';
 import '../models/day_info_model.dart';
-import '../models/settings_model.dart';
+// removed unused import
 import '../models/user_model.dart';
 import 'daily_log_repository.dart';
 import 'settings_repository.dart';
@@ -20,6 +21,7 @@ abstract class CycleRepository {
   Future<List<DayInfoModel>> getMonthDays(DateTime month);
   Future<void> saveCycle(CycleModel cycle);
   Future<void> syncLocalToFirebase();
+  Stream<DateTime> get onDailyLogChanged;
 }
 
 class CycleRepositoryImpl implements CycleRepository {
@@ -27,6 +29,9 @@ class CycleRepositoryImpl implements CycleRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final SettingsRepository _settingsRepository = SettingsRepositoryImpl();
   final DailyLogRepository _dailyLogRepository = DailyLogRepositoryImpl();
+
+  @override
+  Stream<DateTime> get onDailyLogChanged => _dailyLogRepository.onLogChanged;
 
   @override
   Future<UserModel> getUser() async {
@@ -37,17 +42,27 @@ class CycleRepositoryImpl implements CycleRepository {
         if (doc.exists && doc.data() != null) {
           final data = doc.data()!;
           return UserModel.fromMap({
-            'firstName': data['first_name'] ?? 'Hajar',
+            // Prefer Firestore fields, fallback to FirebaseAuth displayName, avoid hardcoded names
+            'firstName': data['first_name'] ?? user.displayName ?? '',
             'lastName': data['last_name'] ?? '',
-            'profileImageUrl': data['profile_image_url'],
+            'profileImageUrl': data['profile_image_url'] ?? user.photoURL,
             'hasUnreadNotifications': data['has_unread_notifications'] ?? false,
             'unreadNotificationCount': data['unread_notification_count'] ?? 0,
           });
         }
+        // If Firestore doc missing, still return a user built from FirebaseAuth
+        return UserModel(
+          firstName: user.displayName,
+          lastName: null,
+          profileImageUrl: user.photoURL,
+          hasUnreadNotifications: false,
+          unreadNotificationCount: 0,
+        );
       } catch (e) {
         debugPrint("Erreur de récupération utilisateur en ligne : $e");
       }
     }
+
     return const UserModel(
       hasUnreadNotifications: false,
       unreadNotificationCount: 0,
@@ -89,8 +104,8 @@ class CycleRepositoryImpl implements CycleRepository {
 
     final daysInMonth = CycleDateUtils.daysInMonth(month.year, month.month);
     final today = CycleDateUtils.dateOnly(DateTime.now());
-
-    return List.generate(daysInMonth, (index) {
+    // Générer la liste de jours basée sur la logique actuelle
+    final rawDays = List.generate(daysInMonth, (index) {
       final date = DateTime(month.year, month.month, index + 1);
       final dayInCycle = CycleUtils.cycleDay(
         date: date,
@@ -114,6 +129,65 @@ class CycleRepositoryImpl implements CycleRepository {
         isPredicted: date.isAfter(today),
       );
     });
+
+    // Charger les daily logs pour le mois et, si le log contient un champ `status`,
+    // surcharger la phase calculée par la phase issue des réponses utilisateur.
+    try {
+      final start = DateTime(month.year, month.month, 1);
+      final end = DateTime(month.year, month.month, daysInMonth);
+      final logs = await _dailyLogRepository.getLogsForRange(start, end);
+
+      final mapByDate = <String, DailyLogModel>{};
+      for (final l in logs) {
+        final key = l.date.toIso8601String().split('T')[0];
+        mapByDate[key] = l;
+      }
+
+      List<DayInfoModel> finalDays = rawDays.map((d) {
+        final key = d.date.toIso8601String().split('T')[0];
+        final log = mapByDate[key];
+        if (log != null && log.status != null && log.status!.isNotEmpty) {
+          // Mapper le status libre en CyclePhase
+          CyclePhase? mapped;
+          switch (log.status!.toLowerCase()) {
+            case 'menstruation':
+            case 'rules':
+            case 'menses':
+              mapped = CyclePhase.rules;
+              break;
+            case 'fertile':
+            case 'fertility':
+              mapped = CyclePhase.fertile;
+              break;
+            case 'ovulation':
+              mapped = CyclePhase.ovulation;
+              break;
+            case 'luteal':
+            case 'luteral':
+              mapped = CyclePhase.luteal;
+              break;
+            default:
+              mapped = null;
+          }
+
+          if (mapped != null) {
+            return DayInfoModel(
+              date: d.date,
+              dayInCycle: d.dayInCycle,
+              phase: mapped,
+              fertilityLevel: d.fertilityLevel,
+              isPredicted: false,
+            );
+          }
+        }
+        return d;
+      }).toList();
+
+      return finalDays;
+    } catch (e) {
+      debugPrint('Erreur lecture daily logs en getMonthDays: $e');
+      return rawDays;
+    }
   }
 
   // getTodayBasalTemperature removed (temperature tracking disabled)
@@ -161,22 +235,7 @@ class CycleRepositoryImpl implements CycleRepository {
     }
   }
 
-  CycleModel _defaultCycleForFallback() {
-    final now = DateTime.now();
-    return CycleModel(
-      id: 'fallback-${now.millisecondsSinceEpoch}',
-      startDate: now,
-      endDate: null,
-      predictedOvulation: now.add(const Duration(days: 14)),
-      predictedFertilityStart: now.add(const Duration(days: 9)),
-      predictedFertilityEnd: now.add(const Duration(days: 15)),
-      cycleDuration: CycleUtils.defaultCycleDuration,
-      expectedPeriodDuration: CycleUtils.defaultPeriodDuration,
-      regularity: 'Régulier',
-      lastUpdated: now,
-      isSynced: 1,
-    );
-  }
+  // _defaultCycleForFallback removed (not used)
 
   @override
   Future<void> syncLocalToFirebase() async {

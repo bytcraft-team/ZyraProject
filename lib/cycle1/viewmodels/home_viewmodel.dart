@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../data/models/cycle_model.dart';
 import '../data/models/user_model.dart';
 import '../data/models/day_info_model.dart';
@@ -12,9 +14,27 @@ enum ViewState { idle, loading, success, error }
 
 class HomeViewModel extends ChangeNotifier {
   final CycleRepository _repository;
+  StreamSubscription<DateTime>? _dailyLogSub;
+  StreamSubscription<User?>? _authSub;
 
   HomeViewModel({required CycleRepository repository})
-      : _repository = repository;
+      : _repository = repository {
+    // s'abonner aux modifications des daily logs pour rafraîchir le mois actif
+    try {
+      _dailyLogSub = _repository.onDailyLogChanged.listen((date) {
+        if (date.year == _selectedMonth.year && date.month == _selectedMonth.month) {
+          _loadMonthDays();
+        }
+      });
+    } catch (_) {}
+
+    // Listen to FirebaseAuth user changes to refresh displayed user info
+    try {
+      _authSub = FirebaseAuth.instance.userChanges().listen((_) async {
+        await loadData();
+      });
+    } catch (_) {}
+  }
 
   // State
   ViewState _state = ViewState.idle;
@@ -298,5 +318,12 @@ class HomeViewModel extends ChangeNotifier {
     } catch (_) {
       return null;
     }
+  }
+
+  @override
+  void dispose() {
+    _dailyLogSub?.cancel();
+    _authSub?.cancel();
+    super.dispose();
   }
 }
