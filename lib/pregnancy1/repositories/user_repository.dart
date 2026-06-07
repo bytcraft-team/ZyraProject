@@ -222,8 +222,17 @@ class UserRepository {
     required List<Map<String, dynamic>> symptoms,
     required DateTime expectedDeliveryDate,
   }) async {
+    debugPrint('🔐 [REPO] Vérification authentification...');
     final user = currentUser;
-    if (user == null) throw StateError('Utilisateur non authentifié');
+    debugPrint(
+      '👤 [REPO] currentUser: ${user?.uid ?? 'NULL - PAS AUTHENTIFIÉ'}',
+    );
+    debugPrint('📧 [REPO] Email: ${user?.email ?? 'N/A'}');
+
+    if (user == null) {
+      debugPrint('❌ [REPO] ERREUR: Utilisateur non authentifié!');
+      throw StateError('Utilisateur non authentifié');
+    }
 
     final payload = <String, dynamic>{
       'uid': user.uid,
@@ -236,20 +245,50 @@ class UserRepository {
       'updatedAt': DateTime.now().toIso8601String(),
     };
 
-    await _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('pregnancySymptoms')
-        .doc(dateKey)
-        .set(payload, SetOptions(merge: true));
+    debugPrint('[REPO] === Payload à sauvegarder ===');
+    debugPrint('[REPO] dateKey: $dateKey');
+    debugPrint('[REPO] weekNumber: $weekNumber');
+    debugPrint('[REPO] moodIndex: $moodIndex');
+    debugPrint(
+      '[REPO] notes: ${notes.trim().isEmpty ? "(vides)" : notes.substring(0, (20 < notes.length ? 20 : notes.length))}',
+    );
+    debugPrint('[REPO] symptoms.length: ${symptoms.length}');
+    for (int i = 0; i < symptoms.length; i++) {
+      final s = symptoms[i];
+      debugPrint('[REPO]   [$i] ${s['label']}: ${s['intensity']}');
+    }
+    debugPrint('[REPO] === Fin Payload ===');
 
-    await _firestore.collection('users').doc(user.uid).set({
-      'lastPregnancySymptomEntry': payload,
-      'updatedAt': DateTime.now().toIso8601String(),
-    }, SetOptions(merge: true));
+    try {
+      debugPrint('🚀 [REPO] Écriture Firestore en cours...');
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('pregnancySymptoms')
+          .doc(dateKey)
+          .set(payload, SetOptions(merge: true));
+      debugPrint('✅ [REPO] Écriture pregnancySymptoms réussie!');
+    } catch (e) {
+      debugPrint('❌ [REPO] ERREUR écriture pregnancySymptoms: $e');
+      rethrow;
+    }
+
+    try {
+      debugPrint('🚀 [REPO] Mise à jour lastPregnancySymptomEntry...');
+      await _firestore.collection('users').doc(user.uid).set({
+        'lastPregnancySymptomEntry': payload,
+        'updatedAt': DateTime.now().toIso8601String(),
+      }, SetOptions(merge: true));
+      debugPrint('✅ [REPO] Mise à jour lastPregnancySymptomEntry réussie!');
+    } catch (e) {
+      debugPrint('❌ [REPO] ERREUR mise à jour lastPregnancySymptomEntry: $e');
+      rethrow;
+    }
   }
 
-  Future<Map<String, dynamic>?> loadPregnancySymptomsForDate(String dateKey) async {
+  Future<Map<String, dynamic>?> loadPregnancySymptomsForDate(
+    String dateKey,
+  ) async {
     final user = currentUser;
     if (user == null) return null;
 
@@ -265,6 +304,32 @@ class UserRepository {
     } catch (e) {
       debugPrint('Erreur lors du chargement des symptômes: $e');
       return null;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> loadPregnancySymptomsHistory({
+    int limit = 7,
+  }) async {
+    final user = currentUser;
+    if (user == null) return [];
+
+    try {
+      final querySnapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('pregnancySymptoms')
+          .orderBy('dateKey', descending: true)
+          .limit(limit)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => {'docId': doc.id, ...?doc.data()})
+          .toList();
+    } catch (e) {
+      debugPrint(
+        'Erreur lors du chargement de l\'historique des symptômes: $e',
+      );
+      return [];
     }
   }
 

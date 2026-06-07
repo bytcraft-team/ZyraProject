@@ -159,7 +159,8 @@ class CycleHistoryEntry {
   final DateTime? endDate;
   final int? duration;
   final int? periodDuration;
-  final String regularity; // Mis à jour de bool à String pour s'aligner sur CycleModel
+  final String
+  regularity; // Mis à jour de bool à String pour s'aligner sur CycleModel
 
   const CycleHistoryEntry({
     required this.id,
@@ -172,8 +173,19 @@ class CycleHistoryEntry {
 
   String get startLabel {
     const months = [
-      '', 'jan', 'fév', 'mar', 'avr', 'mai', 'juin',
-      'juil', 'août', 'sep', 'oct', 'nov', 'déc',
+      '',
+      'jan',
+      'fév',
+      'mar',
+      'avr',
+      'mai',
+      'juin',
+      'juil',
+      'août',
+      'sep',
+      'oct',
+      'nov',
+      'déc',
     ];
     return '${startDate.day} ${months[startDate.month]} ${startDate.year}';
   }
@@ -181,8 +193,19 @@ class CycleHistoryEntry {
   String get endLabel {
     if (endDate == null) return 'En cours';
     const months = [
-      '', 'jan', 'fév', 'mar', 'avr', 'mai', 'juin',
-      'juil', 'août', 'sep', 'oct', 'nov', 'déc',
+      '',
+      'jan',
+      'fév',
+      'mar',
+      'avr',
+      'mai',
+      'juin',
+      'juil',
+      'août',
+      'sep',
+      'oct',
+      'nov',
+      'déc',
     ];
     return '${endDate!.day} ${months[endDate!.month]} ${endDate!.year}';
   }
@@ -232,6 +255,7 @@ class CycleHistoryEntry {
 // ─── Paramètres globaux ───────────────────────────────────────
 class CycleSettings {
   final bool onboardingCompleted;
+  final bool hasCompletedCycleQuestions;
   final DateTime? lastPeriodStart;
   final int cycleDuration;
   final int periodDuration;
@@ -243,6 +267,7 @@ class CycleSettings {
 
   const CycleSettings({
     this.onboardingCompleted = false,
+    this.hasCompletedCycleQuestions = false,
     this.lastPeriodStart,
     this.cycleDuration = 28,
     this.periodDuration = 5,
@@ -255,6 +280,7 @@ class CycleSettings {
 
   CycleSettings copyWith({
     bool? onboardingCompleted,
+    bool? hasCompletedCycleQuestions,
     DateTime? lastPeriodStart,
     int? cycleDuration,
     int? periodDuration,
@@ -266,6 +292,8 @@ class CycleSettings {
   }) {
     return CycleSettings(
       onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
+      hasCompletedCycleQuestions:
+          hasCompletedCycleQuestions ?? this.hasCompletedCycleQuestions,
       lastPeriodStart: lastPeriodStart ?? this.lastPeriodStart,
       cycleDuration: cycleDuration ?? this.cycleDuration,
       periodDuration: periodDuration ?? this.periodDuration,
@@ -280,6 +308,7 @@ class CycleSettings {
   Map<String, dynamic> toMap() {
     return {
       'onboardingCompleted': onboardingCompleted,
+      'hasCompletedCycleQuestions': hasCompletedCycleQuestions,
       'lastPeriodStart': lastPeriodStart?.toIso8601String(),
       'cycleDuration': cycleDuration,
       'periodDuration': periodDuration,
@@ -294,6 +323,8 @@ class CycleSettings {
   factory CycleSettings.fromMap(Map<String, dynamic> map) {
     return CycleSettings(
       onboardingCompleted: map['onboardingCompleted'] as bool? ?? false,
+      hasCompletedCycleQuestions:
+          map['hasCompletedCycleQuestions'] as bool? ?? false,
       lastPeriodStart: map['lastPeriodStart'] != null
           ? DateTime.parse(map['lastPeriodStart'] as String)
           : null,
@@ -303,12 +334,13 @@ class CycleSettings {
       goal: UserGoal.values[map['goal'] as int? ?? 0],
       notifications: map['notifications'] != null
           ? NotificationSettings.fromMap(
-              Map<String, dynamic>.from(map['notifications'] as Map))
+              Map<String, dynamic>.from(map['notifications'] as Map),
+            )
           : const NotificationSettings(),
       history: map['history'] != null
-          ? List<Map<String, dynamic>>.from(map['history'] as List)
-              .map(CycleHistoryEntry.fromMap)
-              .toList()
+          ? List<Map<String, dynamic>>.from(
+              map['history'] as List,
+            ).map(CycleHistoryEntry.fromMap).toList()
           : const [],
       userName: map['userName'] as String? ?? '',
     );

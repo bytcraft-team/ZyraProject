@@ -13,7 +13,7 @@ class SettingsViewModel extends ChangeNotifier {
   final CycleRepository _cycleRepository = CycleRepositoryImpl();
 
   SettingsViewModel({required SettingsRepository repository})
-      : _repository = repository;
+    : _repository = repository;
 
   // ── State ────────────────────────────────────────────────────
   SettingsLoadState _state = SettingsLoadState.idle;
@@ -27,8 +27,10 @@ class SettingsViewModel extends ChangeNotifier {
   int get currentStep => _currentStep;
   static const int totalSteps = 5;
 
-  bool get onboardingCompleted =>
-      _settings?.onboardingCompleted ?? false;
+  bool get onboardingCompleted => _settings?.onboardingCompleted ?? false;
+
+  bool get hasCompletedCycleQuestions =>
+      _settings?.hasCompletedCycleQuestions ?? false;
 
   // Données onboarding en cours
   DateTime? _selectedLastPeriod;
@@ -56,17 +58,22 @@ class SettingsViewModel extends ChangeNotifier {
   // ── Validation par étape ─────────────────────────────────────
   bool get canProceed {
     switch (_currentStep) {
-      case 0: return _selectedLastPeriod != null;
-      case 1: return true;
-      case 2: return true;
-      case 3: return true;
-      case 4: return true;
-      default: return false;
+      case 0:
+        return _selectedLastPeriod != null;
+      case 1:
+        return true;
+      case 2:
+        return true;
+      case 3:
+        return true;
+      case 4:
+        return true;
+      default:
+        return false;
     }
   }
 
-  double get progressFraction =>
-      (_currentStep + 1) / totalSteps;
+  double get progressFraction => (_currentStep + 1) / totalSteps;
 
   // ─────────────────────────────────────────────────────────────
   // Chargement
@@ -75,15 +82,21 @@ class SettingsViewModel extends ChangeNotifier {
     _setState(SettingsLoadState.loading);
     try {
       _settings = await _repository.getSettings();
+      debugPrint(
+        'SettingsViewModel.init: loaded hasCompletedCycleQuestions=${_settings?.hasCompletedCycleQuestions}',
+      );
       if (_settings != null) {
-        _cycleDuration  = _settings!.cycleDuration;
+        _cycleDuration = _settings!.cycleDuration;
         _periodDuration = _settings!.periodDuration;
-        _regularity     = _settings!.regularity;
-        _goal           = _settings!.goal;
+        _regularity = _settings!.regularity;
+        _goal = _settings!.goal;
         _selectedLastPeriod = _settings!.lastPeriodStart;
       }
       _setState(SettingsLoadState.success);
     } catch (e) {
+      debugPrint(
+        'SettingsViewModel.init: erreur de chargement des settings: $e',
+      );
       _setState(SettingsLoadState.error);
     }
   }
@@ -147,9 +160,15 @@ class SettingsViewModel extends ChangeNotifier {
 
       // 1. FORMULES BIOLOGIQUES : Calcul de l'ovulation et de la fertilité
       final int ovulationOffset = _cycleDuration - 14;
-      final DateTime predictedOvulation = startDate.add(Duration(days: ovulationOffset));
-      final DateTime predictedFertilityStart = predictedOvulation.subtract(const Duration(days: 5));
-      final DateTime predictedFertilityEnd = predictedOvulation.add(const Duration(days: 1));
+      final DateTime predictedOvulation = startDate.add(
+        Duration(days: ovulationOffset),
+      );
+      final DateTime predictedFertilityStart = predictedOvulation.subtract(
+        const Duration(days: 5),
+      );
+      final DateTime predictedFertilityEnd = predictedOvulation.add(
+        const Duration(days: 1),
+      );
 
       // 2. EXTRACTION DU LABEL DE LA RÉGULARITÉ DEPUIS L'EXTENSION
       final String regularityText = _regularity.label;
@@ -175,17 +194,26 @@ class SettingsViewModel extends ChangeNotifier {
 
       final newSettings = (_settings ?? const CycleSettings()).copyWith(
         onboardingCompleted: true,
+        hasCompletedCycleQuestions: true,
         lastPeriodStart: _selectedLastPeriod,
         cycleDuration: _cycleDuration,
         periodDuration: _periodDuration,
         regularity: _regularity,
         goal: _goal,
       );
-      await _repository.completeOnboarding(newSettings);
+      final success = await _repository.completeOnboarding(newSettings);
+
+      if (!success) {
+        debugPrint(
+          'finishOnboarding: Firestore sync failed, onboarding not fully committed.',
+        );
+        _setState(SettingsLoadState.error);
+        return false;
+      }
 
       _settings = newSettings;
       _setState(SettingsLoadState.success);
-      debugPrint('finishOnboarding: sauvegarde locale et sync asynchrone terminées');
+      debugPrint('finishOnboarding: sauvegarde locale et Firestore terminées');
       return true;
     } catch (e, stack) {
       debugPrint('Erreur finishOnboarding : $e\n$stack');
@@ -199,9 +227,7 @@ class SettingsViewModel extends ChangeNotifier {
   // ─────────────────────────────────────────────────────────────
   Future<void> toggleDailyReminder(bool value) async {
     await _updateNotifs(
-      _settings!.notifications.copyWith(
-        dailyJournalReminder: value,
-      ),
+      _settings!.notifications.copyWith(dailyJournalReminder: value),
     );
   }
 
@@ -213,9 +239,7 @@ class SettingsViewModel extends ChangeNotifier {
 
   Future<void> togglePeriodAlert(bool value) async {
     await _updateNotifs(
-      _settings!.notifications.copyWith(
-        periodInTwoDaysAlert: value,
-      ),
+      _settings!.notifications.copyWith(periodInTwoDaysAlert: value),
     );
   }
 
@@ -249,9 +273,7 @@ class SettingsViewModel extends ChangeNotifier {
   // ─────────────────────────────────────────────────────────────
   Future<void> deleteHistoryEntry(String id) async {
     await _repository.deleteHistoryEntry(id);
-    final updated = _settings!.history
-        .where((e) => e.id != id)
-        .toList();
+    final updated = _settings!.history.where((e) => e.id != id).toList();
     _settings = _settings!.copyWith(history: updated);
     notifyListeners();
   }

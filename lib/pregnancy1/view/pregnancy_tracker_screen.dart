@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zyra/pregnancy1/view/nutrition_page.dart';
+import 'package:zyra/pregnancy1/view/shared_header.dart';
 import 'package:zyra/pregnancy1/view/shared_navigation.dart';
 import 'package:zyra/pregnancy1/viewmodels/pregnancy_view_model.dart';
 import 'baby_growth_page.dart';
@@ -57,35 +58,6 @@ const _t3 = _TrimesterTheme(
   labelColor: Color(0xFF9C27E8), // Purple
   arrowColor: Color(0xFFF8DDE8), // Calendar pink circles
 );
-
-// ============================================================
-// WAVE CLIPPER
-// ============================================================
-class WaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0, size.height - 20);
-    path.quadraticBezierTo(
-      size.width / 4,
-      size.height,
-      size.width / 2,
-      size.height - 20,
-    );
-    path.quadraticBezierTo(
-      size.width * 3 / 4,
-      size.height - 30,
-      size.width,
-      size.height - 10,
-    );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
 
 // ============================================================
 // APP
@@ -197,7 +169,7 @@ class PregnancyHomePageContent extends StatelessWidget {
             child: Column(
               children: [
                 // HEADER
-                _buildHeader(),
+                const PregnancyModuleHeader(title: 'Suivi de Grossesse'),
 
                 // BODY
                 Expanded(
@@ -226,83 +198,6 @@ class PregnancyHomePageContent extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  // ----------------------------------------------------------
-  // HEADER — gradient wave, no change
-  // ----------------------------------------------------------
-  Widget _buildHeader() {
-    return ClipPath(
-      clipper: WaveClipper(),
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 120, 113, 220),
-              Color.fromARGB(255, 202, 134, 224),
-              Color.fromARGB(255, 227, 67, 134),
-            ],
-            stops: [0.0, 0.5, 1.0],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 14, bottom: 44),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                const Center(
-                  child: Text(
-                    'Suivi de Grossesse',
-                    style: TextStyle(
-                      color: AppColors.offWhite,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 8,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.settings_outlined,
-                      color: AppColors.offWhite,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 16,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.notifications_outlined,
-                      color: AppColors.offWhite,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -399,7 +294,11 @@ class PregnancyHomePageContent extends StatelessWidget {
               ),
             ),
             _buildStatItem(
-                'Poids', babyWeight, 'g', Icons.monitor_weight_outlined),
+              'Poids',
+              babyWeight,
+              'g',
+              Icons.monitor_weight_outlined,
+            ),
           ],
         ),
         const SizedBox(height: 22),
@@ -571,7 +470,8 @@ class PregnancyHomePageContent extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(7, (index) {
             final date = weekStart.add(Duration(days: index));
-            final isToday = date.day == now.day &&
+            final isToday =
+                date.day == now.day &&
                 date.month == now.month &&
                 date.year == now.year;
 
@@ -598,8 +498,9 @@ class PregnancyHomePageContent extends StatelessWidget {
                         '${date.day}',
                         style: TextStyle(
                           color: isToday ? Colors.white : AppColors.deepIndigo,
-                          fontWeight:
-                              isToday ? FontWeight.w800 : FontWeight.w500,
+                          fontWeight: isToday
+                              ? FontWeight.w800
+                              : FontWeight.w500,
                           fontSize: 13,
                         ),
                       ),
@@ -663,7 +564,8 @@ class PregnancyHomePageContent extends StatelessWidget {
   // TODAY TIP — flat on background, no card
   // ----------------------------------------------------------
   Widget _buildTodayTip(PregnancyViewModel viewModel) {
-    final tip = viewModel.currentWeekInfo?.motherTips ??
+    final tip =
+        viewModel.currentWeekInfo?.motherTips ??
         'Restez hydratée tout au long de la journée et prenez des pauses courtes pour vous détendre. Votre corps a besoin de repos et de soins pendant la grossesse.';
 
     return Container(
@@ -750,7 +652,7 @@ class PregnancyHomePageContent extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: _buildModernCard(
+              child: _buildCuteCard(
                 context: context,
                 icon: Icons.menu_book_rounded,
                 title: 'Guide',
@@ -765,7 +667,7 @@ class PregnancyHomePageContent extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _buildModernCard(
+              child: _buildCuteCard(
                 context: context,
                 icon: Icons.favorite_rounded,
                 title: 'Santé',
@@ -782,7 +684,7 @@ class PregnancyHomePageContent extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _buildModernCard(
+              child: _buildCuteCard(
                 context: context,
                 icon: Icons.monitor_heart_rounded,
                 title: 'Symptômes',
@@ -801,7 +703,7 @@ class PregnancyHomePageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildModernCard({
+  Widget _buildCuteCard({
     required BuildContext context,
     required IconData icon,
     required String title,
@@ -810,68 +712,116 @@ class PregnancyHomePageContent extends StatelessWidget {
     required List<Color> iconColors,
     required VoidCallback onTap,
   }) {
-    return TweenAnimationBuilder(
+    return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 500),
-      tween: Tween<double>(begin: 0.9, end: 1),
+      tween: Tween(begin: 0.85, end: 1.0),
       curve: Curves.easeOutBack,
-      builder: (context, double value, child) {
-        return Transform.scale(scale: value, child: child);
-      },
+      builder: (context, value, child) =>
+          Transform.scale(scale: value, child: child),
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          height: 110,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+          duration: const Duration(milliseconds: 200),
+          height: 118,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: colors,
             ),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(26),
             boxShadow: [
               BoxShadow(
-                color: colors.last.withValues(alpha: 0.25),
-                blurRadius: 14,
+                color: colors.last.withValues(alpha: 0.30),
+                blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: iconColors),
-                  borderRadius: BorderRadius.circular(14),
+              // Petits cercles décoratifs (même couleur d'icône, très discrets)
+              Positioned(
+                top: 8,
+                right: 10,
+                child: Container(
+                  width: 11,
+                  height: 11,
+                  decoration: BoxDecoration(
+                    color: iconColors.first.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                  ),
                 ),
-                child: Icon(icon, color: Colors.white, size: 20),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: AppColors.deepIndigo,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                    ),
+              Positioned(
+                bottom: 12,
+                right: 7,
+                child: Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: iconColors.first.withValues(alpha: 0.13),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.black.withValues(alpha: 0.55),
-                      fontSize: 11,
-                      height: 1.3,
+                ),
+              ),
+              // Contenu centré verticalement
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 12,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Icône — plus grande, ombre colorée
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: iconColors,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: iconColors.last.withValues(alpha: 0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(icon, color: Colors.white, size: 22),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    // Titre
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: AppColors.deepIndigo,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.1,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    // Sous-titre
+                    Text(
+                      subtitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black.withValues(alpha: 0.50),
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w500,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

@@ -43,13 +43,14 @@ class _AppEntryState extends State<AppEntry> {
         if (vm.state == SettingsLoadState.loading ||
             vm.state == SettingsLoadState.idle) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
         if (vm.state == SettingsLoadState.error) {
+          debugPrint(
+            'AppEntry: settings state error, affichage du bouton Réessayer.',
+          );
           return Scaffold(
             body: Center(
               child: ElevatedButton(
@@ -60,10 +61,8 @@ class _AppEntryState extends State<AppEntry> {
           );
         }
 
-        if (!vm.onboardingCompleted) {
-          return const Scaffold(
-            body: OnboardingScreen(),
-          );
+        if (!vm.hasCompletedCycleQuestions) {
+          return const Scaffold(body: OnboardingScreen());
         }
 
         return const MainShell();
