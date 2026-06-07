@@ -58,6 +58,17 @@ class CycleService {
         .toList();
 
     if (cycle != null) {
+      final currentCycleStart = CycleDateUtils.dateOnly(cycle.startDate);
+      final hasCurrentCycleInHistory = history.any(
+        (entry) =>
+            CycleDateUtils.dateOnly(entry.startDate) == currentCycleStart,
+      );
+
+      if (!hasCurrentCycleInHistory) {
+        cycleLengths.add(cycle.cycleDuration);
+        periodLengths.add(cycle.expectedPeriodDuration);
+      }
+
       if (cycleLengths.isEmpty) {
         cycleLengths.add(cycle.cycleDuration);
       }
@@ -69,8 +80,9 @@ class CycleService {
     return CycleStats(
       avgCycleDuration: CycleUtils.averageCycleDuration(cycleLengths),
       avgPeriodDuration: CycleUtils.averageCycleDuration(periodLengths),
-      avgOvulationDay:
-          cycle != null ? math.max(1, cycle.cycleDuration - 14) : 14,
+      avgOvulationDay: cycle != null
+          ? math.max(1, cycle.cycleDuration - 14)
+          : 14,
       cyclesAnalyzed: math.max(1, cycleLengths.length),
     );
   }
@@ -114,11 +126,7 @@ class CycleService {
       );
     });
 
-    return CalendarMonth(
-      month: month,
-      days: days,
-      firstWeekdayOffset: offset,
-    );
+    return CalendarMonth(month: month, days: days, firstWeekdayOffset: offset);
   }
 
   static List<TimelineSegment> buildTimelineSegments(CycleModel cycle) {
@@ -141,24 +149,28 @@ class CycleService {
 
       if (phaseAtDay != currentPhase) {
         final duration = day - startDay;
-        segments.add(TimelineSegment(
-          phase: currentPhase,
-          startDay: startDay,
-          endDay: day - 1,
-          widthFraction: duration / cycle.cycleDuration,
-        ));
+        segments.add(
+          TimelineSegment(
+            phase: currentPhase,
+            startDay: startDay,
+            endDay: day - 1,
+            widthFraction: duration / cycle.cycleDuration,
+          ),
+        );
         currentPhase = phaseAtDay;
         startDay = day;
       }
 
       if (day == cycle.cycleDuration) {
         final duration = day - startDay + 1;
-        segments.add(TimelineSegment(
-          phase: currentPhase,
-          startDay: startDay,
-          endDay: day,
-          widthFraction: duration / cycle.cycleDuration,
-        ));
+        segments.add(
+          TimelineSegment(
+            phase: currentPhase,
+            startDay: startDay,
+            endDay: day,
+            widthFraction: duration / cycle.cycleDuration,
+          ),
+        );
       }
     }
 
