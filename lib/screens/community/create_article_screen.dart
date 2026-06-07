@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zyra/theme/zyra_colors.dart';
+import 'package:zyra/widgets/zyra_buttons.dart';
 
 class CreateArticleScreen extends StatefulWidget {
   const CreateArticleScreen({super.key});
@@ -76,12 +77,14 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
   }
 
   void _snack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg, style: GoogleFonts.poppins()),
-      backgroundColor: ZyraColors.primary,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: GoogleFonts.poppins()),
+        backgroundColor: ZyraColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   @override
@@ -99,8 +102,11 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
                 children: [
                   _sectionLabel('Titre de l\'article'),
                   const SizedBox(height: 10),
-                  _inputField(_titleCtrl,
-                      'Ex: Comment gérer ses règles au travail...', 2),
+                  _inputField(
+                    _titleCtrl,
+                    'Ex: Comment gérer ses règles au travail...',
+                    2,
+                  ),
                   const SizedBox(height: 20),
                   _sectionLabel('Contenu'),
                   const SizedBox(height: 10),
@@ -132,67 +138,46 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
           child: Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 40, height: 40,
-                  decoration: BoxDecoration(
-                    color: ZyraColors.lightPink,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded,
-                      color: ZyraColors.primary, size: 18),
+              ZyraIconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: ZyraColors.primary,
+                  size: 18,
                 ),
+                onTap: () => Navigator.pop(context),
+                size: 40,
+                borderRadius: 12,
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Articles',
-                        style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            color: ZyraColors.primary,
-                            fontWeight: FontWeight.w600)),
-                    Text('Écrire un article',
-                        style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: ZyraColors.darkText)),
+                    Text(
+                      'Articles',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        color: ZyraColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Écrire un article',
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: ZyraColors.darkText,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              GestureDetector(
-                onTap: _publishing ? null : _publish,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 22, vertical: 11),
-                  decoration: BoxDecoration(
-                    gradient: _publishing
-                        ? null
-                        : const LinearGradient(
-                            colors: [ZyraColors.purple, ZyraColors.primary]),
-                    color: _publishing ? ZyraColors.greyText : null,
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: _publishing
-                        ? []
-                        : [const BoxShadow(
-                            color: Color(0x44E91E8C),
-                            blurRadius: 12,
-                            offset: Offset(0, 4))],
-                  ),
-                  child: _publishing
-                      ? const SizedBox(
-                          width: 16, height: 16,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white))
-                      : Text('Publier',
-                          style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white)),
-                ),
+              ZyraPrimaryButton(
+                label: 'Publier',
+                onPressed: _publishing ? null : _publish,
+                width: 120,
+                height: 44,
+                isLoading: _publishing,
               ),
             ],
           ),
@@ -201,8 +186,7 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
     );
   }
 
-  Widget _inputField(
-      TextEditingController ctrl, String hint, int maxLines) {
+  Widget _inputField(TextEditingController ctrl, String hint, int maxLines) {
     return Container(
       decoration: ZyraColors.cardDecoration,
       child: TextField(
@@ -210,11 +194,16 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
         maxLines: maxLines,
         minLines: maxLines ~/ 2 + 1,
         style: GoogleFonts.poppins(
-            fontSize: 14, color: ZyraColors.darkText, height: 1.6),
+          fontSize: 14,
+          color: ZyraColors.darkText,
+          height: 1.6,
+        ),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: GoogleFonts.poppins(
-              fontSize: 13, color: ZyraColors.greyText),
+            fontSize: 13,
+            color: ZyraColors.greyText,
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(16),
         ),
@@ -222,42 +211,52 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
     );
   }
 
-  Widget _sectionLabel(String t) => Text(t,
-      style: GoogleFonts.poppins(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: ZyraColors.darkText));
+  Widget _sectionLabel(String t) => Text(
+    t,
+    style: GoogleFonts.poppins(
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+      color: ZyraColors.darkText,
+    ),
+  );
 
   Widget _tagsWrap() {
     return Wrap(
-      spacing: 8, runSpacing: 8,
+      spacing: 8,
+      runSpacing: 8,
       children: _tags.map((t) {
         final sel = _tag == t.$1;
         return GestureDetector(
           onTap: () => setState(() => _tag = t.$1),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
             decoration: BoxDecoration(
               gradient: sel
                   ? const LinearGradient(
-                      colors: [ZyraColors.purple, ZyraColors.primary])
+                      colors: [ZyraColors.purple, ZyraColors.primary],
+                    )
                   : null,
               color: sel ? null : t.$3,
               borderRadius: BorderRadius.circular(30),
               boxShadow: sel
-                  ? [const BoxShadow(
-                      color: Color(0x44E91E8C),
-                      blurRadius: 10,
-                      offset: Offset(0, 4))]
+                  ? [
+                      const BoxShadow(
+                        color: Color(0x44E91E8C),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ]
                   : [],
             ),
-            child: Text(t.$1,
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: sel ? Colors.white : t.$2)),
+            child: Text(
+              t.$1,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: sel ? Colors.white : t.$2,
+              ),
+            ),
           ),
         );
       }).toList(),
@@ -270,41 +269,56 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          const Icon(Icons.access_time_rounded,
-              color: ZyraColors.primary, size: 22),
+          const Icon(
+            Icons.access_time_rounded,
+            color: ZyraColors.primary,
+            size: 22,
+          ),
           const SizedBox(width: 10),
-          Text('$_readTime minutes',
-              style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: ZyraColors.darkText)),
+          Text(
+            '$_readTime minutes',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: ZyraColors.darkText,
+            ),
+          ),
           const Spacer(),
           GestureDetector(
             onTap: () {
               if (_readTime > 1) setState(() => _readTime--);
             },
             child: Container(
-              width: 36, height: 36,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 color: ZyraColors.lightPink,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.remove_rounded,
-                  color: ZyraColors.primary, size: 18),
+              child: const Icon(
+                Icons.remove_rounded,
+                color: ZyraColors.primary,
+                size: 18,
+              ),
             ),
           ),
           const SizedBox(width: 10),
           GestureDetector(
             onTap: () => setState(() => _readTime++),
             child: Container(
-              width: 36, height: 36,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                    colors: [ZyraColors.purple, ZyraColors.primary]),
+                  colors: [ZyraColors.purple, ZyraColors.primary],
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.add_rounded,
-                  color: Colors.white, size: 18),
+              child: const Icon(
+                Icons.add_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
           ),
         ],

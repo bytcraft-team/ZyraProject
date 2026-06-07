@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zyra/theme/zyra_colors.dart';
 import 'package:zyra/screens/community/article_detail_screen.dart';
 import 'package:zyra/screens/community/create_article_screen.dart';
-import 'package:zyra/screens/community/posts_feed_screen.dart';
+import 'package:zyra/pregnancy1/view/shared_navigation.dart';
 
 class ArticlesListScreen extends StatefulWidget {
   const ArticlesListScreen({super.key});
@@ -61,11 +61,10 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
         ],
       ),
-      bottomNavigationBar: _BottomNav(
-        currentIndex: 3,
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 5,
         onTap: (i) {
-          if (i == 2) Navigator.push(context,
-            MaterialPageRoute(builder: (_) => const PostsFeedScreen()));
+          if (i != 5) navigateToPage(context, i);
         },
       ),
     );
@@ -507,72 +506,3 @@ class _ArticleCard extends StatelessWidget {
 }
 
 // ─── Bottom Nav (shared) ──────────────────────────────────────
-class _BottomNav extends StatelessWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
-  const _BottomNav({required this.currentIndex, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final items = [
-      (Icons.home_outlined, Icons.home_rounded, 'Accueil'),
-      (Icons.edit_note_outlined, Icons.edit_note_rounded, 'Journal'),
-      (Icons.people_outline, Icons.people_rounded, 'Communauté'),
-      (Icons.article_outlined, Icons.article_rounded, 'Articles'),
-      (Icons.person_outline, Icons.person_rounded, 'Profil'),
-    ];
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Color(0x0F000000), blurRadius: 12)],
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(items.length, (i) {
-              final active = currentIndex == i;
-              final item = items[i];
-              return GestureDetector(
-                onTap: () => onTap(i),
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      active
-                          ? Container(
-                              width: 44, height: 32,
-                              decoration: BoxDecoration(
-                                color: ZyraColors.lightPink,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Icon(item.$2,
-                                  color: ZyraColors.primary, size: 22))
-                          : Icon(item.$1,
-                              color: ZyraColors.greyText, size: 22),
-                      const SizedBox(height: 3),
-                      Text(item.$3,
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: active
-                                ? FontWeight.w600
-                                : FontWeight.w400,
-                            color: active
-                                ? ZyraColors.primary
-                                : ZyraColors.greyText,
-                          )),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
-}

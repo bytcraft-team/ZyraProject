@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zyra/theme/zyra_colors.dart';
+import 'package:zyra/widgets/zyra_buttons.dart';
 
 class CreatePostScreen extends StatefulWidget {
   const CreatePostScreen({super.key});
@@ -74,12 +75,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   void _snack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg, style: GoogleFonts.poppins()),
-      backgroundColor: ZyraColors.primary,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: GoogleFonts.poppins()),
+        backgroundColor: ZyraColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   @override
@@ -128,61 +131,46 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
           child: Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 40, height: 40,
-                  decoration: BoxDecoration(
-                    color: ZyraColors.lightPink,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded,
-                      color: ZyraColors.primary, size: 18),
+              ZyraIconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: ZyraColors.primary,
+                  size: 18,
                 ),
+                onTap: () => Navigator.pop(context),
+                size: 40,
+                borderRadius: 12,
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Communauté',
-                        style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            color: ZyraColors.primary,
-                            fontWeight: FontWeight.w600)),
-                    Text('Nouveau post',
-                        style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: ZyraColors.darkText)),
+                    Text(
+                      'Communauté',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        color: ZyraColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Nouveau post',
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: ZyraColors.darkText,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              GestureDetector(
-                onTap: _publishing ? null : _publish,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
-                  decoration: BoxDecoration(
-                    gradient: _publishing ? null : const LinearGradient(
-                        colors: [ZyraColors.purple, ZyraColors.primary]),
-                    color: _publishing ? ZyraColors.greyText : null,
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: _publishing ? [] : [const BoxShadow(
-                        color: Color(0x44E91E8C),
-                        blurRadius: 12,
-                        offset: Offset(0, 4))],
-                  ),
-                  child: _publishing
-                      ? const SizedBox(width: 16, height: 16,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white))
-                      : Text('Publier',
-                          style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white)),
-                ),
+              ZyraPrimaryButton(
+                label: 'Publier',
+                onPressed: _publishing ? null : _publish,
+                width: 120,
+                height: 44,
+                isLoading: _publishing,
               ),
             ],
           ),
@@ -197,19 +185,25 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       return Row(
         children: [
           Container(
-            width: 48, height: 48,
+            width: 48,
+            height: 48,
             decoration: const BoxDecoration(
-                shape: BoxShape.circle, gradient: ZyraColors.mainGradient),
+              shape: BoxShape.circle,
+              gradient: ZyraColors.mainGradient,
+            ),
             child: const Center(
               child: Icon(Icons.person_outline, color: Colors.white, size: 24),
             ),
           ),
           const SizedBox(width: 12),
-          Text('Utilisatrice',
-              style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: ZyraColors.darkText)),
+          Text(
+            'Utilisatrice',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: ZyraColors.darkText,
+            ),
+          ),
         ],
       );
     }
@@ -228,29 +222,42 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         return Row(
           children: [
             Container(
-              width: 48, height: 48,
+              width: 48,
+              height: 48,
               decoration: const BoxDecoration(
-                  shape: BoxShape.circle, gradient: ZyraColors.mainGradient),
+                shape: BoxShape.circle,
+                gradient: ZyraColors.mainGradient,
+              ),
               child: Center(
-                child: Text(initial,
-                    style: GoogleFonts.poppins(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white)),
+                child: Text(
+                  initial,
+                  style: GoogleFonts.poppins(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                    style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: ZyraColors.darkText)),
-                Text('Partage ton expérience...',
-                    style: GoogleFonts.poppins(
-                        fontSize: 11, color: ZyraColors.greyText)),
+                Text(
+                  name,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: ZyraColors.darkText,
+                  ),
+                ),
+                Text(
+                  'Partage ton expérience...',
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: ZyraColors.greyText,
+                  ),
+                ),
               ],
             ),
           ],
@@ -264,12 +271,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       decoration: ZyraColors.cardDecoration,
       child: TextField(
         controller: _ctrl,
-        maxLines: 6, minLines: 4,
+        maxLines: 6,
+        minLines: 4,
         style: GoogleFonts.poppins(
-            fontSize: 14, color: ZyraColors.darkText, height: 1.6),
+          fontSize: 14,
+          color: ZyraColors.darkText,
+          height: 1.6,
+        ),
         decoration: InputDecoration(
           hintText: 'Qu\'est-ce que tu veux partager aujourd\'hui ? 💬',
-          hintStyle: GoogleFonts.poppins(fontSize: 13, color: ZyraColors.greyText),
+          hintStyle: GoogleFonts.poppins(
+            fontSize: 13,
+            color: ZyraColors.greyText,
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(16),
         ),
@@ -277,13 +291,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     );
   }
 
-  Widget _sectionLabel(String t) => Text(t,
-      style: GoogleFonts.poppins(
-          fontSize: 13, fontWeight: FontWeight.w700, color: ZyraColors.darkText));
+  Widget _sectionLabel(String t) => Text(
+    t,
+    style: GoogleFonts.poppins(
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+      color: ZyraColors.darkText,
+    ),
+  );
 
   Widget _tagsWrap() {
     return Wrap(
-      spacing: 8, runSpacing: 8,
+      spacing: 8,
+      runSpacing: 8,
       children: _tags.map((t) {
         final sel = _tag == t.$1;
         return GestureDetector(
@@ -292,20 +312,31 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
             decoration: BoxDecoration(
-              gradient: sel ? const LinearGradient(
-                  colors: [ZyraColors.purple, ZyraColors.primary]) : null,
+              gradient: sel
+                  ? const LinearGradient(
+                      colors: [ZyraColors.purple, ZyraColors.primary],
+                    )
+                  : null,
               color: sel ? null : t.$3,
               borderRadius: BorderRadius.circular(30),
-              boxShadow: sel ? [const BoxShadow(
-                  color: Color(0x44E91E8C),
-                  blurRadius: 10,
-                  offset: Offset(0, 4))] : [],
+              boxShadow: sel
+                  ? [
+                      const BoxShadow(
+                        color: Color(0x44E91E8C),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ]
+                  : [],
             ),
-            child: Text(t.$1,
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: sel ? Colors.white : t.$2)),
+            child: Text(
+              t.$1,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: sel ? Colors.white : t.$2,
+              ),
+            ),
           ),
         );
       }).toList(),
@@ -328,26 +359,44 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               margin: EdgeInsets.only(right: o.$1 == 'Tout le monde' ? 10 : 0),
               padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
-                gradient: sel ? const LinearGradient(
-                    colors: [ZyraColors.purple, ZyraColors.primary]) : null,
+                gradient: sel
+                    ? const LinearGradient(
+                        colors: [ZyraColors.purple, ZyraColors.primary],
+                      )
+                    : null,
                 color: sel ? null : Colors.white,
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: sel
-                    ? [const BoxShadow(
-                        color: Color(0x44E91E8C),
-                        blurRadius: 12, offset: Offset(0, 4))]
-                    : [const BoxShadow(color: Color(0x0F000000), blurRadius: 8)],
+                    ? [
+                        const BoxShadow(
+                          color: Color(0x44E91E8C),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
+                        ),
+                      ]
+                    : [
+                        const BoxShadow(
+                          color: Color(0x0F000000),
+                          blurRadius: 8,
+                        ),
+                      ],
               ),
               child: Column(
                 children: [
-                  Icon(o.$2,
-                      color: sel ? Colors.white : ZyraColors.greyText, size: 24),
+                  Icon(
+                    o.$2,
+                    color: sel ? Colors.white : ZyraColors.greyText,
+                    size: 24,
+                  ),
                   const SizedBox(height: 6),
-                  Text(o.$1,
-                      style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: sel ? Colors.white : ZyraColors.greyText)),
+                  Text(
+                    o.$1,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: sel ? Colors.white : ZyraColors.greyText,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -373,17 +422,22 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
-              boxShadow: const [BoxShadow(color: Color(0x0F000000), blurRadius: 8)],
+              boxShadow: const [
+                BoxShadow(color: Color(0x0F000000), blurRadius: 8),
+              ],
             ),
             child: Column(
               children: [
                 Icon(o.$1, color: ZyraColors.purple, size: 24),
                 const SizedBox(height: 6),
-                Text(o.$2,
-                    style: GoogleFonts.poppins(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: ZyraColors.purple)),
+                Text(
+                  o.$2,
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: ZyraColors.purple,
+                  ),
+                ),
               ],
             ),
           ),
