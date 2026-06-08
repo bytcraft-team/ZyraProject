@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:zyra/paramettres/screens/pages/ai_chat_screen.dart';
+import 'package:zyra/paramettres/screens/settings/settings_screen.dart';
 import 'shared_navigation.dart';
 
 class PregnancyModuleHeader extends StatelessWidget {
@@ -39,33 +40,55 @@ class PregnancyModuleHeader extends StatelessWidget {
                 ),
                 Positioned(
                   left: 16,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.settings_outlined,
-                      color: AppColors.offWhite,
-                      size: 20,
-                    ),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(50),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.settings_outlined,
+                        color: AppColors.offWhite,
+                        size: 20,
+                        ),
+                     ),
                   ),
                 ),
                 Positioned(
                   right: 16,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.notifications_outlined,
-                      color: AppColors.offWhite,
-                      size: 20,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AiChatScreen(),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(50),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.smart_toy, 
+                        color: AppColors.offWhite,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ),

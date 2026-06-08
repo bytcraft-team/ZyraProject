@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zyra/pregnancy1/view/shared_header.dart';
 import 'package:zyra/pregnancy1/view/shared_navigation.dart';
 import 'package:zyra/pregnancy1/viewmodels/pregnancy_view_model.dart';
 import 'mother_week_page.dart';
@@ -25,6 +24,35 @@ class _TrimesterTheme {
     required this.labelColor,
     required this.arrowColor,
   });
+}
+
+// ============================================================
+// WAVE CLIPPER
+// ============================================================
+class WaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 20);
+    path.quadraticBezierTo(
+      size.width / 4,
+      size.height,
+      size.width / 2,
+      size.height - 20,
+    );
+    path.quadraticBezierTo(
+      size.width * 3 / 4,
+      size.height - 30,
+      size.width,
+      size.height - 10,
+    );
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
 // ============================================================
@@ -66,7 +94,7 @@ class BabyGrowthPage extends StatefulWidget {
 }
 
 class _BabyGrowthPageState extends State<BabyGrowthPage> {
-  int _selectedIndex = 1;
+  final int _selectedIndex = 1;
 
   void _onItemTapped(int index) {
     if (index != _selectedIndex) navigateToPage(context, index);
@@ -105,7 +133,7 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
       if (!mounted) return;
       final currentWeek =
           context.read<PregnancyViewModel>().pregnancyTracking?.currentWeek ??
-          19;
+              19;
       final offset = (currentWeek - 1) * 76.0 - 40;
       if (_timelineScrollController.hasClients) {
         _timelineScrollController.animateTo(
@@ -139,7 +167,7 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
           ),
           child: Column(
             children: [
-              const PregnancyModuleHeader(title: 'Croissance bébé'),
+              _buildHeader(),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -202,6 +230,58 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
     arrowColor: Color(0xFFF8DDE8), // Calendar pink circles
   );
   // ─────────────────────────────────────────────
+  // HEADER
+  // ─────────────────────────────────────────────
+  Widget _buildHeader() {
+    return ClipPath(
+      clipper: WaveClipper(),
+      child: Container(
+        decoration: const BoxDecoration(gradient: _gradientHeader),
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 14, bottom: 44),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const Center(
+                  child: Text(
+                    'Croissance bébé',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 16,
+                  child: _headerIconBtn(Icons.settings_outlined),
+                ),
+                Positioned(
+                  right: 16,
+                  child: _headerIconBtn(Icons.notifications_outlined),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _headerIconBtn(IconData icon) => Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      );
+
+  // ─────────────────────────────────────────────
   // WEEK HERO
   // ─────────────────────────────────────────────
   Widget _buildWeekHero(int currentWeek, WeekInfo? weekInfo) {
@@ -220,8 +300,12 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
             letterSpacing: -0.3,
           ),
         ),
-
-        const SizedBox(height: 25),
+        const SizedBox(height: 2),
+        Text(
+          'Votre bébé a la taille d\'une mangue 🥭',
+          style: TextStyle(fontSize: 14, color: _Colors.violet),
+        ),
+        const SizedBox(height: 28),
         Stack(
           alignment: Alignment.center,
           children: [
@@ -239,8 +323,8 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
               ),
             ),
             Container(
-              width: 150,
-              height: 150,
+              width: 140,
+              height: 140,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
@@ -253,7 +337,7 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
                 child: Image.asset(
                   babyWeekAsset(currentWeek),
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Center(
+                  errorBuilder: (_, _, _) => const Center(
                     child: Text('🫶', style: TextStyle(fontSize: 48)),
                   ),
                 ),
@@ -266,18 +350,14 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Flexible(
-              child: _inlineStat(
-                '${weekInfo?.babyWeightGrams.toStringAsFixed(2) ?? '193'} g',
-                'Poids',
-              ),
-            ),
+                child: _inlineStat(
+                    '${weekInfo?.babyWeightGrams.toStringAsFixed(2) ?? '193'} g',
+                    'Poids')),
             const SizedBox(width: 8),
             Flexible(
-              child: _inlineStat(
-                '${weekInfo?.babyLengthCm.toStringAsFixed(2) ?? '15.3'} cm',
-                'Taille',
-              ),
-            ),
+                child: _inlineStat(
+                    '${weekInfo?.babyLengthCm.toStringAsFixed(2) ?? '15.3'} cm',
+                    'Taille')),
             const SizedBox(width: 8),
             Flexible(child: _inlineStat('2ème', 'Trimestre')),
           ],
@@ -287,42 +367,43 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
   }
 
   Widget _inlineStat(String value, String label) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    decoration: BoxDecoration(
-      color: Color.fromARGB(255, 235, 206, 245),
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: Color.fromARGB(255, 226, 156, 227), width: 1),
-      boxShadow: [
-        BoxShadow(
-          color: Color(0x33E91E8F),
-          blurRadius: 8,
-          offset: Offset(0, 3),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 235, 206, 245),
+          borderRadius: BorderRadius.circular(16),
+          border:
+              Border.all(color: Color.fromARGB(255, 226, 156, 227), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x33E91E8F),
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
         ),
-      ],
-    ),
-    child: Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF3A2032),
-          ),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF3A2032),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.4,
+                color: Color(0xFFB39AAA),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.4,
-            color: Color(0xFFB39AAA),
-          ),
-        ),
-      ],
-    ),
-  );
+      );
 
   // ─────────────────────────────────────────────
   // PROGRESS
@@ -424,19 +505,19 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
   }
 
   Widget _progressRow(String k, String v) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(k, style: const TextStyle(fontSize: 13, color: _Colors.violet)),
-      Text(
-        v,
-        style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: _Colors.deepIndigo,
-        ),
-      ),
-    ],
-  );
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(k, style: const TextStyle(fontSize: 13, color: _Colors.violet)),
+          Text(
+            v,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: _Colors.deepIndigo,
+            ),
+          ),
+        ],
+      );
 
   // ─────────────────────────────────────────────
   // TIMELINE (pill scroll)
@@ -492,9 +573,8 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: isActive ? _gradientPrimary : null,
-                          color: isActive
-                              ? null
-                              : Colors.white.withOpacity(0.65),
+                          color:
+                              isActive ? null : Colors.white.withOpacity(0.65),
                           boxShadow: isActive
                               ? [
                                   BoxShadow(
@@ -519,9 +599,8 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
                         'S$week',
                         style: TextStyle(
                           fontSize: 10,
-                          fontWeight: isActive
-                              ? FontWeight.w700
-                              : FontWeight.w600,
+                          fontWeight:
+                              isActive ? FontWeight.w700 : FontWeight.w600,
                           color: isActive
                               ? _Colors.deepIndigo
                               : _Colors.violetLight,
@@ -773,9 +852,8 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
 
   Widget _buildWeekCircleGroup(List<int> weeks, _TrimesterTheme theme) {
     final midWeek = weeks[weeks.length ~/ 2];
-    final String topLine = weeks.length == 1
-        ? '${weeks.first}'
-        : '${weeks.last} - ${weeks.first}';
+    final String topLine =
+        weeks.length == 1 ? '${weeks.first}' : '${weeks.last} - ${weeks.first}';
     final String bottomLine = weeks.length == 1 ? 'Semaine' : 'Semaines';
 
     return GestureDetector(
@@ -805,7 +883,7 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
               child: Image.asset(
                 babyWeekAsset(midWeek),
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Center(
+                errorBuilder: (_, _, _) => Center(
                   child: Text(
                     _weekEmoji(midWeek),
                     style: const TextStyle(fontSize: 26),
@@ -890,7 +968,7 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
                 child: Image.asset(
                   babyWeekAsset(w),
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Center(
+                  errorBuilder: (_, _, _) => Center(
                     child: Text(
                       _weekEmoji(w),
                       style: const TextStyle(fontSize: 40),
@@ -1131,14 +1209,14 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
   // SHARED
   // ─────────────────────────────────────────────
   Widget _sectionLabel(String label) => Text(
-    label,
-    style: const TextStyle(
-      fontSize: 11,
-      fontWeight: FontWeight.w700,
-      letterSpacing: 1.1,
-      color: _Colors.violetLight,
-    ),
-  );
+        label,
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.1,
+          color: _Colors.violetLight,
+        ),
+      );
 
   Widget _buildDivider() => Container(height: 0.5, color: _Colors.divider);
 

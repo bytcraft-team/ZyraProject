@@ -25,10 +25,17 @@ import 'package:zyra/cycle1/data/repositories/calendar_repository.dart';
 import 'package:zyra/pregnancy1/viewmodels/pregnancy_view_model.dart';
 import 'package:zyra/pregnancy1/viewmodels/user_phase_view_model.dart';
 //import 'package:zyra/models/user_phase.dart';
-
+import 'package:zyra/paramettres/providers/appearance_provider.dart';
+import 'package:zyra/paramettres/providers/cycle_provider.dart';
+import 'package:zyra/paramettres/providers/user_provider.dart';
+import 'package:zyra/paramettres/screens/settings/settings_screen.dart';
+import 'package:zyra/l10n/app_localizations.dart';
+import 'package:zyra/paramettres/viewmodel/notification_provider.dart';
+import 'package:zyra/paramettres/services/local_notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await LocalNotificationService.init();
   runApp(const LunaApp());
 }
 
@@ -70,11 +77,17 @@ class LunaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EducationViewModel()),
 
         ChangeNotifierProvider(create: (_) => PregnancyViewModel()),
+        ChangeNotifierProvider(create: (_) => AppearanceProvider()),
+        ChangeNotifierProvider(create: (_) => CycleProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: MaterialApp(
         title: 'Luna',
         scaffoldMessengerKey: appScaffoldMessengerKey,
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: colorScheme,
@@ -94,6 +107,7 @@ class LunaApp extends StatelessWidget {
           '/home': (_) => const AuthGate(),
           '/login': (_) => const LoginScreen(),
           '/signup': (_) => const SignupScreen(),
+          '/settings': (_) => const SettingsScreen(),
         },
       ),
     );

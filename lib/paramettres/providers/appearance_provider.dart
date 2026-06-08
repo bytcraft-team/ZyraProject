@@ -8,21 +8,25 @@ class AppearanceProvider extends ChangeNotifier {
 
   bool _initialized = false;
 
+  bool get initialized => _initialized;
+
   int get selectedColor => _selectedColor;
   int get selectedMode => _selectedMode;
   int get selectedLang => _selectedLang;
 
   AppearanceProvider() {
-    loadSettings();
+    _init();
   }
 
   // ================= COLORS =================
 
   static const List<Color> primaryColors = [
-    Color(0xFFC8698A),
-    Color(0xFF7F77DD),
-    Color(0xFF1D9E75),
-    Color(0xFFD85A30),
+    Color(0xFFE91E8C),
+    Color(0xFF9B59B6),
+    Color(0xFFB388EB),
+    Color(0xFFFF8A65),
+    Color(0xFF26A69A),
+    Color(0xFF2D1B3D),
   ];
 
   Color get currentPrimaryColor =>
@@ -42,13 +46,11 @@ class AppearanceProvider extends ChangeNotifier {
   }
 
   ThemeData get lightTheme {
+    final seed = currentPrimaryColor;
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: currentPrimaryColor,
-        brightness: Brightness.light,
-      ),
-      scaffoldBackgroundColor: const Color(0xFFFDF8FB),
+      colorScheme: ColorScheme.fromSeed(seedColor: seed),
+      scaffoldBackgroundColor: seed.withValues(alpha: 0.12),
     );
   }
 
@@ -76,9 +78,9 @@ class AppearanceProvider extends ChangeNotifier {
     }
   }
 
-  // ================= LOAD =================
+  // ================= INIT =================
 
-  Future<void> loadSettings() async {
+  Future<void> _init() async {
     final prefs = await SharedPreferences.getInstance();
 
     _selectedColor = prefs.getInt('selectedColor') ?? 0;
@@ -86,24 +88,22 @@ class AppearanceProvider extends ChangeNotifier {
     _selectedLang = prefs.getInt('selectedLang') ?? 0;
 
     _initialized = true;
-    notifyListeners(); 
+    notifyListeners();
   }
 
-  // ================= UPDATE MODE =================
+  // ================= UPDATES =================
 
   Future<void> updateMode(int value) async {
     _selectedMode = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('selectedMode', value);
-
-    notifyListeners(); 
+    notifyListeners();
   }
 
   Future<void> updateColor(int value) async {
     _selectedColor = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('selectedColor', value);
-
     notifyListeners();
   }
 
@@ -111,7 +111,6 @@ class AppearanceProvider extends ChangeNotifier {
     _selectedLang = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('selectedLang', value);
-
     notifyListeners();
   }
 }

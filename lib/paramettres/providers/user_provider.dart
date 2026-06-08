@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../database/db_helper.dart';
-import '../services/image_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserProvider extends ChangeNotifier {
@@ -89,6 +88,13 @@ class UserProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+  Future<void> loadUserData() async {
+    final uid = user?.uid;
+    if (uid != null) {
+       _avatarPath = await _db.getAvatar(uid);
+       notifyListeners();
     }
   }
 }
