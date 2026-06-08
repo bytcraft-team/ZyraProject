@@ -367,40 +367,44 @@ class _PhaseLabelsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: segments.map((seg) {
-        return Flexible(
-          flex: (seg.widthFraction * 10000).round(),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Point coloré
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: seg.phase.activeColor,
-                  shape: BoxShape.circle,
-                ),
+    // Extraire les phases uniques dans l'ordre
+    final seenPhases = <CyclePhase>{};
+    final uniquePhases = <CyclePhase>[];
+    for (final seg in segments) {
+      if (!seenPhases.contains(seg.phase)) {
+        seenPhases.add(seg.phase);
+        uniquePhases.add(seg.phase);
+      }
+    }
+
+    return Wrap(
+      spacing: 12,
+      runSpacing: 8,
+      children: uniquePhases.map((phase) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Point coloré
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: phase.activeColor,
+                shape: BoxShape.circle,
               ),
-              const SizedBox(width: 3),
-              // Label de la phase
-              Flexible(
-                child: Text(
-                  seg.phase.label,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontFamily: AppTextStyles.fontFamily,
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.w600,
-                    color: seg.phase.activeColor,
-                  ),
-                ),
+            ),
+            const SizedBox(width: 3),
+            // Label de la phase
+            Text(
+              phase.label,
+              style: TextStyle(
+                fontFamily: AppTextStyles.fontFamily,
+                fontSize: fontSize,
+                fontWeight: FontWeight.w600,
+                color: phase.activeColor,
               ),
-            ],
-          ),
+            ),
+          ],
         );
       }).toList(),
     );
