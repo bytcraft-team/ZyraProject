@@ -84,7 +84,7 @@ class _PostsFeedScreenState extends State<PostsFeedScreen> {
       ),
       bottomNavigationBar: widget.showCycleNav
           ? BottomNavBar(
-              selectedIndex: 5,
+              selectedIndex: 4,
               onTap: (i) {
                 // request MainShell to switch tab and return to it
                 appTabNotifier.value = i;

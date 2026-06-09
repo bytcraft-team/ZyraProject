@@ -12,9 +12,6 @@ import 'cycle1/views/daily_log/daily_log_screen.dart';
 import 'cycle1/views/calendar/fertility_calendar_screen.dart';
 import 'cycle1/views/education/phase_education_screen.dart';
 
-import 'cycle1/views/settings/cycle_settings_screen.dart';
-import 'cycle1/viewmodels/settings_viewmodel.dart';
-
 import 'widgets/bottom_nav_bar.dart';
 import 'app_tab_notifier.dart';
 
@@ -42,7 +39,6 @@ class _MainShellState extends State<MainShell> {
       DailyLogScreen(),
       FertilityCalendarScreen(),
       PhaseEducationScreen(),
-      CycleSettingsScreen(),
     ];
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -93,13 +89,6 @@ class _MainShellState extends State<MainShell> {
 
       case 3:
         // EducationViewModel n'a pas besoin d'init async
-        break;
-
-      case 4:
-        final settingsVm = context.read<SettingsViewModel>();
-        if (settingsVm.state == SettingsLoadState.idle) {
-          settingsVm.init();
-        }
         break;
     }
 

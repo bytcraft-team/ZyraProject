@@ -9,7 +9,6 @@ const List<String> _labels = [
   'Journal',
   'Calendrier',
   'Éducation',
-  'Paramaitre',
   'Posts',
   'Articles',
 ];
@@ -19,7 +18,6 @@ const List<IconData> _icons = [
   Icons.edit_note_rounded,
   Icons.calendar_month_rounded,
   Icons.today_rounded,
-  Icons.menu_book_rounded,
   Icons.people_alt_outlined,
   Icons.article_outlined,
 ];
@@ -144,7 +142,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
                       debugPrint('BottomNav tap -> $i');
-                      if (i < 5) {
+                      if (i < 4) {
                         widget.onTap(i);
                         return;
                       }
@@ -153,7 +151,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         return;
                       }
 
-                      if (i == 5) {
+                      if (i == 4) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -163,7 +161,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         return;
                       }
 
-                      if (i == 6) {
+                      if (i == 5) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(

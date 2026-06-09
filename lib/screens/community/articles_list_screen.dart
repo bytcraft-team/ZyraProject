@@ -74,7 +74,7 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
       ),
       bottomNavigationBar: widget.showCycleNav
           ? BottomNavBar(
-              selectedIndex: 6,
+              selectedIndex: 5,
               onTap: (i) {
                 appTabNotifier.value = i;
                 Navigator.popUntil(context, (r) => r.isFirst);
