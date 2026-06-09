@@ -82,45 +82,7 @@ class _LogHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              color: AppColors.pinkSoft,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.edit_note_rounded,
-              color: AppColors.pink,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Journal quotidien',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppColors.pink,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                _label(date),
-                style: const TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+      
     );
   }
 }

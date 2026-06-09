@@ -85,40 +85,7 @@ class _EducationHeader extends StatelessWidget {
         AppDimensions.md, AppDimensions.sm,
         AppDimensions.md, 0,
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              color: AppColors.pinkSoft,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.menu_book_rounded,
-              color: AppColors.pink,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.md),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Éducation',
-                style: AppTextStyles.cardLabel.copyWith(
-                  fontSize: 11,
-                  color: AppColors.pink,
-                ),
-              ),
-              Text(
-                'Comprendre ton cycle',
-                style: AppTextStyles.userName.copyWith(fontSize: 19),
-              ),
-            ],
-          ),
-        ],
-      ),
+      
     );
   }
 }
