@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/cycle_utils.dart';
 
 enum CyclePhase { rules, fertile, ovulation, luteal }
 
@@ -149,34 +150,17 @@ class CycleModel {
   CyclePhase getPhaseForDate(DateTime targetDate) {
     final date = DateTime(targetDate.year, targetDate.month, targetDate.day);
     final start = DateTime(startDate.year, startDate.month, startDate.day);
-    final ovul = DateTime(predictedOvulation.year, predictedOvulation.month, predictedOvulation.day);
-    final fertStart = DateTime(predictedFertilityStart.year, predictedFertilityStart.month, predictedFertilityStart.day);
-    final fertEnd = DateTime(predictedFertilityEnd.year, predictedFertilityEnd.month, predictedFertilityEnd.day);
+    final dayInCycle = CycleUtils.cycleDay(
+      date: date,
+      lastPeriodStart: start,
+      cycleDuration: cycleDuration,
+    );
 
-    // 1. Phase des Règles
-    final endOfPeriod = start.add(Duration(days: expectedPeriodDuration - 1));
-    if (date.isAtSameMomentAs(start) || (date.isAfter(start) && date.isBefore(endOfPeriod.add(const Duration(days: 1))))) {
-      return CyclePhase.rules;
-    }
-
-    // 2. Jour de l'Ovulation
-    if (date.isAtSameMomentAs(ovul)) {
-      return CyclePhase.ovulation;
-    }
-
-    // 3. Fenêtre Fertile (Autour de l'ovulation)
-    if ((date.isAfter(fertStart.subtract(const Duration(days: 1))) && date.isBefore(fertEnd.add(const Duration(days: 1))))) {
-      return CyclePhase.fertile;
-    }
-
-    // 4. Phase Lutéale (Après l'ovulation et avant les prochaines règles)
-    if (date.isAfter(ovul)) {
-      return CyclePhase.luteal;
-    }
-
-    // Par défaut, si on est entre les règles et la fertilité : Phase Folliculaire
-    // Tu peux utiliser la couleur fertile adoucie ou lutéale selon ton UI de repos.
-    return CyclePhase.luteal; 
+    return CycleUtils.phaseForDay(
+      day: dayInCycle,
+      cycleDuration: cycleDuration,
+      periodDuration: expectedPeriodDuration,
+    );
   }
 
   // Récupère la phase actuelle à l'instant T

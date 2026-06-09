@@ -39,24 +39,32 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
   }
 
   Future<void> _loadLog() async {
-    setState(() { _loading = true; });
+    if (mounted) {
+      setState(() { _loading = true; });
+    }
     try {
       final repo = DailyLogRepositoryImpl();
       final l = await repo.getLogForDate(widget.dayInfo.date);
-      setState(() { _log = l; _loading = false; });
+      if (mounted) {
+        setState(() { _log = l; _loading = false; });
+      }
     } catch (e) {
-      setState(() { _log = null; _loading = false; });
+      if (mounted) {
+        setState(() { _log = null; _loading = false; });
+      }
     }
   }
 
   Future<void> _onEdit() async {
     await DailyLogBottomSheet.show(context: context, date: widget.dayInfo.date, onSaved: () async {
       // After saving, try to refresh HomeViewModel and local log
-      try {
-        final homeVm = context.read<HomeViewModel>();
-        await homeVm.loadData();
-      } catch (_) {}
-      await _loadLog();
+      if (mounted) {
+        try {
+          final homeVm = context.read<HomeViewModel>();
+          await homeVm.loadData();
+        } catch (_) {}
+        await _loadLog();
+      }
     });
   }
 

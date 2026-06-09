@@ -155,7 +155,7 @@ class CalendarDayDetailSheet extends StatelessWidget {
                   label: 'Fertilité',
                   value: day.fertilityLevel.label,
                   icon: Icons.favorite_rounded,
-                  color: AppColors.pink,
+                  color: color,
                 ),
                 const Divider(height: AppDimensions.lg),
                 _InfoRow(

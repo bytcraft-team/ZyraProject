@@ -55,37 +55,16 @@ class CalendarRepositoryImpl implements CalendarRepository {
       final overriddenDays = built.days.map((d) {
         final key = d.date.toIso8601String().split('T')[0];
         final log = mapByDate[key];
-        if (log != null && log.status != null && log.status!.isNotEmpty) {
-          CyclePhase? mapped;
-          switch (log.status!.toLowerCase()) {
-            case 'menstruation':
-            case 'rules':
-              mapped = CyclePhase.rules;
-              break;
-            case 'fertile':
-              mapped = CyclePhase.fertile;
-              break;
-            case 'ovulation':
-              mapped = CyclePhase.ovulation;
-              break;
-            case 'luteal':
-              mapped = CyclePhase.luteal;
-              break;
-            default:
-              mapped = null;
-          }
-
-          if (mapped != null) {
-            return CalendarDay(
-              date: d.date,
-              dayInCycle: d.dayInCycle,
-              phase: mapped,
-              fertilityLevel: d.fertilityLevel,
-              isPredicted: false,
-              hasLoggedData: true,
-              isToday: d.isToday,
-            );
-          }
+        if (log != null) {
+          return CalendarDay(
+            date: d.date,
+            dayInCycle: d.dayInCycle,
+            phase: d.phase,
+            fertilityLevel: d.fertilityLevel,
+            isPredicted: d.isPredicted,
+            hasLoggedData: true,
+            isToday: d.isToday,
+          );
         }
         return d;
       }).toList();
@@ -152,54 +131,6 @@ class CalendarRepositoryImpl implements CalendarRepository {
         cycle,
         hasLoggedData: log != null,
       );
-
-      if (log != null && log.status != null && log.status!.isNotEmpty) {
-        switch (log.status!.toLowerCase()) {
-          case 'menstruation':
-          case 'rules':
-            return CalendarDay(
-              date: base.date,
-              dayInCycle: base.dayInCycle,
-              phase: CyclePhase.rules,
-              fertilityLevel: base.fertilityLevel,
-              isPredicted: false,
-              hasLoggedData: true,
-              isToday: base.isToday,
-            );
-          case 'fertile':
-            return CalendarDay(
-              date: base.date,
-              dayInCycle: base.dayInCycle,
-              phase: CyclePhase.fertile,
-              fertilityLevel: base.fertilityLevel,
-              isPredicted: false,
-              hasLoggedData: true,
-              isToday: base.isToday,
-            );
-          case 'ovulation':
-            return CalendarDay(
-              date: base.date,
-              dayInCycle: base.dayInCycle,
-              phase: CyclePhase.ovulation,
-              fertilityLevel: base.fertilityLevel,
-              isPredicted: false,
-              hasLoggedData: true,
-              isToday: base.isToday,
-            );
-          case 'luteal':
-            return CalendarDay(
-              date: base.date,
-              dayInCycle: base.dayInCycle,
-              phase: CyclePhase.luteal,
-              fertilityLevel: base.fertilityLevel,
-              isPredicted: false,
-              hasLoggedData: true,
-              isToday: base.isToday,
-            );
-          default:
-            return base;
-        }
-      }
 
       return base;
     } catch (e) {

@@ -130,64 +130,7 @@ class CycleRepositoryImpl implements CycleRepository {
       );
     });
 
-    // Charger les daily logs pour le mois et, si le log contient un champ `status`,
-    // surcharger la phase calculée par la phase issue des réponses utilisateur.
-    try {
-      final start = DateTime(month.year, month.month, 1);
-      final end = DateTime(month.year, month.month, daysInMonth);
-      final logs = await _dailyLogRepository.getLogsForRange(start, end);
-
-      final mapByDate = <String, DailyLogModel>{};
-      for (final l in logs) {
-        final key = l.date.toIso8601String().split('T')[0];
-        mapByDate[key] = l;
-      }
-
-      List<DayInfoModel> finalDays = rawDays.map((d) {
-        final key = d.date.toIso8601String().split('T')[0];
-        final log = mapByDate[key];
-        if (log != null && log.status != null && log.status!.isNotEmpty) {
-          // Mapper le status libre en CyclePhase
-          CyclePhase? mapped;
-          switch (log.status!.toLowerCase()) {
-            case 'menstruation':
-            case 'rules':
-            case 'menses':
-              mapped = CyclePhase.rules;
-              break;
-            case 'fertile':
-            case 'fertility':
-              mapped = CyclePhase.fertile;
-              break;
-            case 'ovulation':
-              mapped = CyclePhase.ovulation;
-              break;
-            case 'luteal':
-            case 'luteral':
-              mapped = CyclePhase.luteal;
-              break;
-            default:
-              mapped = null;
-          }
-
-          if (mapped != null) {
-            return DayInfoModel(
-              date: d.date,
-              dayInCycle: d.dayInCycle,
-              phase: mapped,
-              fertilityLevel: d.fertilityLevel,
-              isPredicted: false,
-            );
-          }
-        }
-        return d;
-      }).toList();
-
-      return finalDays;
-    } catch (e) {
-      debugPrint('Erreur lecture daily logs en getMonthDays: $e');
-      return rawDays;
-    }
+    return rawDays;
   }
 
   // getTodayBasalTemperature removed (temperature tracking disabled)

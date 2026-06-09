@@ -31,9 +31,11 @@ class CycleUtils {
     required DateTime lastPeriodStart,
     int cycleDuration = defaultCycleDuration,
   }) {
-    final daysSince = CycleDateUtils.daysSince(lastPeriodStart);
-    final day = (daysSince % cycleDuration) + 1;
-    return day.clamp(1, cycleDuration);
+    return cycleDay(
+      date: DateTime.now(),
+      lastPeriodStart: lastPeriodStart,
+      cycleDuration: cycleDuration,
+    ).clamp(1, cycleDuration);
   }
 
   /// Calcule le jour dans le cycle pour une date donnée
@@ -42,10 +44,10 @@ class CycleUtils {
     required DateTime lastPeriodStart,
     int cycleDuration = defaultCycleDuration,
   }) {
+    if (cycleDuration <= 0) return 1;
     final diff = CycleDateUtils.dateOnly(date)
         .difference(CycleDateUtils.dateOnly(lastPeriodStart))
         .inDays;
-    if (diff < 0) return 0; // Avant le début du cycle
     return (diff % cycleDuration) + 1;
   }
 
@@ -62,22 +64,18 @@ class CycleUtils {
     if (day < 1 || day > cycleDuration) return CyclePhase.luteal;
 
     final ovulationDay = _ovulationDay(cycleDuration);
-    final fertileStart = ovulationDay - 5;
 
     // 1. Phase des règles
     if (day <= periodDuration) return CyclePhase.rules;
-    
-    // 2. Fenêtre fertile (Phase folliculaire tardive)
-    if (day >= fertileStart && day <= ovulationDay - 1) return CyclePhase.fertile;
-    
-    // 3. Jour de l'ovulation
+
+    // 2. Jour de l'ovulation
     if (day == ovulationDay) return CyclePhase.ovulation;
-    
-    // 4. Phase folliculaire précoce (entre les règles et la fertilité)
-    if (day < fertileStart) return CyclePhase.fertile; 
-    
-    // 5. Phase lutéale (post-ovulation)
-    return CyclePhase.luteal;
+
+    // 3. Phase lutéale (post-ovulation)
+    if (day > ovulationDay) return CyclePhase.luteal;
+
+    // 4. Phase folliculaire et fenêtre fertile avant l'ovulation
+    return CyclePhase.fertile;
   }
 
   /// Jour d'ovulation estimé (14 jours avant les prochaines règles)
@@ -148,13 +146,15 @@ class CycleUtils {
     return CycleDateUtils.dateOnly(lastPeriodStart).add(Duration(days: ovDay - 6));
   }
 
-  /// Date de fin de la fenêtre fertile
+  /// Date de fin de la fenêtre fertile (incluant le jour d'ovulation)
   static DateTime fertileWindowEnd({
     required DateTime lastPeriodStart,
     int cycleDuration = defaultCycleDuration,
   }) {
-    final ovDay = _ovulationDay(cycleDuration);
-    return CycleDateUtils.dateOnly(lastPeriodStart).add(Duration(days: ovDay));
+    return ovulationDate(
+      lastPeriodStart: lastPeriodStart,
+      cycleDuration: cycleDuration,
+    );
   }
 
   /// Date d'ovulation estimée (Synchronisée sur ovDay)
@@ -177,8 +177,9 @@ class CycleUtils {
       lastPeriodStart: lastPeriodStart,
       cycleDuration: cycleDuration,
     );
-    final phase = phaseForDay(day: day, cycleDuration: cycleDuration);
-    return phase == CyclePhase.fertile || phase == CyclePhase.ovulation;
+    final ovulationDay = _ovulationDay(cycleDuration);
+    final fertileStart = ovulationDay - 5;
+    return day >= fertileStart && day <= ovulationDay;
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -197,8 +198,8 @@ class CycleUtils {
       case CyclePhase.fertile:
         final ovDay = _ovulationDay(cycleDuration);
         final fertileStart = ovDay - 5;
-        final dayInFertile = day - fertileStart;
-        if (dayInFertile <= 2) return FertilityLevel.medium;
+        if (day < fertileStart) return FertilityLevel.low;
+        if (day < ovDay - 1) return FertilityLevel.medium;
         return FertilityLevel.high;
       case CyclePhase.ovulation:
         return FertilityLevel.veryHigh;
