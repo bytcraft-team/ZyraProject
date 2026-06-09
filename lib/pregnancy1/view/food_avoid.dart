@@ -14,172 +14,80 @@ class FoodAvoidListScreen extends StatelessWidget {
 
   final List<Map<String, String>> foodData = const [
     {
-      "name": "Viande crue ou insuffisamment cuite",
-      "description": "Risque de toxoplasmose et d'infections bactériennes.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780676180/cover-r4x3w1200-5a58eaeba4206-043-belpress-00118164-007_bnuoib.jpg",
-    },
-    {
-      "name": "Viande hachée insuffisamment cuite",
-      "description":
-          "Peut contenir des bactéries dangereuses pour la grossesse.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Sushi et sashimi",
-      "description":
-          "Contiennent du poisson cru pouvant transmettre des parasites ou bactéries.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Huîtres crues",
-      "description": "Risque élevé d'infections alimentaires.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Moules crues",
-      "description": "Peuvent contenir des microorganismes nocifs.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Foie cru",
-      "description":
-          "Très riche en vitamine A, potentiellement dangereuse en excès.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Œufs crus ou peu cuits",
-      "description": "Risque de contamination par la salmonelle.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Mayonnaise maison à base d'œufs crus",
-      "description": "Peut contenir des bactéries dangereuses.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Tiramisu traditionnel",
-      "description": "Souvent préparé avec des œufs crus.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Lait cru",
-      "description": "Risque de listériose et autres infections.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Brie non pasteurisé",
-      "description": "Peut contenir la bactérie Listeria.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Camembert non pasteurisé",
-      "description": "Risque de listériose.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Roquefort non pasteurisé",
-      "description":
-          "À éviter s'il est fabriqué à partir de lait non pasteurisé.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Gorgonzola",
-      "description": "Peut présenter un risque microbiologique.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Requin",
-      "description": "Contient une forte concentration de mercure.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Espadon",
-      "description":
-          "Taux élevé de mercure pouvant affecter le développement du fœtus.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Maquereau royal",
-      "description": "À éviter en raison de sa teneur élevée en mercure.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Grande thonine",
-      "description": "Consommation déconseillée à cause du mercure.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Hot-dog non réchauffé",
-      "description": "Risque de contamination par Listeria.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Charcuterie froide",
-      "description": "À éviter sauf si bien chauffée.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Salami",
-      "description": "Peut contenir des bactéries ou parasites.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Pastrami froid",
-      "description": "Risque de listériose.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Alcool",
-      "description": "À éviter totalement pendant toute la grossesse.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Boissons énergétiques",
-      "description": "Contiennent beaucoup de caféine et de stimulants.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Excès de caféine",
-      "description": "Limiter à moins de 200 mg de caféine par jour.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Fruits non lavés",
-      "description": "Risque de toxoplasmose et d'autres infections.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
-    {
-      "name": "Légumes non lavés",
-      "description": "Peuvent contenir des parasites ou bactéries.",
-      "imageUrl":
-          "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg",
-    },
+  "name": "Viande crue ou insuffisamment cuite",
+  "description": "Risque de toxoplasmose et d'infections bactériennes.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Sushi et sashimi",
+  "description": "Contiennent du poisson cru pouvant transmettre des parasites ou bactéries.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Huîtres crues",
+  "description": "Risque élevé d'infections alimentaires.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Moules crues",
+  "description": "Peuvent contenir des microorganismes nocifs.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Foie (surtout en grande quantité)",
+  "description": "Très riche en vitamine A. Une consommation excessive est déconseillée pendant la grossesse.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Œufs crus ou peu cuits",
+  "description": "Risque de contamination par la salmonelle.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Mayonnaise maison à base d'œufs crus",
+  "description": "Peut contenir des bactéries dangereuses.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Tiramisu traditionnel",
+  "description": "Souvent préparé avec des œufs crus.",
+  "imageUrl": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9"
+},
+{
+  "name": "Lait cru",
+  "description": "Risque de listériose et autres infections.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Brie non pasteurisé",
+  "description": "Peut contenir la bactérie Listeria.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Alcool",
+  "description": "À éviter totalement pendant toute la grossesse.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Boissons énergétiques",
+  "description": "Contiennent beaucoup de caféine et de stimulants.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Excès de caféine",
+  "description": "Limiter à moins de 200 mg de caféine par jour.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Fruits non lavés",
+  "description": "Risque de toxoplasmose et d'autres infections.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+},
+{
+  "name": "Légumes non lavés",
+  "description": "Peuvent contenir des parasites ou bactéries.",
+  "imageUrl": "https://res.cloudinary.com/bf8hpkjr/image/upload/v1780176958/food_evite_tipps4.jpg"
+}
   ];
 
   @override

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../repositories/user_repository.dart';
+import '../../database/pregnancy_dao.dart';
+import '../../services/connectivity_service.dart';
 import '../services/week_data_service.dart';
 import '../services/pregnancy_calculator.dart';
 import '../models/week_info.dart';
@@ -9,6 +11,8 @@ enum PregnancyViewState { idle, loading, success, error }
 
 class PregnancyViewModel extends ChangeNotifier {
   final WeekDataService _weekDataService = WeekDataService();
+  final PregnancyDao _pregnancyDao = PregnancyDao();
+  final ConnectivityService _connectivityService = ConnectivityService();
   final UserRepository _userRepository;
 
   PregnancyViewModel({UserRepository? userRepository})
@@ -82,6 +86,7 @@ class PregnancyViewModel extends ChangeNotifier {
   Future<void> loadWeekInfo(int weekNumber) async {
     try {
       final adjustedWeek = PregnancyCalculator.validateWeekNumber(weekNumber);
+      final userId = _userRepository.currentUser?.uid;
 
       // Vérifier le cache d'abord
       if (_weekInfoCache.containsKey(adjustedWeek)) {
@@ -93,7 +98,36 @@ class PregnancyViewModel extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final weekInfo = await _weekDataService.fetchWeekInfo(adjustedWeek);
+      WeekInfo? weekInfo;
+      final hasInternet = await _connectivityService.hasInternetConnection();
+
+      if (hasInternet) {
+        weekInfo = await _weekDataService.fetchWeekInfo(adjustedWeek);
+        if (weekInfo != null && userId != null) {
+          await _pregnancyDao.saveWeekInfo(userId, adjustedWeek, {
+            'id': weekInfo.id,
+            'weekNumber': weekInfo.weekNumber,
+            'pregnancyInfo': weekInfo.pregnancyInfo,
+            'babyLengthCm': weekInfo.babyLengthCm,
+            'babyWeightGrams': weekInfo.babyWeightGrams,
+            'babyFruitComparison': weekInfo.babyFruitComparison,
+            'babyDevelopmentDetails': weekInfo.babyDevelopmentDetails,
+            'motherTips': weekInfo.motherTips,
+            'imageUrl': weekInfo.imageUrl,
+          });
+        }
+      }
+
+      if (weekInfo == null && userId != null) {
+        final localWeekInfo = await _pregnancyDao.getWeekInfo(
+          userId,
+          adjustedWeek,
+        );
+        if (localWeekInfo != null) {
+          weekInfo = WeekInfo.fromJson(localWeekInfo);
+        }
+      }
+
       if (weekInfo != null) {
         _currentWeekInfo = weekInfo;
         _weekInfoCache[adjustedWeek] = weekInfo;
@@ -196,7 +230,22 @@ class PregnancyViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = await _userRepository.loadPregnancyTracking();
+      final userId = _userRepository.currentUser?.uid;
+      if (userId == null) {
+        _state = PregnancyViewState.idle;
+        _errorMessage = null;
+        return;
+      }
+
+      final hasInternet = await _connectivityService.hasInternetConnection();
+      Map<String, dynamic>? data;
+
+      if (hasInternet) {
+        data = await _userRepository.loadPregnancyTracking();
+      }
+
+      data ??= await _pregnancyDao.loadPregnancyTracking(userId);
+
       if (data == null) {
         _state = PregnancyViewState.idle;
         _errorMessage = null;
@@ -204,11 +253,15 @@ class PregnancyViewModel extends ChangeNotifier {
         restoreFromFirestore(data);
         if (_pregnancyTracking != null) {
           await recalculateCurrentWeek();
+          await _pregnancyDao.savePregnancyTracking(
+            userId,
+            exportToFirestore(),
+          );
           _state = PregnancyViewState.success;
         }
       }
     } catch (e) {
-      _errorMessage = 'Erreur lors du chargement des données Firestore: $e';
+      _errorMessage = 'Erreur lors du chargement des données de grossesse: $e';
       _state = PregnancyViewState.error;
       debugPrint('Erreur loadTrackingFromFirestore: $e');
     } finally {

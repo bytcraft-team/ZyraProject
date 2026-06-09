@@ -2,16 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../database/pregnancy_dao.dart';
 import '../onboarding/onboarding_model.dart';
 import 'signup_request.dart';
 
 class UserRepository {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
+  final PregnancyDao _pregnancyDao;
 
   UserRepository({FirebaseAuth? auth, FirebaseFirestore? firestore})
     : _auth = auth ?? FirebaseAuth.instance,
-      _firestore = firestore ?? FirebaseFirestore.instance;
+      _firestore = firestore ?? FirebaseFirestore.instance,
+      _pregnancyDao = PregnancyDao();
 
   Stream<User?> authStateChanges() => _auth.authStateChanges();
 
@@ -152,6 +155,7 @@ class UserRepository {
         .collection('pregnancy')
         .doc(user.uid)
         .set(values, SetOptions(merge: true));
+    await _pregnancyDao.savePregnancyTracking(user.uid, values);
     await _firestore.collection('users').doc(user.uid).set({
       'isOnboarded': true,
       'mode': 'pregnancy',
@@ -323,7 +327,7 @@ class UserRepository {
           .get();
 
       return querySnapshot.docs
-          .map((doc) => {'docId': doc.id, ...?doc.data()})
+          .map((doc) => {'docId': doc.id, ...doc.data()})
           .toList();
     } catch (e) {
       debugPrint(
@@ -338,19 +342,25 @@ class UserRepository {
     final user = currentUser;
     if (user == null) throw StateError('Utilisateur non authentifié');
 
-    // Sauvegarde dans le document utilisateur principal
-    await _firestore.collection('users').doc(user.uid).set({
-      'pregnancyTracking': trackingData,
-      'updatedAt': DateTime.now().toIso8601String(),
-    }, SetOptions(merge: true));
+    try {
+      // Sauvegarde dans le document utilisateur principal
+      await _firestore.collection('users').doc(user.uid).set({
+        'pregnancyTracking': trackingData,
+        'updatedAt': DateTime.now().toIso8601String(),
+      }, SetOptions(merge: true));
 
-    // Aussi sauvegarde dans la sous-collection pregnancy pour accès rapide
-    await _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('pregnancy')
-        .doc(user.uid)
-        .set(trackingData, SetOptions(merge: true));
+      // Aussi sauvegarde dans la sous-collection pregnancy pour accès rapide
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('pregnancy')
+          .doc(user.uid)
+          .set(trackingData, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Erreur lors de la sauvegarde Firestore grossesse: $e');
+    }
+
+    await _pregnancyDao.savePregnancyTracking(user.uid, trackingData);
   }
 
   /// Charge les données de suivi de grossesse

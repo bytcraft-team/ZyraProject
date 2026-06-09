@@ -279,11 +279,22 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
               ),
             ),
             const SizedBox(width: 8),
-            Flexible(child: _inlineStat('2ème', 'Trimestre')),
+            Flexible(
+              child: _inlineStat(
+                _trimesterShortLabel(currentWeek),
+                'Trimestre',
+              ),
+            ),
           ],
         ),
       ],
     );
+  }
+
+  String _trimesterShortLabel(int weekNumber) {
+    if (weekNumber <= 13) return '1er';
+    if (weekNumber <= 27) return '2e';
+    return '3e';
   }
 
   Widget _inlineStat(String value, String label) => Container(
