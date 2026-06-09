@@ -71,9 +71,7 @@ class PregnancyModuleHeader extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const AiChatScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const AiChatScreen()),
                       );
                     },
                     borderRadius: BorderRadius.circular(50),
@@ -85,7 +83,7 @@ class PregnancyModuleHeader extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
-                        Icons.smart_toy, 
+                        Icons.smart_toy,
                         color: AppColors.offWhite,
                         size: 20,
                       ),

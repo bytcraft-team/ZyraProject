@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../viewmodels/education_viewmodel.dart';
+import '../shared_header.dart';
 import 'widgets/phase_tab_bar_widget.dart';
 import 'widgets/phase_illustration_widget.dart';
 import 'widgets/what_happens_widget.dart';
@@ -18,52 +19,55 @@ class PhaseEducationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<EducationViewModel>(
-      builder: (context, vm, _) {
+    return StickyPregnancyHeader(
+      title: 'Comprendre ton cycle',
+      child: Consumer<EducationViewModel>(
+        builder: (context, vm, _) {
+          return SafeArea(
+            top: false,
+            bottom: false,
+            child: Column(
+              children: [
+                // ── Header fixe ──────────────────────────────────
+                const _EducationHeader(),
 
-        return SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              // ── Header fixe ──────────────────────────────────
-              const _EducationHeader(),
+                // ── Tab Bar fixe ─────────────────────────────────
+                PhaseTabBarWidget(
+                  selectedIndex: vm.selectedTabIndex,
+                  onTabSelected: vm.selectTab,
+                ),
 
-              // ── Tab Bar fixe ─────────────────────────────────
-              PhaseTabBarWidget(
-                selectedIndex: vm.selectedTabIndex,
-                onTabSelected: vm.selectTab,
-              ),
+                const SizedBox(height: AppDimensions.sm),
 
-              const SizedBox(height: AppDimensions.sm),
-
-              // ── Contenu scrollable ───────────────────────────
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  switchInCurve: Curves.easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0.05, 0),
-                          end: Offset.zero,
-                        ).animate(animation),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: _EducationContent(
-                    key: ValueKey(vm.selectedTabIndex),
-                    vm: vm,
+                // ── Contenu scrollable ───────────────────────────
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0.05, 0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: _EducationContent(
+                      key: ValueKey(vm.selectedTabIndex),
+                      vm: vm,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -200,7 +204,7 @@ class _PhaseNavigationButtons extends StatelessWidget {
               label: const Text('Précédente'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: color,
-                side: BorderSide(color: color.withOpacity(0.4)),
+                side: BorderSide(color: color.withValues(alpha: 0.4)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius:

@@ -7,7 +7,7 @@ import '../../core/constants/app_dimensions.dart';
 import '../../data/models/settings_model.dart';
 import '../../viewmodels/home_viewmodel.dart';
 import '../../viewmodels/settings_viewmodel.dart';
-import 'widgets/header_widget.dart';
+import '../shared_header.dart';
 import 'widgets/phase_ring_widget.dart';
 import 'widgets/phase_chips_widget.dart';
 import 'widgets/info_cards_grid_widget.dart';
@@ -98,67 +98,63 @@ class _HomeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user  = vm.user!;
     final cycle = vm.cycle!;
 
-    return SafeArea(
-      bottom: false, // bottomNav gère l'espace bas
-      child: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                const SizedBox(height: AppDimensions.sm),
-                HeaderWidget(
-                  user: user,
-                  greeting: vm.greeting,
-                  onAvatarTap: () {},
-                ),
-                const SizedBox(height: AppDimensions.lg),
-                PhaseRingWidget(
-                  currentDay: cycle.currentDay,
-                  totalDays: cycle.cycleDuration,
-                  currentPhase: cycle.currentPhase,
-                  phaseDescription: cycle.currentPhase.description,
-                ),
-                const SizedBox(height: AppDimensions.lg),
-                PhaseChipsWidget(
-                  activePhase: cycle.currentPhase,
-                  onPhaseTap: (p) => PhaseDetailBottomSheet.show(context, p),
-                ),
-                const SizedBox(height: AppDimensions.lg),
-                InfoCardsGridWidget(
-                  daysUntilPeriod: cycle.daysUntilNextPeriod,
-                  nextPeriodDate: vm.nextPeriodDateFormatted,
-                  fertilityLevel: vm.todayFertility,
-                  cycleDuration: cycle.cycleDuration,
-                  isRegular: cycle.isRegular,
-                  periodDuration: cycle.expectedPeriodDuration,
-                ),
-                const SizedBox(height: AppDimensions.lg),
-                const SizedBox(height: AppDimensions.lg),
-                NextPeriodBannerWidget(
-                  nextPeriodDate: vm.nextPeriodDateFormatted,
-                  daysUntilPeriod: cycle.daysUntilNextPeriod,
-                  expectedDuration: cycle.expectedPeriodDuration,
-                  cycleProgress: vm.cycleProgress,
-                ),
-                const SizedBox(height: AppDimensions.lg),
-                // Dans MiniCalendarWidget :
-MiniCalendarWidget(
-  monthLabel: vm.selectedMonthLabel,
-  days: vm.monthDays,
-  today: DateTime.now(),
-  onDayTap: (d) => DayDetailBottomSheet.show(context, d),
-  onPreviousMonth: vm.previousMonth,
-  onNextMonth: vm.nextMonth,
-),
-                const SizedBox(height: 100), // espace pour bottomNav
-              ],
+    return StickyPregnancyHeader(
+      title: 'Suivi du cycle',
+      child: SafeArea(
+        top: false,
+        bottom: false, // bottomNav gère l'espace bas
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  const SizedBox(height: AppDimensions.sm),
+                  PhaseRingWidget(
+                    currentDay: cycle.currentDay,
+                    totalDays: cycle.cycleDuration,
+                    currentPhase: cycle.currentPhase,
+                    phaseDescription: cycle.currentPhase.description,
+                  ),
+                  const SizedBox(height: AppDimensions.lg),
+                  PhaseChipsWidget(
+                    activePhase: cycle.currentPhase,
+                    onPhaseTap: (p) => PhaseDetailBottomSheet.show(context, p),
+                  ),
+                  const SizedBox(height: AppDimensions.lg),
+                  InfoCardsGridWidget(
+                    daysUntilPeriod: cycle.daysUntilNextPeriod,
+                    nextPeriodDate: vm.nextPeriodDateFormatted,
+                    fertilityLevel: vm.todayFertility,
+                    cycleDuration: cycle.cycleDuration,
+                    isRegular: cycle.isRegular,
+                    periodDuration: cycle.expectedPeriodDuration,
+                  ),
+                  const SizedBox(height: AppDimensions.lg),
+                  const SizedBox(height: AppDimensions.lg),
+                  NextPeriodBannerWidget(
+                    nextPeriodDate: vm.nextPeriodDateFormatted,
+                    daysUntilPeriod: cycle.daysUntilNextPeriod,
+                    expectedDuration: cycle.expectedPeriodDuration,
+                    cycleProgress: vm.cycleProgress,
+                  ),
+                  const SizedBox(height: AppDimensions.lg),
+                  MiniCalendarWidget(
+                    monthLabel: vm.selectedMonthLabel,
+                    days: vm.monthDays,
+                    today: DateTime.now(),
+                    onDayTap: (d) => DayDetailBottomSheet.show(context, d),
+                    onPreviousMonth: vm.previousMonth,
+                    onNextMonth: vm.nextMonth,
+                  ),
+                  const SizedBox(height: 100), // espace pour bottomNav
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
