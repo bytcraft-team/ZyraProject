@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:zyra/pregnancy1/repositories/user_repository.dart';
 import 'package:zyra/pregnancy1/viewmodels/pregnancy_view_model.dart';
+import 'package:zyra/pregnancy1/view/shared_header.dart';
 import 'package:zyra/pregnancy1/view/shared_navigation.dart';
 import 'package:zyra/paramettres/services/local_notification_service.dart';
 
@@ -111,6 +112,7 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
   // ── State
   int _selectedMood = 2;
   bool _isSaving = false;
+  List<Map<String, dynamic>> _symptomHistory = [];
 
   // ── Moods (icon-based, no emojis)
   static const _moods = [
@@ -219,6 +221,7 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
     )..forward();
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
     _loadSavedSymptomsForToday();
+    _loadSymptomHistory();
   }
 
   Future<void> _loadSavedSymptomsForToday() async {
@@ -258,10 +261,23 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
 
   // ── Save
   Future<void> _save() async {
-    if (_isSaving) return;
+    debugPrint('[PAGE-SAVE] Bouton clic!');
+    if (_isSaving) {
+      debugPrint('[PAGE-SAVE] Deja en cours, skip');
+      return;
+    }
     HapticFeedback.mediumImpact();
 
     final tracking = context.read<PregnancyViewModel>().pregnancyTracking;
+
+    debugPrint('[PAGE-SAVE] === État des ${_symptoms.length} symptômes ===');
+    for (var i = 0; i < _symptoms.length; i++) {
+      final s = _symptoms[i];
+      debugPrint(
+        '[PAGE-SAVE]   [$i] ${s.label}: selected=${s.selected} intensity=${s.intensity}',
+      );
+    }
+
     final selectedSymptoms = _symptoms
         .where((symptom) => symptom.selected)
         .map(
@@ -272,6 +288,14 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
           },
         )
         .toList();
+
+    debugPrint('[PAGE-SAVE] === Après filtre ===');
+    debugPrint(
+      '[PAGE-SAVE] ${selectedSymptoms.length}/${_symptoms.length} symptômes sélectionnés',
+    );
+    for (final s in selectedSymptoms) {
+      debugPrint('[PAGE-SAVE]   → ${s['label']}: ${s['intensity']}');
+    }
 
     if (selectedSymptoms.isEmpty && _notes.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -291,6 +315,13 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
         body: 'Vos symptômes d\'aujourd\'hui ont été sauvegardés avec succès.',
       );
       final dateKey = DateTime.now().toIso8601String().split('T').first;
+      debugPrint(
+        '💾 Sauvegarde de ${selectedSymptoms.length} symptômes pour $dateKey',
+      );
+      debugPrint(
+        '📋 Symptômes: ${selectedSymptoms.map((s) => '${s['label']}(${s['intensity']})').join(', ')}',
+      );
+
       await _userRepository.savePregnancySymptoms(
         dateKey: dateKey,
         weekNumber: tracking?.currentWeek ?? 1,
@@ -301,11 +332,36 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
             tracking?.expectedDeliveryDate ??
             DateTime.now().add(const Duration(days: 280)),
       );
+      debugPrint('[PAGE-SAVE] savePregnancySymptoms appele');
+
+      debugPrint('[PAGE-SAVE] Sauvegarde Firestore OK');
+
+      // Vider les symptômes sélectionnés et réinitialiser l'interface
+      setState(() {
+        for (final symptom in _symptoms) {
+          symptom.selected = false;
+          symptom.intensity = 0.4;
+        }
+        _notes.clear();
+        _selectedMood = 2;
+      });
+      debugPrint('[PAGE-SAVE] Interface reinit OK');
+
+      // Recharger l'historique
+      await _loadSymptomHistory();
+      debugPrint('[PAGE-SAVE] Historique recharge OK');
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Enregistrement impossible: $e')));
+
+      debugPrint('[PAGE-SAVE] ERREUR: $e');
+      debugPrint('[PAGE-SAVE] Stack trace: ${StackTrace.current}');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
       setState(() => _isSaving = false);
       return;
     }
@@ -373,7 +429,7 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
       backgroundColor: _C.bg,
       body: Column(
         children: [
-          _buildHeader(),
+          const PregnancyModuleHeader(title: 'Suivi des symptômes'),
           Expanded(
             child: FadeTransition(
               opacity: _fadeAnim,
@@ -395,6 +451,8 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
                     _buildNotesCard(),
                     const SizedBox(height: 24),
                     _buildSaveButton(),
+                    const SizedBox(height: 16),
+                    _buildHistoryCard(),
                     const SizedBox(height: 8),
                   ],
                 ),
@@ -406,83 +464,6 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-      ),
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════════════════════════
-  // HEADER — original code preserved exactly
-  // ══════════════════════════════════════════════════════════════════════════════
-  Widget _buildHeader() {
-    return ClipPath(
-      clipper: _HeaderWaveClipper(),
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 120, 113, 220),
-              Color.fromARGB(255, 202, 134, 224),
-              Color.fromARGB(255, 227, 67, 134),
-            ],
-            stops: [0.0, 0.5, 1.0],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 14, bottom: 44),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                const Center(
-                  child: Text(
-                    'Suivi des symptômes',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 8,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.settings_outlined,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 16,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -815,6 +796,114 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
           ),
         ),
       ],
+    );
+  }
+
+  Future<void> _loadSymptomHistory() async {
+    final history = await _userRepository.loadPregnancySymptomsHistory();
+    if (!mounted) return;
+    debugPrint('📖 Historique chargé: ${history.length} entrées');
+    for (final entry in history) {
+      final symptoms = entry['symptoms'] as List<dynamic>? ?? [];
+      debugPrint('   - ${entry['dateKey']}: ${symptoms.length} symptômes');
+    }
+    setState(() => _symptomHistory = history);
+  }
+
+  Widget _buildHistoryCard() {
+    if (_symptomHistory.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return _PremiumCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CardHeader(
+            icon: Icons.history_rounded,
+            label: 'Historique des symptômes',
+            iconColor: _C.secondary,
+          ),
+          const SizedBox(height: 14),
+          Column(
+            children: _symptomHistory.map((entry) {
+              final dateKey =
+                  entry['dateKey'] as String? ??
+                  entry['docId'] as String? ??
+                  '';
+              final date = DateTime.tryParse(dateKey) ?? DateTime.now();
+              final symptoms =
+                  (entry['symptoms'] as List<dynamic>?)
+                      ?.whereType<Map<String, dynamic>>()
+                      .toList() ??
+                  [];
+              final symptomLabels = symptoms
+                  .map((item) => item['label']?.toString() ?? '')
+                  .where((label) => label.isNotEmpty)
+                  .toList();
+              final notes = (entry['notes'] as String?)?.trim();
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: _C.surfaceVar,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '${date.day}/${date.month}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: _C.onSurfaceMid,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            symptomLabels.isNotEmpty
+                                ? symptomLabels.join(' · ')
+                                : 'Aucune sélection',
+                            style: const TextStyle(
+                              color: _C.onSurface,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          if (notes != null && notes.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              notes,
+                              style: const TextStyle(
+                                color: _C.onSurfaceMid,
+                                fontSize: 12,
+                                height: 1.4,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1391,33 +1480,4 @@ class _CardHeader extends StatelessWidget {
       ],
     );
   }
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// ORIGINAL HEADER CLIPPER — preserved exactly
-// ══════════════════════════════════════════════════════════════════════════════
-class _HeaderWaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0, size.height - 20);
-    path.quadraticBezierTo(
-      size.width / 4,
-      size.height,
-      size.width / 2,
-      size.height - 20,
-    );
-    path.quadraticBezierTo(
-      size.width * 3 / 4,
-      size.height - 30,
-      size.width,
-      size.height - 10,
-    );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

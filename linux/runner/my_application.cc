@@ -51,13 +51,7 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
   } else {
     gtk_window_set_title(window, "zyra_flow");
-
-    gtk_header_bar_set_title(header_bar, "zyra");
-    gtk_header_bar_set_show_close_button(header_bar, TRUE);
-    gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
-  } else {
     gtk_window_set_title(window, "zyra");
->>>>>>> a7a5e75893cfae5fbe0ea8e49c247154ed0850a6
   }
 
   gtk_window_set_default_size(window, 1280, 720);

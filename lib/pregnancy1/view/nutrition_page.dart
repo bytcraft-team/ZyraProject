@@ -9,12 +9,16 @@ import 'nutrition_detail_page.dart';
 import 'shared_header.dart';
 import 'shared_navigation.dart';
 
-// ── Palette ───────────────────────────────────────────────────────────────────
-const Color kDeepViolet = Color(0xFF7C3AED);
-const Color kLavenderLight = Color(0xFFF5F0FF);
-const Color kPageBg = Color(0xFFFDF7FF);
-const Color kCardBorder = Color(0xFFF0E6FA);
-const Color kTextPrimary = Color(0xFF1C1C2E);
+// ── Palette rose-violet ───────────────────────────────────────────────────────
+const Color kViolet = Color(0xFF7C3AED);
+const Color kVioletMid = Color(0xFF9B5CF6);
+const Color kVioletLight = Color(0xFFEDE9FE);
+const Color kPink = Color(0xFFEC4899);
+const Color kPinkDeep = Color(0xFFBE185D);
+const Color kPinkLight = Color(0xFFFCE7F3);
+const Color kPinkBorder = Color(0xFFFBCFE8);
+const Color kPageBg = Color(0xFFFDF8FF);
+const Color kTextPrimary = Color(0xFF1A0A2E);
 const Color kTextMuted = Color(0xFF6B6880);
 const Color kTextHint = Color(0xFF9590A8);
 
@@ -117,52 +121,71 @@ class _HealthyNutritionPageState extends State<HealthyNutritionPage> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ← header original inchangé
-              const PregnancyModuleHeader(title: 'Nutrition de Grossesse'),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 20, 18, 48),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildStatRow(),
-                    const SizedBox(height: 16),
-                    _buildSummaryCard(),
-                    const SizedBox(height: 14),
-                    _buildAvoidFoodsCard(context),
-                    const SizedBox(height: 24),
-                    _buildSectionLabel('Catégorie nutritionnelle'),
-                    const SizedBox(height: 10),
-                    _buildCategoryChips(),
-                    const SizedBox(height: 24),
-                    _buildSectionLabel('Recommandations de la semaine'),
-                    const SizedBox(height: 10),
-                    _buildNutritionItemList(),
-                  ],
+      body: Column(
+        children: [
+          const PregnancyModuleHeader(title: 'Nutrition de Grossesse'),
+          Expanded(
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 22, 18, 56),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildStatRow(),
+                      const SizedBox(height: 18),
+                      _buildSummaryCard(),
+                      const SizedBox(height: 14),
+                      _buildAvoidFoodsCard(context),
+                      const SizedBox(height: 28),
+                      _buildSectionLabel('Catégorie nutritionnelle'),
+                      const SizedBox(height: 12),
+                      _buildCategoryChips(),
+                      const SizedBox(height: 28),
+                      _buildSectionLabel('Recommandations de la semaine'),
+                      const SizedBox(height: 12),
+                      _buildNutritionItemList(),
+                    ],
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  // ── Stat pills ─────────────────────────────────────────────────────────────
+  // ── Stat Row ───────────────────────────────────────────────────────────────
 
   Widget _buildStatRow() {
     return Row(
       children: [
-        _StatPill(value: '+300', label: 'kcal/jour'),
+        _StatPill(
+          value: '+300',
+          label: 'kcal / jour',
+          icon: Icons.local_fire_department_rounded,
+          iconColor: kViolet,
+          iconBg: kVioletLight,
+        ),
         const SizedBox(width: 10),
-        _StatPill(value: '71g', label: 'protéines'),
+        _StatPill(
+          value: '71g',
+          label: 'protéines',
+          icon: Icons.egg_alt_outlined,
+          iconColor: kPink,
+          iconBg: kPinkLight,
+        ),
         const SizedBox(width: 10),
-        _StatPill(value: '27mg', label: 'fer'),
+        _StatPill(
+          value: '27mg',
+          label: 'fer',
+          icon: Icons.opacity_rounded,
+          iconColor: kViolet,
+          iconBg: kVioletLight,
+        ),
       ],
     );
   }
@@ -170,50 +193,110 @@ class _HealthyNutritionPageState extends State<HealthyNutritionPage> {
   // ── Summary card ───────────────────────────────────────────────────────────
 
   Widget _buildSummaryCard() {
-    return _NiceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: _kGradientMain,
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: kViolet.withOpacity(0.30),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
+          ),
+          BoxShadow(
+            color: kPink.withOpacity(0.18),
+            blurRadius: 18,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _IconPill(
-                icon: Icons.eco_outlined,
-                bg: kLavenderLight,
-                color: kDeepViolet,
+          // Decorative orbs
+          Positioned(
+            top: -30,
+            right: -30,
+            child: Container(
+              width: 130,
+              height: 130,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.07),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
+            ),
+          ),
+          Positioned(
+            bottom: -20,
+            left: -20,
+            child: Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.06),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(22),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _CardLabel('Résumé nutritionnel'),
-                    const SizedBox(height: 4),
-                    Text(
-                      _viewModel.currentSummary,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: kTextPrimary,
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.20),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      child: const Icon(
+                        Icons.eco_rounded,
+                        color: Colors.white,
+                        size: 26,
+                      ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _viewModel.headerSubtitle,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: kTextMuted,
-                        height: 1.5,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _GradientLabel('Résumé nutritionnel'),
+                          const SizedBox(height: 5),
+                          Text(
+                            _viewModel.currentSummary,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              height: 1.35,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            _viewModel.headerSubtitle,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white.withOpacity(0.80),
+                              height: 1.55,
+                            ),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                _WeekProgressBar(week: _viewModel.effectiveWeek),
+              ],
+            ),
           ),
         ],
       ),
@@ -230,80 +313,98 @@ class _HealthyNutritionPageState extends State<HealthyNutritionPage> {
       ),
       child: Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFFFF0F7), Color(0xFFFDF4FF)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFFBCFE8), width: 0.8),
+          gradient: _kGradientCard,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: kPinkBorder, width: 1),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFE879A0).withOpacity(0.07),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+              color: kPink.withOpacity(0.10),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        padding: const EdgeInsets.all(18),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _IconPill(
-              icon: Icons.warning_amber_rounded,
-              bg: Color(0xFFFFE4EF),
-              color: Color(0xFFE11D6A),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _CardLabel(
-                    'Aliments à éviter',
-                    color: Color(0xFFE11D6A),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Risques pendant la grossesse',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: kTextPrimary,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: Stack(
+            children: [
+              Positioned(
+                right: -18,
+                bottom: -18,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [kPink.withOpacity(0.15), Colors.transparent],
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Découvrez les aliments qui peuvent présenter un risque pour vous et votre bébé.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: kTextMuted,
-                      height: 1.45,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: kDeepViolet,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Text(
-                      'Voir la liste complète →',
-                      style: TextStyle(
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 54,
+                      height: 54,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFEC4899), Color(0xFF7C3AED)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: kPink.withOpacity(0.30),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.no_food_rounded,
                         color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        size: 24,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _GradientTextLabel('Aliments à éviter'),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Risques pendant la grossesse',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: kTextPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Protégez votre bébé en évitant ces aliments.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: kTextMuted,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _GradientCircleArrow(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -319,31 +420,86 @@ class _HealthyNutritionPageState extends State<HealthyNutritionPage> {
         children: NutritionViewModel.categories.map((cat) {
           final selected = _viewModel.selectedCategory == cat;
           return Padding(
-            padding: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.only(right: 10),
             child: GestureDetector(
               onTap: () => _viewModel.updateCategory(cat),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: selected ? kDeepViolet : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: selected ? kDeepViolet : const Color(0xFFE9D5FF),
-                    width: 0.8,
-                  ),
-                ),
-                child: Text(
-                  _categoryLabel(cat),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: selected ? Colors.white : kDeepViolet,
-                  ),
-                ),
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeInOut,
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                child: selected
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 11,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: _kGradientMain,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: kViolet.withOpacity(0.30),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              _categoryIcon(cat),
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _categoryLabel(cat),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 11,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: kPinkBorder, width: 1.2),
+                        ),
+                        child: Row(
+                          children: [
+                            ShaderMask(
+                              shaderCallback: (b) =>
+                                  _kGradientMain.createShader(b),
+                              child: Icon(
+                                _categoryIcon(cat),
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            ShaderMask(
+                              shaderCallback: (b) =>
+                                  _kGradientMain.createShader(b),
+                              child: Text(
+                                _categoryLabel(cat),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
               ),
             ),
           );
@@ -383,14 +539,20 @@ class _HealthyNutritionPageState extends State<HealthyNutritionPage> {
   Widget _buildNutritionItemList() {
     final items = _viewModel.filteredList;
     if (items.isEmpty) {
-      return _NiceCard(
+      return Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          gradient: _kGradientSoft,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kPinkBorder, width: 1),
+        ),
         child: Row(
           children: const [
-            Icon(Icons.inbox_outlined, color: kTextHint, size: 20),
-            SizedBox(width: 10),
+            Icon(Icons.inbox_outlined, color: kTextHint, size: 22),
+            SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Aucun élément trouvé pour cette catégorie cette semaine.',
+                'Aucun élément pour cette catégorie cette semaine.',
                 style: TextStyle(color: kTextMuted, fontSize: 13),
               ),
             ),
@@ -400,143 +562,211 @@ class _HealthyNutritionPageState extends State<HealthyNutritionPage> {
     }
 
     return Column(
-      children: items.map((item) {
+      children: List.generate(items.length, (i) {
+        final item = items[i];
         return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: GestureDetector(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: _NutritionItemCard(
+            item: item,
+            index: i,
             onTap: () => _openDetail(item),
-            child: _NiceCard(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: SizedBox(
-                      width: 76,
-                      height: 76,
-                      child: Image.network(
-                        item.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) =>
-                            Container(color: const Color(0xFFF3E8FF)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                            color: kTextPrimary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item.shortBenefit,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: kTextHint,
-                            height: 1.45,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            _FoodTag(
-                              label: item.categoryLabel,
-                              bg: const Color(0xFFFDF2F8),
-                              fg: const Color(0xFFBE185D),
-                            ),
-                            const SizedBox(width: 6),
-                            _FoodTag(
-                              label: item.mealTypeLabel,
-                              bg: const Color(0xFFEEF2FF),
-                              fg: const Color(0xFF4338CA),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    size: 20,
-                    color: Color(0xFFD4AEFB),
-                  ),
-                ],
-              ),
-            ),
           ),
         );
-      }).toList(),
+      }),
     );
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
-  String _trimesterLabel(int? week) {
-    final w = week ?? _viewModel.effectiveWeek;
-    if (w <= 13) return '1er trimestre';
-    if (w <= 27) return '2e trimestre';
-    return '3e trimestre';
-  }
-
   Widget _buildSectionLabel(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: kTextMuted,
-        letterSpacing: 0.2,
-      ),
+    return Row(
+      children: [
+        ShaderMask(
+          shaderCallback: (b) => _kGradientMain.createShader(b),
+          child: Container(
+            width: 3,
+            height: 15,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: kTextMuted,
+            letterSpacing: 0.9,
+          ),
+        ),
+      ],
     );
   }
 }
 
-// ── Reusable widgets ──────────────────────────────────────────────────────────
+// ── Nutrition Item Card ───────────────────────────────────────────────────────
 
-class _StatPill extends StatelessWidget {
-  final String value;
-  final String label;
-  const _StatPill({required this.value, required this.label});
+class _NutritionItemCard extends StatelessWidget {
+  final NutritionModel item;
+  final VoidCallback onTap;
+  final int index;
+  const _NutritionItemCard({
+    required this.item,
+    required this.onTap,
+    required this.index,
+  });
+
+  // Alternating accent: odd = more rose, even = more violet
+  Color get _accentColor =>
+      index.isEven ? const Color(0xFF7C3AED) : const Color(0xFFEC4899);
+  Color get _accentBg =>
+      index.isEven ? const Color(0xFFEDE9FE) : const Color(0xFFFCE7F3);
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return GestureDetector(
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFF5F0FF), Color(0xFFFFF0F7)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: index.isEven ? const Color(0xFFEDE9FE) : kPinkBorder,
+            width: 1,
           ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFEDE9FE), width: 0.8),
+          boxShadow: [
+            BoxShadow(
+              color: _accentColor.withOpacity(0.08),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
-        child: Column(
+        child: Row(
           children: [
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: kDeepViolet,
+            // Image side with gradient overlay strip
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(22),
+                    bottomLeft: Radius.circular(22),
+                  ),
+                  child: SizedBox(
+                    width: 90,
+                    height: 98,
+                    child: Image.network(
+                      item.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: _accentBg,
+                        child: Icon(
+                          Icons.restaurant_outlined,
+                          color: _accentColor,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Thin gradient strip on right edge of image
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 6,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          _accentBg.withOpacity(0.5),
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 2,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        color: kTextPrimary,
+                        letterSpacing: -0.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      item.shortBenefit,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: kTextMuted,
+                        height: 1.45,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        _GradientTag(
+                          label: item.categoryLabel,
+                          gradient: _kGradientMain,
+                        ),
+                        const SizedBox(width: 6),
+                        _PlainTag(
+                          label: item.mealTypeLabel,
+                          bg: _accentBg,
+                          fg: _accentColor,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 3),
-            Text(label, style: const TextStyle(fontSize: 11, color: kTextHint)),
+            Padding(
+              padding: const EdgeInsets.only(right: 14),
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  gradient: _kGradientMain,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: _accentColor.withOpacity(0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 15,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -544,77 +774,220 @@ class _StatPill extends StatelessWidget {
   }
 }
 
-class _NiceCard extends StatelessWidget {
-  final Widget child;
-  final EdgeInsets? padding;
-  const _NiceCard({required this.child, this.padding});
+// ── Week Progress Bar ─────────────────────────────────────────────────────────
+
+class _WeekProgressBar extends StatelessWidget {
+  final int week;
+  const _WeekProgressBar({required this.week});
 
   @override
   Widget build(BuildContext context) {
+    final progress = (week / 40).clamp(0.0, 1.0);
+    final trimester = week <= 13
+        ? '1er'
+        : week <= 27
+        ? '2e'
+        : '3e';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Semaine $week · $trimester trimestre',
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.white.withOpacity(0.75),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              '${(progress * 100).round()}%',
+              style: const TextStyle(
+                fontSize: 11,
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Stack(
+          children: [
+            // Track
+            Container(
+              height: 6,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.22),
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            // Fill
+            FractionallySizedBox(
+              widthFactor: progress,
+              child: Container(
+                height: 6,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.50),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ── Stat Pill ─────────────────────────────────────────────────────────────────
+
+class _StatPill extends StatelessWidget {
+  final String value;
+  final String label;
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
+  const _StatPill({
+    required this.value,
+    required this.label,
+    required this.icon,
+    required this.iconColor,
+    required this.iconBg,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          gradient: _kGradientSoft,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: kPinkBorder, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: kPink.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                gradient: _kGradientMain,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: kViolet.withOpacity(0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Icon(icon, size: 16, color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+            ShaderMask(
+              shaderCallback: (b) => _kGradientMain.createShader(b),
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                color: kTextHint,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Gradient circle arrow ─────────────────────────────────────────────────────
+
+class _GradientCircleArrow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: padding ?? const EdgeInsets.all(18),
+      width: 36,
+      height: 36,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kCardBorder, width: 0.8),
+        gradient: _kGradientMain,
+        shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFB06AE3).withOpacity(0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: kPink.withOpacity(0.25),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: child,
+      child: const Icon(
+        Icons.chevron_right_rounded,
+        color: Colors.white,
+        size: 20,
+      ),
     );
   }
 }
 
-class _IconPill extends StatelessWidget {
-  final IconData icon;
-  final Color bg;
-  final Color color;
-  const _IconPill({required this.icon, required this.bg, required this.color});
+// ── Gradient tag (pill with gradient bg) ─────────────────────────────────────
+
+class _GradientTag extends StatelessWidget {
+  final String label;
+  final Gradient gradient;
+  const _GradientTag({required this.label, required this.gradient});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 48,
-      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(14),
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(10),
       ),
-      child: Icon(icon, color: color, size: 22),
-    );
-  }
-}
-
-class _CardLabel extends StatelessWidget {
-  final String text;
-  final Color? color;
-  const _CardLabel(this.text, {this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text.toUpperCase(),
-      style: TextStyle(
-        fontSize: 10,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.6,
-        color: color ?? kDeepViolet,
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
       ),
     );
   }
 }
 
-class _FoodTag extends StatelessWidget {
+class _PlainTag extends StatelessWidget {
   final String label;
   final Color bg;
   final Color fg;
-  const _FoodTag({required this.label, required this.bg, required this.fg});
+  const _PlainTag({required this.label, required this.bg, required this.fg});
 
   @override
   Widget build(BuildContext context) {

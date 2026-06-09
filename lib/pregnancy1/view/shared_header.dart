@@ -61,8 +61,8 @@ class PregnancyModuleHeader extends StatelessWidget {
                         Icons.settings_outlined,
                         color: AppColors.offWhite,
                         size: 20,
-                        ),
-                     ),
+                      ),
+                    ),
                   ),
                 ),
                 Positioned(
