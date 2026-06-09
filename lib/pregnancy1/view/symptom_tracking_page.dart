@@ -5,24 +5,9 @@ import 'package:zyra/pregnancy1/repositories/user_repository.dart';
 import 'package:zyra/pregnancy1/viewmodels/pregnancy_view_model.dart';
 import 'package:zyra/pregnancy1/view/shared_header.dart';
 import 'package:zyra/pregnancy1/view/shared_navigation.dart';
+import 'package:zyra/paramettres/services/local_notification_service.dart';
 
-// ══════════════════════════════════════════════════════════════════════════════
-// NOTE: Add to pubspec.yaml:
-//   dependencies:
-//     flutter:
-//       sdk: flutter
-//   flutter:
-//     fonts:
-//       - family: MaterialSymbols
-//         fonts:
-//           - asset: fonts/MaterialSymbolsRounded.ttf
-//
-// Material Symbols Rounded font: https://fonts.google.com/icons
-// All icons below use IconData with codepoints from Material Symbols Rounded.
-// ══════════════════════════════════════════════════════════════════════════════
 
-// ── Fallback: use standard Material Icons if MaterialSymbols font is unavailable
-// Simply replace _Sym.xxx → Icons.xxx equivalents throughout.
 
 // ══════════════════════════════════════════════════════════════════════════════
 // DESIGN TOKENS
@@ -113,7 +98,7 @@ class SymptomTrackingPage extends StatefulWidget {
 class _SymptomTrackingPageState extends State<SymptomTrackingPage>
     with TickerProviderStateMixin {
   // ── Nav
-  int _selectedIndex = 3;
+  final int _selectedIndex = 3;
   void _onItemTapped(int i) {
     if (i != _selectedIndex) navigateToPage(context, i);
   }
@@ -325,6 +310,10 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
 
     setState(() => _isSaving = true);
     try {
+      await LocalNotificationService.show(
+        title: 'Bilan enregistré ! ✨',
+        body: 'Vos symptômes d\'aujourd\'hui ont été sauvegardés avec succès.',
+      );
       final dateKey = DateTime.now().toIso8601String().split('T').first;
       debugPrint(
         '💾 Sauvegarde de ${selectedSymptoms.length} symptômes pour $dateKey',
@@ -363,6 +352,11 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
       debugPrint('[PAGE-SAVE] Historique recharge OK');
     } catch (e) {
       if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Enregistrement impossible: $e')));
+
       debugPrint('[PAGE-SAVE] ERREUR: $e');
       debugPrint('[PAGE-SAVE] Stack trace: ${StackTrace.current}');
       ScaffoldMessenger.of(
@@ -424,6 +418,7 @@ class _SymptomTrackingPageState extends State<SymptomTrackingPage>
       ),
     );
   }
+  
 
   // ══════════════════════════════════════════════════════════════════════════════
   // BUILD

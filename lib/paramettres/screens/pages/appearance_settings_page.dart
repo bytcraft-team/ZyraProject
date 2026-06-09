@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zyra/l10n/app_localizations.dart';
-import 'package:zyra/providers/appearance_provider.dart';
+import 'package:zyra/paramettres/providers/appearance_provider.dart';
 
 class AppearanceSettingsPage extends StatelessWidget {
   const AppearanceSettingsPage({super.key});
@@ -10,39 +10,60 @@ class AppearanceSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = Provider.of<AppearanceProvider>(context);
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    final primaryColor = provider.currentPrimaryColor;
+    final dividerColor = theme.dividerColor;
+    final cardColor = theme.cardColor;
 
     final List<Map<String, dynamic>> colorThemes = [
       {
-        'name': 'Rose doux',
+        'name': 'Zyra Rose',
         'sub': 'Par défaut',
-        'bg': const Color(0xFFFDEEF4),
-        'dot': const Color(0xFFC8698A),
+        'bg': const Color(0xFFFFE4F3),
+        'dot': const Color(0xFFE91E8C),
         'text': const Color(0xFF72243E),
         'sub_c': const Color(0xFF993556),
       },
       {
-        'name': 'Lavande',
-        'sub': 'Violet doux',
-        'bg': const Color(0xFFF0EEFE),
-        'dot': const Color(0xFF7F77DD),
-        'text': const Color(0xFF3C3489),
-        'sub_c': const Color(0xFF534AB7),
+        'name': 'Zyra Violet',
+        'sub': 'Élégant',
+        'bg': const Color(0xFFF3EEFF),
+        'dot': const Color(0xFF9B59B6),
+        'text': const Color(0xFF4B2B66),
+        'sub_c': const Color(0xFF6C3E85),
       },
       {
-        'name': 'Menthe',
-        'sub': 'Vert frais',
-        'bg': const Color(0xFFE1F5EE),
-        'dot': const Color(0xFF1D9E75),
-        'text': const Color(0xFF085041),
-        'sub_c': const Color(0xFF0F6E56),
+        'name': 'Lavande',
+        'sub': 'Relaxant',
+        'bg': const Color(0xFFF7F3FF),
+        'dot': const Color(0xFFB388EB),
+        'text': const Color(0xFF4E3A68),
+        'sub_c': const Color(0xFF73589A),
       },
       {
         'name': 'Pêche',
-        'sub': 'Chaud & doux',
-        'bg': const Color(0xFFFAECE7),
-        'dot': const Color(0xFFD85A30),
-        'text': const Color(0xFF712B13),
-        'sub_c': const Color(0xFF993C1D),
+        'sub': 'Chaleureux',
+        'bg': const Color(0xFFFFF0E8),
+        'dot': const Color(0xFFFF8A65),
+        'text': const Color(0xFF7A3E2A),
+        'sub_c': const Color(0xFFA8553A),
+      },
+      {
+        'name': 'Menthe',
+        'sub': 'Santé',
+        'bg': const Color(0xFFE8F8F2),
+        'dot': const Color(0xFF26A69A),
+        'text': const Color(0xFF0C5A52),
+        'sub_c': const Color(0xFF15756B)
+      },
+      {
+        'name': 'Night',
+        'sub': 'Premium',
+        'bg': const Color(0xFF2D1B3D),
+        'dot': const Color(0xFF9B59B6),
+        'text': Colors.white,
+        'sub_c': const Color(0xFFD6C6E5),
       },
     ];
 
@@ -59,9 +80,9 @@ class AppearanceSettingsPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: provider.currentPrimaryColor,
+        backgroundColor: primaryColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(
@@ -86,7 +107,7 @@ class AppearanceSettingsPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: provider.currentPrimaryColor,
+              color: primaryColor,
               borderRadius: BorderRadius.circular(18),
             ),
             child: Row(
@@ -131,13 +152,13 @@ class AppearanceSettingsPage extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
             l10n.colorTheme.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFFB06080),
+              fontWeight: FontWeight.w600,
+              color: primaryColor.withOpacity(0.8), 
               letterSpacing: 0.7,
             ),
           ),
@@ -167,8 +188,8 @@ class AppearanceSettingsPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: selected
-                          ? provider.currentPrimaryColor
-                          : const Color(0xFFF2D6E4),
+                          ? primaryColor
+                          : dividerColor.withOpacity(0.3), // 🚀 حدود غير المختار تصبح متناسقة ديناميكياً
                       width: selected ? 2 : 1,
                     ),
                   ),
@@ -208,10 +229,10 @@ class AppearanceSettingsPage extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             l10n.displayMode.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFFB06080),
+              fontWeight: FontWeight.w600,
+              color: primaryColor.withOpacity(0.8), // 🚀 يتبع اللون المختار
               letterSpacing: 0.7,
             ),
           ),
@@ -232,13 +253,13 @@ class AppearanceSettingsPage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
                       color: selected
-                          ? provider.currentPrimaryColor.withOpacity(0.15)
-                          : Theme.of(context).cardColor,
+                          ? primaryColor.withOpacity(0.15)
+                          : cardColor,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: selected
-                            ? provider.currentPrimaryColor
-                            : const Color(0xFFF2D6E4),
+                            ? primaryColor
+                            : dividerColor.withOpacity(0.3), // 🚀 يتبع الثيم
                         width: selected ? 2 : 1,
                       ),
                     ),
@@ -254,11 +275,8 @@ class AppearanceSettingsPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             color: selected
-                                ? provider.currentPrimaryColor
-                                : Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .color,
+                                ? primaryColor
+                                : theme.textTheme.bodyMedium?.color,
                             fontWeight: selected
                                 ? FontWeight.w500
                                 : FontWeight.normal,
@@ -274,20 +292,20 @@ class AppearanceSettingsPage extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             l10n.appLanguage.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFFB06080),
+              fontWeight: FontWeight.w600,
+              color: primaryColor.withOpacity(0.8),
               letterSpacing: 0.7,
             ),
           ),
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color: cardColor,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: const Color(0xFFF2D6E4),
+                color: dividerColor.withOpacity(0.3), 
               ),
             ),
             child: Column(
@@ -318,17 +336,14 @@ class AppearanceSettingsPage extends StatelessWidget {
                                 languages[i]['name']!,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .color,
+                                  color: theme.textTheme.bodyMedium?.color,
                                 ),
                               ),
                             ),
                             if (selected)
                               Icon(
                                 Icons.check,
-                                color: provider.currentPrimaryColor,
+                                color: primaryColor,
                                 size: 18,
                               ),
                           ],
@@ -336,11 +351,11 @@ class AppearanceSettingsPage extends StatelessWidget {
                       ),
                     ),
                     if (i < languages.length - 1)
-                      const Divider(
+                      Divider(
                         height: 0.5,
                         thickness: 0.5,
                         indent: 52,
-                        color: Color(0xFFF5E0EC),
+                        color: dividerColor.withOpacity(0.3), // 🚀 خط فاصل متناسق
                       ),
                   ],
                 );
@@ -355,14 +370,14 @@ class AppearanceSettingsPage extends StatelessWidget {
                   content: Text(
                     l10n.appearanceUpdated,
                   ),
-                  backgroundColor: provider.currentPrimaryColor,
+                  backgroundColor: primaryColor,
                 ),
               );
 
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: provider.currentPrimaryColor,
+              backgroundColor: primaryColor,
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(

@@ -66,7 +66,7 @@ class BabyGrowthPage extends StatefulWidget {
 }
 
 class _BabyGrowthPageState extends State<BabyGrowthPage> {
-  int _selectedIndex = 1;
+  final int _selectedIndex = 1;
 
   void _onItemTapped(int index) {
     if (index != _selectedIndex) navigateToPage(context, index);
@@ -253,7 +253,7 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
                 child: Image.asset(
                   babyWeekAsset(currentWeek),
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Center(
+                  errorBuilder: (_, _, _) => const Center(
                     child: Text('🫶', style: TextStyle(fontSize: 48)),
                   ),
                 ),
@@ -805,7 +805,7 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
               child: Image.asset(
                 babyWeekAsset(midWeek),
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Center(
+                errorBuilder: (_, _, _) => Center(
                   child: Text(
                     _weekEmoji(midWeek),
                     style: const TextStyle(fontSize: 26),
@@ -890,7 +890,7 @@ class _BabyGrowthContentState extends State<BabyGrowthContent> {
                 child: Image.asset(
                   babyWeekAsset(w),
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Center(
+                  errorBuilder: (_, _, _) => Center(
                     child: Text(
                       _weekEmoji(w),
                       style: const TextStyle(fontSize: 40),

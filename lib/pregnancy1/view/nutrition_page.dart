@@ -51,7 +51,7 @@ class _HealthyNutritionPageState extends State<HealthyNutritionPage> {
   late PregnancyViewModel _pregnancyViewModel;
   bool _isInitialized = false;
   bool _hasPregnancyListener = false;
-  int _selectedIndex = 2;
+  final int _selectedIndex = 2;
 
   @override
   void didChangeDependencies() {
@@ -563,12 +563,13 @@ class _HealthyNutritionPageState extends State<HealthyNutritionPage> {
 
     return Column(
       children: List.generate(items.length, (i) {
+        final item = items[i];
         return Padding(
           padding: const EdgeInsets.only(bottom: 14),
           child: _NutritionItemCard(
-            item: items[i],
+            item: item,
             index: i,
-            onTap: () => _openDetail(items[i]),
+            onTap: () => _openDetail(item),
           ),
         );
       }),
