@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../viewmodels/calendar_viewmodel.dart';
+import '../shared_header.dart';
 import 'widgets/calendar_header_widget.dart';
 import 'widgets/calendar_legend_widget.dart';
 import 'widgets/calendar_grid_widget.dart';
@@ -130,71 +131,75 @@ class _CalendarBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: AppDimensions.sm),
+    return StickyPregnancyHeader(
+      title: 'Calendrier de fertilité',
+      child: SafeArea(
+        top: false,
+        bottom: false,
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: AppDimensions.sm),
 
-                // ── 1. Header navigation mois ─────────────────
-                CalendarHeaderWidget(
-                  monthLabel: vm.monthLabel,
-                  onPrevious: vm.previousMonth,
-                  onNext: vm.nextMonth,
-                ),
-
-                const SizedBox(height: AppDimensions.sm),
-
-                // ── 2. Légende des couleurs ───────────────────
-                const CalendarLegendWidget(),
-
-                const SizedBox(height: AppDimensions.md),
-
-                // ── 3. Grille du calendrier ───────────────────
-                CalendarGridWidget(
-                  calendarMonth: vm.calendarMonth!,
-                  onDayTap: (day) =>
-                      CalendarDayDetailSheet.show(context, day),
-                ),
-
-                const SizedBox(height: AppDimensions.lg),
-
-                // ── 4. Analyse intelligente du cycle ───────────
-                if (vm.stats != null)
-                  CycleAnalysisWidget(vm: vm),
-
-                const SizedBox(height: AppDimensions.lg),
-
-                // ── 5. Timeline du cycle ──────────────────────
-                if (vm.timeline.isNotEmpty)
-                  CycleTimelineWidget(
-                    segments: vm.timeline,
-                    currentDay: vm.currentCycleDay,
-                    cycleDuration: vm.cycleDuration,
+                  // ── 1. Header navigation mois ─────────────────
+                  CalendarHeaderWidget(
+                    monthLabel: vm.monthLabel,
+                    onPrevious: vm.previousMonth,
+                    onNext: vm.nextMonth,
                   ),
 
-                const SizedBox(height: AppDimensions.lg),
+                  const SizedBox(height: AppDimensions.sm),
 
-                // ── 6. Statistiques ───────────────────────────
-                if (vm.stats != null)
-                  StatsCardsWidget(stats: vm.stats!),
+                  // ── 2. Légende des couleurs ───────────────────
+                  const CalendarLegendWidget(),
 
-                const SizedBox(height: AppDimensions.lg),
+                  const SizedBox(height: AppDimensions.md),
 
-                // ── 7. Conseil contextuel ─────────────────────
-                AdviceCardWidget(advice: vm.currentAdvice),
+                  // ── 3. Grille du calendrier ───────────────────
+                  CalendarGridWidget(
+                    calendarMonth: vm.calendarMonth!,
+                    onDayTap: (day) =>
+                        CalendarDayDetailSheet.show(context, day),
+                  ),
 
-                // Espace pour la bottomNav
-                const SizedBox(height: 100),
-              ],
+                  const SizedBox(height: AppDimensions.lg),
+
+                  // ── 4. Analyse intelligente du cycle ───────────
+                  if (vm.stats != null)
+                    CycleAnalysisWidget(vm: vm),
+
+                  const SizedBox(height: AppDimensions.lg),
+
+                  // ── 5. Timeline du cycle ──────────────────────
+                  if (vm.timeline.isNotEmpty)
+                    CycleTimelineWidget(
+                      segments: vm.timeline,
+                      currentDay: vm.currentCycleDay,
+                      cycleDuration: vm.cycleDuration,
+                    ),
+
+                  const SizedBox(height: AppDimensions.lg),
+
+                  // ── 6. Statistiques ───────────────────────────
+                  if (vm.stats != null)
+                    StatsCardsWidget(stats: vm.stats!),
+
+                  const SizedBox(height: AppDimensions.lg),
+
+                  // ── 7. Conseil contextuel ─────────────────────
+                  AdviceCardWidget(advice: vm.currentAdvice),
+
+                  // Espace pour la bottomNav
+                  const SizedBox(height: 100),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

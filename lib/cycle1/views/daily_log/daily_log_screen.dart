@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../viewmodels/daily_log_viewmodel.dart';
+import '../shared_header.dart';
 import 'widgets/date_strip_widget.dart';
 import 'widgets/flow_intensity_widget.dart';
 import 'widgets/symptoms_grid_widget.dart';
@@ -18,9 +19,12 @@ class DailyLogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DailyLogViewModel>(
+    return StickyPregnancyHeader(
+      title: 'Journal quotidien',
+      child: Consumer<DailyLogViewModel>(
         builder: (context, vm, _) {
           return SafeArea(
+            top: false,
             bottom: false,
             child: Column(
               children: [
@@ -51,7 +55,7 @@ class DailyLogScreen extends StatelessWidget {
             ),
           );
         },
-      
+      ),
     );
   }
 }
