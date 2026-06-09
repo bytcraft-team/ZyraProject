@@ -30,6 +30,14 @@ class PregnancyDao {
     }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
+  /// حفظ أو تحديث بيانات الحمل المحلية
+  Future<int> savePregnancyTracking(
+    String userId,
+    Map<String, dynamic> pregnancyData,
+  ) {
+    return insertOrReplace(userId, pregnancyData);
+  }
+
   /// الحصول على بيانات الحمل للمستخدم
   Future<Map<String, dynamic>?> getByUserId(String userId) async {
     final db = await _dbHelper.database;
@@ -49,6 +57,11 @@ class PregnancyDao {
       print('خطأ في فك تشفير بيانات الحمل: $e');
       return null;
     }
+  }
+
+  /// تحميل بيانات الحمل المحلية للمستخدم
+  Future<Map<String, dynamic>?> loadPregnancyTracking(String userId) {
+    return getByUserId(userId);
   }
 
   /// تحديث بيانات الحمل
