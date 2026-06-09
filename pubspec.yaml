@@ -61,6 +61,7 @@ dependencies:
   google_generative_ai: ^0.4.7
   firebase_messaging: ^15.2.10
   share_plus: ^13.1.0
+  flutter_launcher_icons: ^0.14.4
 
 
 dev_dependencies:
@@ -95,6 +96,7 @@ flutter:
     - assets/images/
     - assets/imagesBaby/
     - assets/nutrition.json
+    - assets/images/logo.png
 
      
 
@@ -123,3 +125,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
